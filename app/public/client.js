@@ -20,4 +20,9 @@ client.controller('home', ['$scope', '$rootScope', function($scope, $rootScope) 
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
     $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
 
+    //submit button function
+    $scope.submit = function() {
+        console.log('submit pressed');
+    }
+
 }]);

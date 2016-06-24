@@ -1,17 +1,22 @@
 <h1>Login Test Page</h1>
+<div id="errorMessages">
+    <div ng-show="loginForm.usernameInput.$touched">
+        <div ng-show="loginForm.usernameInput.$error.required">Please input a username.</div>
+    </div>
+
+    <div ng-show="loginForm.passwordInput.$touched">
+        <div ng-show="loginForm.passwordInput.$error.required">Please input a password.</div>
+        <div ng-show="loginForm.passwordInput.$error.pattern">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
+    </div>
+</div>
 <form novalidate class="loginForm" name="loginForm" ng-submit="submit()">
     <div id="username">
         <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
-        <div ng-show="loginForm.usernameInput.$touched">
-            <div ng-show="loginForm.usernameInput.$error.required">You need to input a username.</div>
-        </div>
+
     </div>
     <div id="password">
         <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-pattern="regex">
-        <div ng-show="loginForm.passwordInput.$touched">
-            <div ng-show="loginForm.passwordInput.$error.required">You need to input a password.</div>
-            <div ng-show="loginForm.passwordInput.$error.pattern">Your password should be at least 8 characters, contain at least one number and at least one letter.</div>
-        </div>
+
     </div>
-    <input type="button" value="Log In" id ="loginButton" name="loginButton" ng-model="loginButton" ng-disabled="!passwordInput">
+    <button type="submit" id="submitButton" name="inputButton" ng-disabled="!passwordInput">Log In</button>
 </form>
