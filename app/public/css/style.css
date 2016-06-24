@@ -1,0 +1,15 @@
+.loginForm input[type='text'].ng-invalid.ng-touched {
+    background-color: #FA787E;
+}
+
+.loginForm input[type='text'].ng-valid.ng-touched {
+    background-color: #78FA89;
+}
+
+.loginForm input[type='password'].ng-invalid.ng-touched {
+    background-color: #FA787E;
+}
+
+.loginForm input[type='password'].ng-valid.ng-touched {
+    background-color: #78FA89;
+}

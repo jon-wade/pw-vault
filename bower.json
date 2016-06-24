@@ -1,0 +1,16 @@
+{
+  "name": "pw-vault",
+  "description": "Secure password storage and retrieval app",
+  "main": "app/index.js",
+  "authors": [
+    "Jon Wade"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/jon-wade/pw-vault",
+  "dependencies": {
+    "crypto-js": "^3.1.6",
+    "angular": "^1.5.7",
+    "angular-route": "^1.5.7",
+    "normalize-css": "normalize.css#^4.1.1"
+  }
+}
