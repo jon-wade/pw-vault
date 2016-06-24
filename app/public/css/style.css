@@ -1,4 +1,7 @@
-div#errorMessages {
-    font-size: 0.5em;
+div.errorMessages {
+    margin: 10px;
+    padding: 20px;
+    font-size: 0.75em;
     background-color: #FFDCEE;
+    width: 200px;
 }

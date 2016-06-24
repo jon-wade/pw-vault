@@ -1,14 +1,14 @@
 <h1>Login Test Page</h1>
-<div id="errorMessages">
-    <div ng-show="loginForm.usernameInput.$touched">
-        <div ng-show="loginForm.usernameInput.$error.required">Please input a username.</div>
-    </div>
 
-    <div ng-show="loginForm.passwordInput.$touched">
-        <div ng-show="loginForm.passwordInput.$error.required">Please input a password.</div>
-        <div ng-show="loginForm.passwordInput.$error.pattern">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
-    </div>
+<div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required">
+    <div ng-show="loginForm.usernameInput.$error.required">Please input a username.</div>
 </div>
+
+<div class="errorMessages" ng-show="(loginForm.passwordInput.$touched && loginForm.passwordInput.$error.required) || (loginForm.passwordInput.$touched && loginForm.passwordInput.$error.pattern) ">
+    <div ng-show="loginForm.passwordInput.$error.required">Please input a password.</div>
+    <div ng-show="loginForm.passwordInput.$error.pattern">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
+</div>
+
 <form novalidate class="loginForm" name="loginForm" ng-submit="submit()">
     <div id="username">
         <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
