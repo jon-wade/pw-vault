@@ -21,13 +21,14 @@ describe('client.js unit test', function() {
             expect(rootScope.title).toBe('Password Vault | Home');
         });
 
-        it('$scope.submit() shoudl return true', function() {
-            expect(scope.submit()).toBe(true);
-        });
 
         it('$scope.regex should be ^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$ which constrains password field', function() {
             expect(scope.regex).toBe('^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
         })
+
+        it('$scope.submit() should return true', function() {
+            expect(scope.submit()).toBe(true);
+        });
     });
 
     //home route
