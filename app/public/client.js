@@ -22,7 +22,8 @@ client.controller('home', ['$scope', '$rootScope', function($scope, $rootScope) 
 
     //submit button function
     $scope.submit = function() {
-        console.log('submit pressed');
+        //console.log('submit pressed');
+        return true;
     }
 
 }]);
