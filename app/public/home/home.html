@@ -1,15 +1,15 @@
 <h1>Login Test Page</h1>
 
-<div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required">
+<div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">
     <div ng-show="loginForm.usernameInput.$error.required">Please input a username.</div>
 </div>
 
 <div class="errorMessages" ng-show="(loginForm.passwordInput.$touched && loginForm.passwordInput.$error.required) || (loginForm.passwordInput.$touched && loginForm.passwordInput.$error.pattern) ">
-    <div ng-show="loginForm.passwordInput.$error.required">Please input a password.</div>
-    <div ng-show="loginForm.passwordInput.$error.pattern">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
+    <div ng-show="loginForm.passwordInput.$error.required" id="passwordMissing">Please input a password.</div>
+    <div ng-show="loginForm.passwordInput.$error.pattern" id="passwordInvalid">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
 </div>
 
-<form novalidate class="loginForm" name="loginForm" ng-submit="submit()">
+<form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
     <div id="username">
         <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
 
@@ -18,5 +18,5 @@
         <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-pattern="regex">
 
     </div>
-    <button type="submit" id="submitButton" name="inputButton" ng-disabled="!passwordInput">Log In</button>
+    <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput">Log In</button>
 </form>
