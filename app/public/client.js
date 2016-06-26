@@ -23,7 +23,15 @@ client.controller('home', ['$scope', '$rootScope', function($scope, $rootScope) 
     //submit button function
     $scope.submit = function() {
         //console.log('submit pressed');
+
+        var usernameHash = CryptoJS.SHA256($scope.usernameInput);
+        console.log(usernameHash.toString());
+
+        var passwordHash = CryptoJS.SHA256($scope.passwordInput);
+        console.log(passwordHash.toString());
+
         return true;
-    }
+    };
+
 
 }]);
