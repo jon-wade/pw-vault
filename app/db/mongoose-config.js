@@ -1,18 +1,17 @@
 //mongoose/mongodb set-up
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/pw-vault');
 
-var pUser = mongoose.Schema({
-    //TODO : insert schema here
-    'username': {type: String, minlength: 64, unique: true},
-    'password': {type: String, 'minlength': 64}
+exports.environment = {
+    production: "",
+    development: "mongodb://localhost:27017/pw-vault-dev",
+    test: "mongodb://localhost:27018/pw-vault-test"
+};
+
+var User = mongoose.Schema({
+    username: {type: String, minlength: 64, unique: true, required: true},
+    password: {type: String, minlength: 64, required: true},
+    email: {type: String, minlength:64, unique: true, required: true}
 });
 
-exports.pUser = mongoose.model('production-user', pUser);
+exports.user = mongoose.model('user', User);
 
-var tUser = mongoose.Schema({
-    'username': {type: String, minlength: 64, unique: true},
-    'password': {type: String, 'minlength': 64}
-});
-
-exports.tUser = mongoose.model('test-user', tUser);

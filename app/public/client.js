@@ -32,6 +32,11 @@ client.controller('home', ['$scope', '$rootScope', function($scope, $rootScope) 
         console.log(passwordHash.toString());
         console.log(passwordHash.toString().length);
 
+        //test code
+        var emailHash = CryptoJS.SHA256('jonwadeuk@gmail.com');
+        console.log(emailHash.toString());
+        console.log(emailHash.toString().length);
+
         //TODO: now need to call /login endpoint
 
         //this return is for unit testing
