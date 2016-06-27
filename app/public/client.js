@@ -13,18 +13,14 @@ client.service('idStore', function () {
     };
 });
 
-client.service('apiGET', ['$http', '$cacheFactory', function($http, $cacheFactory) {
+client.service('apiPOST', ['$http', function($http) {
      return {
         callAPI: function(url, data) {
             return $http({
+                method: 'POST',
                 url: url,
-                data: data,
-                method: 'GET',
-                cache: true
+                data: data
             });
-        },
-        callCache: function(url, data) {
-            return $cacheFactory.get('$http').get(url, data);
         }
     };
 }]);
@@ -42,7 +38,7 @@ client.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
-client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiGET', function($scope, $rootScope, idStore, apiGET) {
+client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', function($scope, $rootScope, idStore, apiPOST) {
     //set the page title
     $rootScope.title = 'Password Vault | Home';
 
@@ -55,11 +51,24 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiGET', function
 
         //TODO: need to unit-test the hash functions
 
-        var usernameHash = CryptoJS.SHA256($scope.usernameInput);
-        var passwordHash = CryptoJS.SHA256($scope.passwordInput);
+        var usernameHash = CryptoJS.SHA256($scope.usernameInput).toString();
+        var passwordHash = CryptoJS.SHA256($scope.passwordInput).toString();
 
-        //TODO: now need to call /login endpoint
-        //apiGET.callAPI('/login', {username: usernameHash, password: passwordHash});
+        //TODO: now need to call /login endpoint and unit test
+
+        apiPOST.callAPI('/login-test', {username: usernameHash, password: passwordHash}).then(function(res) {
+            //login credentials are OK and can progress to manager page
+            //grab id from response object
+            console.log('res=', res);
+
+        }, function(rej) {
+            //login credentials are not OK and an error message should be displayed
+            console.log('rej=', rej);
+            if(rej.status === 404){
+                $scope.loginInvalid = true;
+            }
+        });
+
 
 
 

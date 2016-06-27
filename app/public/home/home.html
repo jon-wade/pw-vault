@@ -9,6 +9,8 @@
     <div ng-show="loginForm.passwordInput.$error.pattern" id="passwordInvalid">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
 </div>
 
+<div class="errorMessages" ng-show="loginInvalid">Login error: username and/or password invalid. Please try again.</div>
+
 <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
     <div id="username">
         <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
