@@ -4,6 +4,21 @@
 describe('client.js unit test', function() {
     beforeEach(module('client'));
 
+    //idStore service
+    describe('idStore service unit test', function() {
+
+        it('should return an empty string when calling get_id...', inject(function(idStore){
+            var res = idStore.get_id();
+            expect(res).toBe('');
+        }));
+
+        it('should return the correct id when calling get_id after set_id...', inject(function(idStore){
+            idStore.set_id('abcd1234');
+            var res = idStore.get_id();
+            expect(res).toBe('abcd1234');
+        }));
+    });
+
     //home controller
     describe('home controller unit test', function() {
         var ctrl, scope, rootScope;
@@ -67,9 +82,5 @@ describe('client.js unit test', function() {
 
 
     });
-
-
-
-
 
 });

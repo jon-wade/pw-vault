@@ -1,5 +1,18 @@
 var client = angular.module('client', ['ngRoute']);
 
+client.service('idStore', function () {
+    var _id = '';
+
+    return {
+        get_id: function () {
+            return _id;
+        },
+        set_id: function(value) {
+            _id = value;
+        }
+    };
+});
+
 client.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when('/',
@@ -13,7 +26,7 @@ client.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
-client.controller('home', ['$scope', '$rootScope', function($scope, $rootScope) {
+client.controller('home', ['$scope', '$rootScope', 'idStore', function($scope, $rootScope, idStore) {
     //set the page title
     $rootScope.title = 'Password Vault | Home';
 
@@ -23,6 +36,8 @@ client.controller('home', ['$scope', '$rootScope', function($scope, $rootScope) 
     //submit button function
     $scope.submit = function() {
         //console.log('submit pressed');
+
+        //TODO: need to unit-test the hash functions
 
         var usernameHash = CryptoJS.SHA256($scope.usernameInput);
         console.log(usernameHash.toString());
