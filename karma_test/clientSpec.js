@@ -19,6 +19,30 @@ describe('client.js unit test', function() {
         }));
     });
 
+    //apiGET service
+    describe('apiGET service unit test', function(){
+
+        it('should successfully return data object when data message matches an existing username and password...', inject(function(apiGET, $rootScope, $httpBackend) {
+            var response = {
+                status: 200,
+                id: '12345'
+            };
+
+            $httpBackend.expect('GET', '/login', {username: 'jon'}).respond(response);
+            apiGET.callAPI('/login', {username: 'jon'}).then(function(res) {
+                //console.log(res);
+                expect(res.data.status).toBe(200);
+                expect(res.data.id).toBe('12345');
+                //expect(res.data).toBe(response);
+            });
+            $rootScope.$digest();
+            $httpBackend.flush();
+            //expect(login).toBe(true);
+            $httpBackend.verifyNoOutstandingRequest();
+        }));
+
+    });
+
     //home controller
     describe('home controller unit test', function() {
         var ctrl, scope, rootScope;

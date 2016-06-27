@@ -13,6 +13,23 @@ client.service('idStore', function () {
     };
 });
 
+//TODO: unit test apiGET function
+client.service('apiGET', ['$http', '$cacheFactory', function($http, $cacheFactory) {
+     return {
+        callAPI: function(url, data) {
+            return $http({
+                url: url,
+                data: data,
+                method: 'GET',
+                cache: true
+            });
+        },
+        callCache: function(url, data) {
+            return $cacheFactory.get('$http').get(url, data);
+        }
+    };
+}]);
+
 client.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when('/',
@@ -26,7 +43,7 @@ client.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
-client.controller('home', ['$scope', '$rootScope', 'idStore', function($scope, $rootScope, idStore) {
+client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiGET', function($scope, $rootScope, idStore, apiGET) {
     //set the page title
     $rootScope.title = 'Password Vault | Home';
 
@@ -40,19 +57,17 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', function($scope, $
         //TODO: need to unit-test the hash functions
 
         var usernameHash = CryptoJS.SHA256($scope.usernameInput);
-        console.log(usernameHash.toString());
-        console.log(usernameHash.toString().length);
-
         var passwordHash = CryptoJS.SHA256($scope.passwordInput);
-        console.log(passwordHash.toString());
-        console.log(passwordHash.toString().length);
-
-        //test code
-        var emailHash = CryptoJS.SHA256('jonwadeuk@gmail.com');
-        console.log(emailHash.toString());
-        console.log(emailHash.toString().length);
 
         //TODO: now need to call /login endpoint
+        //apiGET.callAPI('/login', {username: usernameHash, password: passwordHash});
+
+
+
+
+
+
+
 
         //this return is for unit testing
         return true;
