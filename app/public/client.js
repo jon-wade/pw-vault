@@ -13,7 +13,6 @@ client.service('idStore', function () {
     };
 });
 
-//TODO: unit test apiGET function
 client.service('apiGET', ['$http', '$cacheFactory', function($http, $cacheFactory) {
      return {
         callAPI: function(url, data) {
@@ -61,11 +60,6 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiGET', function
 
         //TODO: now need to call /login endpoint
         //apiGET.callAPI('/login', {username: usernameHash, password: passwordHash});
-
-
-
-
-
 
 
 

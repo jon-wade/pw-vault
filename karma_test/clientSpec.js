@@ -24,16 +24,15 @@ describe('client.js unit test', function() {
 
         it('should successfully return data object when data message matches an existing username and password...', inject(function(apiGET, $rootScope, $httpBackend) {
             var response = {
-                status: 200,
                 id: '12345'
             };
 
-            $httpBackend.expect('GET', '/login', {username: 'jon'}).respond(response);
+            $httpBackend.expect('GET', '/login', {username: 'jon'}).respond(200, response, null, 'success');
             apiGET.callAPI('/login', {username: 'jon'}).then(function(res) {
                 //console.log(res);
-                expect(res.data.status).toBe(200);
+                expect(res.status).toBe(200);
                 expect(res.data.id).toBe('12345');
-                //expect(res.data).toBe(response);
+                expect(res.statusText).toBe('success');
             });
             $rootScope.$digest();
             $httpBackend.flush();
