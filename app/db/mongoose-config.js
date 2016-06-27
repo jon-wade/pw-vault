@@ -1,4 +1,6 @@
 //mongoose/mongodb set-up
+
+//TODO: Needs to be unit tested
 var mongoose = require('mongoose');
 
 var environment = {

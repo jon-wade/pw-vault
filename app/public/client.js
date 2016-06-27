@@ -54,12 +54,16 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', functio
         var usernameHash = CryptoJS.SHA256($scope.usernameInput).toString();
         var passwordHash = CryptoJS.SHA256($scope.passwordInput).toString();
 
-        //TODO: now need to call /login endpoint and unit test
-
         apiPOST.callAPI('/login-test', {username: usernameHash, password: passwordHash}).then(function(res) {
-            //login credentials are OK and can progress to manager page
-            //grab id from response object
+
+            //login credentials are OK
             console.log('res=', res);
+
+            //grab id from response object and store
+            idStore.set_id(res.data._id);
+
+            //TODO: redirect to manager page
+
 
         }, function(rej) {
             //login credentials are not OK and an error message should be displayed
@@ -69,10 +73,7 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', functio
             }
         });
 
-
-
-
-        //this return is for unit testing
+        //this return is for unit testing the submit() method
         return true;
     };
 

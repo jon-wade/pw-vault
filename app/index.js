@@ -1,9 +1,8 @@
 var express = require('express');
-var db = require('./db/database.js');
-var mongooseConfig = require('./db/mongoose-config.js');
 var login = require('./utils/login.js');
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
+var mongooseConfig = require('./db/mongoose-config.js');
 
 //web server
 var app = express();
@@ -15,8 +14,10 @@ app.get('/', function(req, res) {
     res.sendFile('/public/index.html');
 });
 
+//TODO: Needs to be unit tested...perhaps by E2E test as login.check has been unit tested
+
 app.post('/login-test', jsonParser, function(req, res) {
-    login.check(req.body.username, req.body.password)
+    login.check(req.body.username, req.body.password, mongooseConfig.userDev)
         .then(function(success) {
             res.status(200).send(success);
         }, function(error) {
