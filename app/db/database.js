@@ -34,11 +34,11 @@ var controller = {
         return new Promise(function(resolve, reject){
             schema.findOneAndUpdate(item, content, function(err, res){
                 if(err){
-                    console.log('Error updating data: ', err);
+                    //console.log('Error updating data: ', err);
                     reject(err);
                 }
                 else {
-                    console.log('Updating: ', item, ' and found: ', res);
+                    //console.log('Updating: ', item, ' and found: ', res);
                     resolve(res);
                 }
             });
