@@ -1,10 +1,10 @@
 var express = require('express');
-var mg = require('mongoose');
+var mongoose = require('mongoose');
 var db = require('./db/database.js');
-var mongoose = require('./db/mongoose-config.js');
+var mongooseConfig = require('./db/mongoose-config.js');
 
-//connect to the dev db server
-mg.connect(mongoose.environment.development);
+//clean the dev database
+db.controller.delete({}, mongooseConfig.userDev);
 
 //web server
 var app = express();
