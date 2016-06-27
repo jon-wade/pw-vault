@@ -27,10 +27,17 @@ client.service('apiPOST', ['$http', function($http) {
 
 client.config(function($routeProvider, $locationProvider) {
     $routeProvider
+
         .when('/',
             {
                 templateUrl: './home/home.html',
                 controller: 'home'
+            })
+
+        .when('/manager',
+            {
+                templateUrl: './manager/manager.html',
+                controller: 'manager'
             })
 
         .otherwise({redirectTo: '/'});
@@ -38,7 +45,7 @@ client.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
-client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', function($scope, $rootScope, idStore, apiPOST) {
+client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$location', function($scope, $rootScope, idStore, apiPOST, $location) {
     //set the page title
     $rootScope.title = 'Password Vault | Home';
 
@@ -62,7 +69,8 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', functio
             //grab id from response object and store
             idStore.set_id(res.data._id);
 
-            //TODO: redirect to manager page
+            //redirect to the /manager page
+            $location.path('/manager');
 
 
         }, function(rej) {
@@ -78,4 +86,10 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', functio
     };
 
 
+}]);
+
+//TODO: manager controller needs to be unit tested
+client.controller('manager', ['$scope', function($scope) {
+    //manager controller code here
+    $rootScope.title = 'Password Vault | Manager';
 }]);

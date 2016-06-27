@@ -69,8 +69,8 @@ describe('client.js unit test', function() {
         });
     });
 
-    //home route
-    describe('home route unit test', function() {
+    //routing tests
+    describe('routing unit test', function() {
         it('should load the home template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
             $httpBackend.whenGET('./home/home.html').respond('...');
 
@@ -103,7 +103,23 @@ describe('client.js unit test', function() {
 
         }));
 
+        it('should load the manager template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
+            $httpBackend.whenGET('./manager/manager.html').respond('...');
+
+            $rootScope.$apply(function() {
+                $location.path('/manager');
+            });
+
+            $httpBackend.flush();
+            expect($route.current.controller).toBe("manager");
+            expect($route.current.loadedTemplateUrl).toBe("./manager/manager.html");
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
 
     });
+
 
 });

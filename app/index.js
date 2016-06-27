@@ -10,12 +10,7 @@ var app = express();
 //this serves all the static assets
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', function(req, res) {
-    res.sendFile('/public/index.html');
-});
-
 //TODO: Needs to be unit tested...perhaps by E2E test as login.check has been unit tested
-
 app.post('/login-test', jsonParser, function(req, res) {
     login.check(req.body.username, req.body.password, mongooseConfig.userDev)
         .then(function(success) {
@@ -25,9 +20,8 @@ app.post('/login-test', jsonParser, function(req, res) {
         });
 });
 
-//the following block needs to be at the bottom and handles routing for any pages
-//that don't exist - the browser is sent back the home page, index.html, in that case
-app.get('/*', function(req, res) {
+//this sends request for endpoints that don't exist back to angular for routing (as well as dealing with error pages)
+app.get('*', function(req, res) {
     res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 
