@@ -89,7 +89,11 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 }]);
 
 //TODO: manager controller needs to be unit tested
-client.controller('manager', ['$scope', function($scope) {
+client.controller('manager', ['$scope', 'idStore', '$rootScope', function($scope, idStore, $rootScope) {
     //manager controller code here
+    $scope._id = idStore.get_id();
+
     $rootScope.title = 'Password Vault | Manager';
+
+
 }]);
