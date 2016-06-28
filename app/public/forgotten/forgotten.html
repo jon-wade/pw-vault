@@ -1,5 +1,15 @@
 <h1 id="title">I've forgotten my...</h1>
-<h2>Username</h2>
-<h2>Password</h2>
-<button type="button">Help Me!</button>
+<h2 id="username" ng-click="toggle('username')">Username</h2>
+<h2 id="password" ng-click="toggle('password')">Password</h2>
+<form ng-show="email" name="emailForm" id="emailForm" novalidate ng-submit="submit()">
+    <label for="emailInput">Enter registered email address</label>
+    <input type="email" ng-model="emailInput" name="emailInput" id="emailInput" required email>
+    <span ng-show="emailForm.emailInput.$pending.email">Checking email for validity...</span>
+    <span ng-show="emailForm.emailInput.$error.email">This email is not registered!</span>
+    <span ng-show="emailInput && (!emailForm.emailInput.$pending.email && !emailForm.emailInput.$error.email)">Success!</span>
+</form>
+
+<br>
+<button id="helpMe" type="button" ng-disabled="!emailInput">Help Me!</button>
+<br>
 <button id="back" ng-click="go('/')">Back</button>

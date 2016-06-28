@@ -13,6 +13,34 @@ client.service('idStore', function () {
     };
 });
 
+//TODO: unit test directive
+client.directive('email', function($q, $timeout) {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            var email = ['jonwadeuk@gmail.com'];
+
+            ctrl.$asyncValidators.email = function(modelValue) {
+
+                var def = $q.defer();
+
+                $timeout(function() {
+                    // Mock a delayed response
+                    if (email.indexOf(modelValue) !== -1) {
+                        // The username is valid
+                        def.resolve();
+                    } else {
+                        def.reject();
+                    }
+
+                }, 2000);
+
+                return def.promise;
+            };
+        }
+    };
+});
+
 client.service('apiPOST', ['$http', function($http) {
      return {
         callAPI: function(url, data) {
@@ -124,6 +152,36 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
     $scope.go = function (destination) {
         $location.path(destination);
+    };
+
+    //TODO: need to unit test toggle function
+    $scope.username = true;
+    $scope.password = false;
+    $scope.email = false;
+
+    $scope.toggle = function(input) {
+        if($scope.username===true && input==='username') {
+            $scope.username = true;
+            $scope.password = false;
+            $scope.email = true;
+        }
+        else if ($scope.username===false && input==='username') {
+            $scope.username = !$scope.username;
+            $scope.password = !$scope.password;
+            $scope.email = true;
+        }
+        else if ($scope.password===true && input==='password') {
+            $scope.username = false;
+            $scope.password = true;
+            $scope.email = false;
+
+        }
+        else if ($scope.password===false && input==='password') {
+            $scope.username = !$scope.username;
+            $scope.password = !$scope.password;
+            $scope.email = false;
+
+        }
     }
 
 
