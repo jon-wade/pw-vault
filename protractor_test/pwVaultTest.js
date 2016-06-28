@@ -13,10 +13,21 @@ describe('pw-vault E2E test', function() {
         browser.get(ROOT + '/');
         element(by.css('#usernameInput')).sendKeys('jonwade');
         element(by.css('#passwordInput')).sendKeys('abcd1234');
+        element(by.css('#submitButton')).click()
+            .then(function() {
+                expect(element(by.css('#title')).getText()).toBe('Password Vault');
+            });
+    });
+
+    it('should return to the homepage from the manager page on clicking logout...', function() {
+        browser.get(ROOT + '/');
+        element(by.css('#usernameInput')).sendKeys('jonwade');
+        element(by.css('#passwordInput')).sendKeys('abcd1234');
         element(by.css('#submitButton')).click();
-
-        //TODO: complete the login E2E test here
-
+        element(by.css('#logoutButton')).click()
+            .then(function() {
+                expect(element(by.css('#title')).getText()).toBe('Password Vault');
+            });
     });
 
     it('should display an error on invalid password when field loses focus...', function() {
@@ -61,5 +72,40 @@ describe('pw-vault E2E test', function() {
                 expect(element(by.css('#usernameMissing')).getText()).toBe('Please input a username.');
             });
     });
+
+    it('should access the forgotten page when the forgotten link is clicked...', function() {
+        browser.get(ROOT + '/');
+        element(by.css('#forgotten')).click()
+            .then(function() {
+                expect(element(by.css('#title')).getText()).toBe("I've forgotten my...");
+            });
+    });
+
+    it('should return to the home page from the forgotten page when the back button is clicked...', function() {
+        browser.get(ROOT + '/');
+        element(by.css('#forgotten')).click();
+        element(by.css('#back')).click()
+            .then(function() {
+                expect(element(by.css('#title')).getText()).toBe("Password Vault");
+            });
+    });
+
+    it('should access the register page when the register link is clicked...', function() {
+        browser.get(ROOT + '/');
+        element(by.css('#registerLink')).click()
+            .then(function() {
+                expect(element(by.css('#title')).getText()).toBe("Registration");
+            });
+    });
+
+    it('should access the register page when the register button is clicked...', function() {
+        browser.get(ROOT + '/');
+        element(by.css('#registerButton')).click()
+            .then(function() {
+                expect(element(by.css('#title')).getText()).toBe("Registration");
+            });
+    });
+
+
 
 });

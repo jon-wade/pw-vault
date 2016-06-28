@@ -40,14 +40,12 @@ client.config(function($routeProvider, $locationProvider) {
                 controller: 'manager'
             })
 
-        //TODO: unit test forgotten routing
         .when('/forgotten',
             {
                 templateUrl: './forgotten/forgotten.html',
                 controller: 'forgotten'
             })
 
-        //TODO: unit test register routing
         .when('/register',
             {
                 templateUrl: './register/register.html',
@@ -67,7 +65,6 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
     $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
 
-    //TODO: unit test go redirect function
     $scope.go = function (destination) {
         $location.path(destination);
     };
@@ -106,28 +103,25 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 
 }]);
 
-//TODO: manager controller needs to be unit tested
 client.controller('manager', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
     //manager controller code here
     $scope._id = idStore.get_id();
 
     $rootScope.title = 'Password Vault | Manager';
 
-    //TODO: unit test logout redirect function
+
     $scope.logout = function () {
-        idStore.set_id = '';
+        idStore.set_id('');
         $location.path('/');
     };
 
 
 }]);
 
-//TODO: forgotten controller needs to be unit tested
 client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
 
     $rootScope.title = 'Password Vault | Forgotten';
 
-    //TODO: unit test go redirect function
     $scope.go = function (destination) {
         $location.path(destination);
     }
@@ -135,12 +129,10 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
 }]);
 
-//TODO: register controller needs to be unit tested
 client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
 
     $rootScope.title = 'Password Vault | Register';
 
-    //TODO: unit test go redirect function
     $scope.go = function (destination) {
         $location.path(destination);
     }

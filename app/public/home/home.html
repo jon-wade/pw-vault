@@ -1,11 +1,11 @@
 <div id="welcome">
-    <h1>Password Vault</h1>
+    <h1 id="title">Password Vault</h1>
     <h2>Only ever memorise one password!</h2>
     <p>Securely store all your passwords using an internationally recognised, hyper-secure encryption algorithm, AES.</p>
     <p>The encryption key is neither stored by the app nor sent over the internet. Only you know it, EVER, and it’s the ONLY thing you have to remember to securely store ALL your online passwords.</p>
-    <button ng-click="go('/register')">Register</button>
+    <button id="registerButton" ng-click="go('/register')">Register</button>
     <br>
-    <a href="/register">New to Password Vault? Click this link or the register button above.</a>
+    <a id="registerLink" href="/register">New to Password Vault? Click this link or the register button above.</a>
 </div>
 <div id="login">
     <h1>Login</h1>
@@ -32,5 +32,5 @@
         <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput">Log In</button>
     </form>
 
-    <a href="/forgotten">Forgotten your PV username or password?</a>
+    <a id="forgotten" href="/forgotten">Forgotten your PV username or password?</a>
 </div>
