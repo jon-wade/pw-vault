@@ -47,6 +47,14 @@ client.config(function($routeProvider, $locationProvider) {
                 controller: 'forgotten'
             })
 
+        //TODO: unit test register routing
+        .when('/register',
+            {
+                templateUrl: './register/register.html',
+                controller: 'register'
+            })
+
+
         .otherwise({redirectTo: '/'});
 
     $locationProvider.html5Mode(true);
@@ -99,11 +107,17 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 }]);
 
 //TODO: manager controller needs to be unit tested
-client.controller('manager', ['$scope', 'idStore', '$rootScope', function($scope, idStore, $rootScope) {
+client.controller('manager', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
     //manager controller code here
     $scope._id = idStore.get_id();
 
     $rootScope.title = 'Password Vault | Manager';
+
+    //TODO: unit test logout redirect function
+    $scope.logout = function () {
+        idStore.set_id = '';
+        $location.path('/');
+    };
 
 
 }]);
@@ -112,6 +126,21 @@ client.controller('manager', ['$scope', 'idStore', '$rootScope', function($scope
 client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
 
     $rootScope.title = 'Password Vault | Forgotten';
+
+    //TODO: unit test go redirect function
+    $scope.go = function (destination) {
+        $location.path(destination);
+    }
+
+
+}]);
+
+//TODO: register controller needs to be unit tested
+client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
+
+    $rootScope.title = 'Password Vault | Register';
+
+    //TODO: unit test go redirect function
     $scope.go = function (destination) {
         $location.path(destination);
     }
