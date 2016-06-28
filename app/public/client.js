@@ -59,6 +59,11 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
     $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
 
+    //TODO: unit test go redirect function
+    $scope.go = function (destination) {
+        $location.path(destination);
+    };
+
     //submit button function
     $scope.submit = function() {
         //console.log('submit pressed');
@@ -104,9 +109,12 @@ client.controller('manager', ['$scope', 'idStore', '$rootScope', function($scope
 }]);
 
 //TODO: forgotten controller needs to be unit tested
-client.controller('forgotten', ['$scope', 'idStore', '$rootScope', function($scope, idStore, $rootScope) {
+client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
 
     $rootScope.title = 'Password Vault | Forgotten';
+    $scope.go = function (destination) {
+        $location.path(destination);
+    }
 
 
 }]);
