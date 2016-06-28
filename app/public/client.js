@@ -40,6 +40,13 @@ client.config(function($routeProvider, $locationProvider) {
                 controller: 'manager'
             })
 
+        //TODO: unit test forgotten routing
+        .when('/forgotten',
+            {
+                templateUrl: './forgotten/forgotten.html',
+                controller: 'forgotten'
+            })
+
         .otherwise({redirectTo: '/'});
 
     $locationProvider.html5Mode(true);
@@ -56,8 +63,7 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
     $scope.submit = function() {
         //console.log('submit pressed');
 
-        //TODO: need to unit-test the hash functions
-
+        //TODO: need to unit-test the hash function??
         var passwordHash = CryptoJS.SHA256($scope.passwordInput).toString();
 
         apiPOST.callAPI('/login-test', {username: $scope.usernameInput, password: passwordHash}).then(function(res) {
@@ -93,6 +99,14 @@ client.controller('manager', ['$scope', 'idStore', '$rootScope', function($scope
     $scope._id = idStore.get_id();
 
     $rootScope.title = 'Password Vault | Manager';
+
+
+}]);
+
+//TODO: forgotten controller needs to be unit tested
+client.controller('forgotten', ['$scope', 'idStore', '$rootScope', function($scope, idStore, $rootScope) {
+
+    $rootScope.title = 'Password Vault | Forgotten';
 
 
 }]);
