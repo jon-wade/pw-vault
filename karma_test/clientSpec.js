@@ -62,7 +62,7 @@ describe('client.js unit test', function() {
 
         it('$scope.regex should be ^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$ which constrains password field', function() {
             expect(scope.regex).toBe('^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
-        })
+        });
 
         it('$scope.submit() should return true', function() {
             expect(scope.submit()).toBe(true);

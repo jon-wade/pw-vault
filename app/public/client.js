@@ -58,10 +58,9 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 
         //TODO: need to unit-test the hash functions
 
-        var usernameHash = CryptoJS.SHA256($scope.usernameInput).toString();
         var passwordHash = CryptoJS.SHA256($scope.passwordInput).toString();
 
-        apiPOST.callAPI('/login-test', {username: usernameHash, password: passwordHash}).then(function(res) {
+        apiPOST.callAPI('/login-test', {username: $scope.usernameInput, password: passwordHash}).then(function(res) {
 
             //login credentials are OK
             console.log('res=', res);

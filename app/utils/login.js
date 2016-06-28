@@ -1,17 +1,36 @@
 var db = require('../db/database.js');
+var CryptoJS = require('crypto-js');
+var secret = require('./secret.js');
 
 exports.check = function(username, password, model) {
 
     return new Promise(function(resolve, reject) {
-        db.controller.read({username: username, password: password}, '_id', model).then(function(res) {
-            if(res.length === 0) {
+        //get encryption key
+        var encryptionKey = secret.key().get_Key();
+
+        //encrypt username
+        //var ciphertext = CryptoJS.AES.encrypt(username, encryptionKey);
+        //console.log(ciphertext.toString());
+
+        //decrypt username stored in db
+        var decrypt = function(ciphertext) {
+            var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), encryptionKey);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        };
+
+        db.controller.read({}, '_id username password', model).then(function(res) {
+            var result = res.filter(function(item) {
+                return (decrypt(item.username) === username) && (item.password === password);
+            });
+            if(result.length === 0) {
                 //no user that matches that username and password combination
                 reject({
                     errorMessage: 'Username and password combination do not match existing user.'
                 });
             }
             else {
-                resolve(res[0]);
+                //console.log('result[0]._id=', result[0]._id);
+                resolve({'_id': result[0]._id});
             }
         });
     });
