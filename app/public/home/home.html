@@ -1,26 +1,36 @@
-<h1>Login Test Page</h1>
-
-<div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">
-    <div ng-show="loginForm.usernameInput.$error.required">Please input a username.</div>
+<div id="welcome">
+    <h1>Password Vault</h1>
+    <h2>Only ever memorise one password!</h2>
+    <p>Securely store all your passwords using an internationally recognised, hyper-secure encryption algorithm, AES.</p>
+    <p>The encryption key is neither stored by the app nor sent over the internet. Only you know it, EVER, and it’s the ONLY thing you have to remember to securely store ALL your online passwords.</p>
+    <button type="button" ng-click="$location.path('/register')">Register</button>
+    <br>
+    <a href="/register">New to Password Vault? Click this link or the register button above.</a>
 </div>
+<div id="login">
+    <h1>Login</h1>
+    <div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">
+        <div ng-show="loginForm.usernameInput.$error.required">Please input a username.</div>
+    </div>
 
-<div class="errorMessages" ng-show="(loginForm.passwordInput.$touched && loginForm.passwordInput.$error.required) || (loginForm.passwordInput.$touched && loginForm.passwordInput.$error.pattern) ">
-    <div ng-show="loginForm.passwordInput.$error.required" id="passwordMissing">Please input a password.</div>
-    <div ng-show="loginForm.passwordInput.$error.pattern" id="passwordInvalid">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
+    <div class="errorMessages" ng-show="(loginForm.passwordInput.$touched && loginForm.passwordInput.$error.required) || (loginForm.passwordInput.$touched && loginForm.passwordInput.$error.pattern) ">
+        <div ng-show="loginForm.passwordInput.$error.required" id="passwordMissing">Please input a password.</div>
+        <div ng-show="loginForm.passwordInput.$error.pattern" id="passwordInvalid">Password should be at least 8 characters, contain at least one number and at least one letter.</div>
+    </div>
+
+    <div class="errorMessages" ng-show="loginInvalid">Login error: username and/or password invalid. Please try again.</div>
+
+    <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
+        <div id="username">
+            <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
+
+        </div>
+        <div id="password">
+            <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-pattern="regex">
+
+        </div>
+        <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput">Log In</button>
+    </form>
+
+    <a href="/forgotten">Forgotten your PV username or password?</a>
 </div>
-
-<div class="errorMessages" ng-show="loginInvalid">Login error: username and/or password invalid. Please try again.</div>
-
-<form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
-    <div id="username">
-        <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
-
-    </div>
-    <div id="password">
-        <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-pattern="regex">
-
-    </div>
-    <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput">Log In</button>
-</form>
-
-<a href="/forgotten">Forgotten your PV username or password?</a>
