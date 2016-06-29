@@ -25,7 +25,7 @@ client.service('apiPOST', ['$http', function($http) {
     };
 }]);
 
-//TODO: unit test directive
+//TODO: unit test directive (or at the very least, E2E test!)
 client.directive('email', ['$q', '$timeout', 'apiPOST', function($q, $timeout, apiPOST) {
     return {
         require: 'ngModel',
@@ -157,7 +157,6 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
         $location.path(destination);
     };
 
-    //TODO: need to unit test toggle function
     $scope.username = true;
     $scope.password = false;
     $scope.email = false;

@@ -42,6 +42,53 @@ describe('client.js unit test', function() {
 
     });
 
+    //email directive unit test
+    describe('unit test email directive', function() {
+
+        var scope, html;
+
+        beforeEach(inject(function($compile, $rootScope) {
+            scope = $rootScope.$new();
+            html = $compile('<input type="email" ng-model="emailInput" ng-model-options="{debounce: 1000}" name="emailInput" id="emailInput" required email>' + '<span ng-show="emailForm.emailInput.$error.email">This email is not registered!</span>'+ '<span ng-show="emailInput && (!emailForm.emailInput.$pending.email && !emailForm.emailInput.$error.email)">Success!</span>')(scope);
+
+        }));
+
+        it('on successful validation, should set class ng-valid in the input field...', inject(function($httpBackend) {
+
+            scope.emailInput = 'jonwadeuk@gmail.com';
+            var response = {};
+            var hashedEmail = CryptoJS.SHA256(scope.emailInput).toString(CryptoJS.enc.Hex);
+            $httpBackend.expect('POST', '/email-verification', {email: hashedEmail}).respond(200, response, null, 'success');
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(html[0].outerHTML).toContain('ng-valid');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('on unsuccessful validation, should set class ng-invalid in the input field...', inject(function($httpBackend) {
+
+            scope.emailInput = 'jonwadeku@gmail.com';
+            var response = {};
+            var hashedEmail = CryptoJS.SHA256(scope.emailInput).toString(CryptoJS.enc.Hex);
+            $httpBackend.expect('POST', '/email-verification', {email: hashedEmail}).respond(404, response, null, 'error');
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(html[0].outerHTML).toContain('ng-invalid');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+    });
+
     //home controller
     describe('home controller unit test', function() {
         var ctrl, scope, rootScope, location;
@@ -136,6 +183,43 @@ describe('client.js unit test', function() {
             scope.go('/test');
             expect(location.path).toHaveBeenCalledWith('/test');
         });
+
+        it('$scope.toggle("username") and $scope.username=true should set $scope.username=true, $scope.password=false and $scope.email = true', function() {
+            scope.username=true;
+            scope.password=false;
+            scope.toggle('username');
+            expect(scope.username).toBe(true);
+            expect(scope.password).toBe(false);
+            expect(scope.email).toBe(true);
+        });
+
+        it('$scope.toggle("username") and $scope.username=false should set $scope.username=true, $scope.password=false and $scope.email = true', function() {
+            scope.username=false;
+            scope.password=true;
+            scope.toggle('username');
+            expect(scope.username).toBe(true);
+            expect(scope.password).toBe(false);
+            expect(scope.email).toBe(true);
+        });
+
+        it('$scope.toggle("password") and $scope.password=false should set $scope.password=true, $scope.username=false and $scope.email = false', function() {
+            scope.username=true;
+            scope.password=false;
+            scope.toggle('password');
+            expect(scope.username).toBe(false);
+            expect(scope.password).toBe(true);
+            expect(scope.email).toBe(false);
+        });
+
+        it('$scope.toggle("password") and $scope.password=true should set $scope.password=true, $scope.username=false and $scope.email = false', function() {
+            scope.username=false;
+            scope.password=true;
+            scope.toggle('password');
+            expect(scope.username).toBe(false);
+            expect(scope.password).toBe(true);
+            expect(scope.email).toBe(false);
+        });
+
 
     });
 
