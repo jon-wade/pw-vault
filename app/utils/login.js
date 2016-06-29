@@ -8,10 +8,6 @@ exports.check = function(username, password, model) {
         //get encryption key
         var encryptionKey = secret.key().get_Key();
 
-        //encrypt username
-        //var ciphertext = CryptoJS.AES.encrypt(username, encryptionKey);
-        //console.log(ciphertext.toString());
-
         //decrypt username stored in db
         var decrypt = function(ciphertext) {
             var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), encryptionKey);
@@ -29,7 +25,6 @@ exports.check = function(username, password, model) {
                 });
             }
             else {
-                //console.log('result[0]._id=', result[0]._id);
                 resolve({'_id': result[0]._id});
             }
         });

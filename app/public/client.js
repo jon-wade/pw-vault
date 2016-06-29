@@ -13,17 +13,32 @@ client.service('idStore', function () {
     };
 });
 
+client.service('apiPOST', ['$http', function($http) {
+     return {
+        callAPI: function(url, data) {
+            return $http({
+                method: 'POST',
+                url: url,
+                data: data
+            });
+        }
+    };
+}]);
+
 //TODO: unit test directive
-client.directive('email', function($q, $timeout) {
+client.directive('email', ['$q', '$timeout', 'apiPOST', function($q, $timeout, apiPOST) {
     return {
         require: 'ngModel',
         link: function(scope, elm, attrs, ctrl) {
+
+            //this is for the mock
             var email = ['jonwadeuk@gmail.com'];
 
             ctrl.$asyncValidators.email = function(modelValue) {
 
                 var def = $q.defer();
 
+                //TODO: replace with real db call and unit test -- modelValue must be hashed before sending
                 $timeout(function() {
                     // Mock a delayed response
                     if (email.indexOf(modelValue) !== -1) {
@@ -39,19 +54,8 @@ client.directive('email', function($q, $timeout) {
             };
         }
     };
-});
-
-client.service('apiPOST', ['$http', function($http) {
-     return {
-        callAPI: function(url, data) {
-            return $http({
-                method: 'POST',
-                url: url,
-                data: data
-            });
-        }
-    };
 }]);
+
 
 client.config(function($routeProvider, $locationProvider) {
     $routeProvider
