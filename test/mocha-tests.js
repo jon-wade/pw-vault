@@ -225,7 +225,7 @@ describe('login.js unit test', function() {
 
 describe('unit test index.js server', function() {
 
-    it('On /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
+    it('On GET /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)
             .get('/')
             .end(function(err, res) {
@@ -236,7 +236,65 @@ describe('unit test index.js server', function() {
             });
     });
 
-    it('On page that does not exist, should return the home page, with a status 200, include a head tag and res.notFound should be false', function(done){
+    it('On POST /login-test, on success should return an object with an _id property with a status 200...', function(done){
+        chai.request(app)
+            .post('/login-test')
+            .send({username: 'jonwade', password:  'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('_id');
+                res.body._id.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /login-test, on error should return an object with a errorMessage property with a status 404...', function(done){
+        chai.request(app)
+            .post('/login-test')
+            .send({username: 'jonwad', password:  'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /email-verification, on success should return an object with a successMessage property with a status 200...', function(done){
+        chai.request(app)
+            .post('/email-verification')
+            .send({email: '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /email-verification, on error should return an object with an errorMessage property with a status 404...', function(done){
+        chai.request(app)
+            .post('/email-verification')
+            .send({email: '1239f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On GET page that does not exist, should return the home page, with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)
             .get('/abc123')
             .end(function(err, res) {
@@ -248,7 +306,7 @@ describe('unit test index.js server', function() {
     });
 });
 
-describe('unit test emailVerfication.js', function() {
+describe('unit test emailVerification.js', function() {
 
     it('it should return "Registered email address" on successfully finding email in database...', function(done) {
         //create test user

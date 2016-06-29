@@ -1,4 +1,3 @@
-//TODO: emailVerification.js needs to be be unit tested
 var db = require('../db/database.js');
 
 

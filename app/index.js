@@ -11,7 +11,6 @@ var app = express();
 //this serves all the static assets
 app.use(express.static(__dirname + '/public'));
 
-//TODO: Needs to be unit tested...perhaps by E2E test as login.check has been unit tested
 app.post('/login-test', jsonParser, function(req, res) {
     login.check(req.body.username, req.body.password, mongooseConfig.userDev)
         .then(function(success) {
@@ -20,8 +19,6 @@ app.post('/login-test', jsonParser, function(req, res) {
             res.status(404).send(error);
         });
 });
-
-//TODO: POST /email-verification needs to be unit tested
 
 app.post('/email-verification', jsonParser, function(req, res) {
     emailVerification.check(req.body.email, mongooseConfig.userDev)
