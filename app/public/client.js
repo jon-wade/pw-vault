@@ -32,23 +32,22 @@ client.directive('email', ['$q', '$timeout', 'apiPOST', function($q, $timeout, a
         link: function(scope, elm, attrs, ctrl) {
 
             //this is for the mock
-            var email = ['jonwadeuk@gmail.com'];
+            //var email = ['jonwadeuk@gmail.com'];
 
             ctrl.$asyncValidators.email = function(modelValue) {
 
                 var def = $q.defer();
 
-                //TODO: replace with real db call and unit test -- modelValue must be hashed before sending
-                $timeout(function() {
-                    // Mock a delayed response
-                    if (email.indexOf(modelValue) !== -1) {
-                        // The username is valid
-                        def.resolve();
-                    } else {
-                        def.reject();
-                    }
+                var hashedEmail = CryptoJS.SHA256(modelValue).toString(CryptoJS.enc.Hex);
 
-                }, 2000);
+                apiPOST.callAPI('/email-verification', {email : hashedEmail})
+                    .then(function(res) {
+                        //email is registered
+                        def.resolve();
+                    }, function(rej) {
+                        //email is not registered
+                        def.reject();
+                    });
 
                 return def.promise;
             };
