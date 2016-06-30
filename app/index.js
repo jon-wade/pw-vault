@@ -1,9 +1,13 @@
 var express = require('express');
-var login = require('./utils/login.js');
-var emailVerification = require('./utils/emailVerification.js');
 var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
+
+
+var login = require('./utils/login.js');
+var emailVerification = require('./utils/email-verification.js');
 var mongooseConfig = require('./db/mongoose-config.js');
+var usernameRecovery = require('./utils/username-recovery.js');
+
+var jsonParser = bodyParser.json();
 
 //web server
 var app = express();
@@ -25,6 +29,17 @@ app.post('/email-verification', jsonParser, function(req, res) {
         .then(function(success) {
             res.status(200).send(success);
         }, function(error) {
+            res.status(404).send(error);
+        });
+});
+
+app.post('/username-recovery', jsonParser, function(req, res) {
+    usernameRecovery.go(req.body._id, req.body.email, mongooseConfig.userDev)
+        .then(function(success) {
+            //console.log('success=', success);
+            res.status(200).send(success);
+        }, function(error) {
+            //console.log('error=', error);
             res.status(404).send(error);
         });
 });

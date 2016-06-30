@@ -53,7 +53,7 @@ describe('client.js unit test', function() {
 
         }));
 
-        it('on successful validation, should set class ng-valid in the input field...', inject(function($httpBackend) {
+        it('on successful validation, should set class ng-valid in the input field...', inject(function($httpBackend, idStore) {
 
             scope.emailInput = 'jonwadeuk@gmail.com';
             var response = {};
@@ -64,13 +64,14 @@ describe('client.js unit test', function() {
             $httpBackend.flush();
 
             expect(html[0].outerHTML).toContain('ng-valid');
+            expect(idStore.get_id()).not.toBe('');
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
 
         }));
 
-        it('on unsuccessful validation, should set class ng-invalid in the input field...', inject(function($httpBackend) {
+        it('on unsuccessful validation, should set class ng-invalid in the input field...', inject(function($httpBackend, idStore) {
 
             scope.emailInput = 'jonwadeku@gmail.com';
             var response = {};
@@ -81,6 +82,7 @@ describe('client.js unit test', function() {
             $httpBackend.flush();
 
             expect(html[0].outerHTML).toContain('ng-invalid');
+            expect(idStore.get_id()).toBe('');
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
@@ -161,16 +163,18 @@ describe('client.js unit test', function() {
 
     //forgotten controller
     describe('forgotten controller unit test', function() {
-        var ctrl, scope, rootScope, location;
-        beforeEach(inject(function($controller, $rootScope, $location) {
+        var ctrl, scope, rootScope, location, idStr;
+        beforeEach(inject(function($controller, $rootScope, $location, idStore) {
             //create a new clean scope object
             scope = $rootScope.$new();
             rootScope = $rootScope.$new();
             location = $location;
+            idStr = idStore;
             ctrl = $controller('forgotten', {
                 $rootScope: rootScope,
                 $scope : scope,
-                $location: location
+                $location: location,
+                idStore: idStr
             });
         }));
 
@@ -219,6 +223,54 @@ describe('client.js unit test', function() {
             expect(scope.password).toBe(true);
             expect(scope.email).toBe(false);
         });
+
+        it('should initially correctly set the valued of $scope.ui, $scope.emailSuccessMessage and $scope.emailErrorMessage', function() {
+            expect(scope.ui).toBe(true);
+            expect(scope.emailSuccessMessage).toBe(false);
+            expect(scope.emailErrorMessage).toBe(false);
+        });
+
+        it('On success $scope.helpMe() should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a successful response... ', inject(function($httpBackend) {
+            //mock _id and email
+            idStr.set_id('1234');
+            scope.emailInput = 'jonwadeuk@gmail.com';
+
+            var response = {};
+            $httpBackend.expect('POST', '/username-recovery', {_id: '1234', email: 'jonwadeuk@gmail.com'}).respond(200, response, null, 'success');
+
+            scope.helpMe();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(scope.ui).toBe(false);
+            expect(scope.emailSuccessMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('On failure $scope.helpMe() should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a failure response... ', inject(function($httpBackend) {
+            //mock _id and email
+            idStr.set_id('4321');
+            scope.emailInput = 'jonwadeuk@gmail.com';
+
+            var response = {};
+            $httpBackend.expect('POST', '/username-recovery', {_id: '4321', email: 'jonwadeuk@gmail.com'}).respond(404, response, null, 'error');
+
+            scope.helpMe();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(scope.ui).toBe(false);
+            expect(scope.emailErrorMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
 
 
     });

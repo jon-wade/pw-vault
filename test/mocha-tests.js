@@ -5,9 +5,10 @@ var mongooseConfig = require('../app/db/mongoose-config.js');
 var chaiHttp = require('chai-http');
 
 var index = require('../app/index.js');
-var emailVerification = require('../app/utils/emailVerification.js');
+var emailVerification = require('../app/utils/email-verification.js');
 var login = require('../app/utils/login.js');
 var unit = require('./../app/utils/mailer.js');
+var usernameRecovery = require('../app/utils/username-recovery.js');
 
 var should = chai.should();
 var expect = chai.expect;
@@ -57,7 +58,7 @@ describe('unit test database.js functions', function() {
             });
     });
 
-    it('when searching for a record that does not exist, should successfully respond with empty array ...', function(done) {
+    it('when searching for a user that does not exist, should successfully respond with empty array ...', function(done) {
         db.controller.read({'username': 'jonwade'}, {}, mongooseConfig.userTest)
             .then(function(res) {
                 res.should.be.a('array');
@@ -68,6 +69,8 @@ describe('unit test database.js functions', function() {
                 done();
             });
     });
+
+    //TODO: unit test finding an _id (which throws an error from db)
 
     it('should throw error when trying to create a duplicate username...', function(done) {
         db.controller.create({
@@ -294,6 +297,53 @@ describe('unit test index.js server', function() {
             });
     });
 
+    it.skip('On POST /username-recovery, on success should return an object with a successMessage property with a status 200...', function(done){
+        this.timeout(15000);
+        chai.request(app)
+            .post('/username-recovery')
+            .send({_id: '5773272b231c75eb281e4460', email: 'jonwadeuk@gmail.com'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /username-recovery, on _id lookup failure should return an object with a errorMessage property with a status 404...', function(done){
+        this.timeout(15000);
+        chai.request(app)
+            .post('/username-recovery')
+            .send({_id: '5773272b231c75eb281e4462', email: 'jonwadeuk@gmail.com'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /username-recovery, on email format failure should return an object with a errorMessage property with a status 404...', function(done){
+        this.timeout(15000);
+        chai.request(app)
+            .post('/username-recovery')
+            .send({_id: '5773272b231c75eb281e4460', email: 'jonwadeukgmail.com'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+
     it('On GET page that does not exist, should return the home page, with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)
             .get('/abc123')
@@ -306,7 +356,7 @@ describe('unit test index.js server', function() {
     });
 });
 
-describe('unit test emailVerification.js', function() {
+describe('unit test email-verification.js', function() {
 
     it('it should return "Registered email address" on successfully finding email in database...', function(done) {
         //create test user
@@ -320,6 +370,7 @@ describe('unit test emailVerification.js', function() {
                 emailVerification.check('6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e', mongooseConfig.userTest)
                     .then(function(res) {
                         res.successMessage.should.include('Registered email address');
+                        res.should.have.property('_id');
                         done();
                     },function(rej) {
                         console.log('rej=', rej);
@@ -332,29 +383,100 @@ describe('unit test emailVerification.js', function() {
 
 });
 
-//describe('mailer unit test', function(){
-//    this.timeout(15000);
-//    it('On successful sending, data should be an object, data.response should be "250 Great success", data.accepted[0] should be "jonwadeuk@gmail.com", data.envelope.to[0] should be "jonwadeuk@gmail.com, data.envelope.from should be "admin@jonwade.codes" ...', function(done){
-//        unit.send('jonwadeuk@gmail.com', 'success test', 'hello world!').then(function(data){
-//            data.should.be.a('object');
-//            data.response.should.equal('250 Great success');
-//            data.accepted[0].should.equal('jonwadeuk@gmail.com');
-//            data.envelope.to[0].should.equal('jonwadeuk@gmail.com');
-//            data.envelope.from.should.equal('admin@jonwade.codes');
-//            done();
-//        });
-//    });
-//    it('On unsuccessful sending, an error message should be received', function(done){
-//        unit.send('jonwadeukgmail.com', 'error test', 'this will not arrive').then(
-//            function(success){
-//                //testing error response, not success
-//            },
-//            function(data){
-//                //console.log(data.code);
-//                //console.log('keys', Object.keys(data));
-//                data.code.should.include('EENVELOPE');
-//                done();
-//            });
-//    });
-//    //TODO: testing for bounced emails
-//});
+describe('unit test username-recovery.js', function() {
+    this.timeout(15000);
+    it.skip('on successful mailing of username, it should return object containing successMessage and mail username to jonwadeuk@gmail.com...', function(done) {
+        db.controller.create({
+            'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
+            'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
+            'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
+        }, mongooseConfig.userTest).then(
+            function(res) {
+                var _id = res._id;
+                usernameRecovery.go(_id, 'jonwadeuk@gmail.com', mongooseConfig.userTest)
+                    .then(function(res) {
+                        res.should.be.a('object');
+                        res.should.have.a.property('successMessage');
+                        done();
+                    }, function(rej) {
+                        should.have(rej, null);
+                        done();
+                    });
+            }
+        );
+        db.controller.delete({}, mongooseConfig.userTest);
+    });
+
+    it('should return an object with an errorMessage if email address is incorrectly formatted...', function(done) {
+        db.controller.create({
+            'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
+            'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
+            'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
+        }, mongooseConfig.userTest).then(
+            function(res) {
+                var _id = 1234567;
+                usernameRecovery.go(_id, 'jonwadeukgmail.com', mongooseConfig.userTest)
+                    .then(function(res) {
+                        should.have(res, null);
+                        done();
+                    }, function(rej) {
+                        rej.should.be.a('object');
+                        rej.should.have.a.property('errorMessage');
+                        done();
+                    });
+            }
+        );
+        db.controller.delete({}, mongooseConfig.userTest);
+    });
+
+
+    it('should return an object with an errorMessage if no match in the database against the submitted id...', function(done) {
+        db.controller.create({
+            'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
+            'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
+            'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
+        }, mongooseConfig.userTest).then(
+            function(res) {
+                var _id = 1234567;
+                usernameRecovery.go(_id, 'jonwadeuk@gmail.com', mongooseConfig.userTest)
+                    .then(function(res) {
+                        should.have(res, null);
+                        done();
+                    }, function(rej) {
+                        rej.should.be.a('object');
+                        rej.should.have.a.property('errorMessage');
+                        done();
+                    });
+            }
+        );
+        db.controller.delete({}, mongooseConfig.userTest);
+    });
+
+});
+
+describe('mailer unit test', function(){
+    this.timeout(15000);
+    it.skip('On successful sending, data should be an object, data.response should be "250 Great success", data.accepted[0] should be "jonwadeuk@gmail.com", data.envelope.to[0] should be "jonwadeuk@gmail.com, data.envelope.from should be "admin@jonwade.codes" ...', function(done){
+        unit.send('jonwadeuk@gmail.com', 'success test', 'hello world!').then(function(data){
+            data.should.be.a('object');
+            data.response.should.equal('250 Great success');
+            data.accepted[0].should.equal('jonwadeuk@gmail.com');
+            data.envelope.to[0].should.equal('jonwadeuk@gmail.com');
+            data.envelope.from.should.equal('admin@jonwade.codes');
+            done();
+        });
+    });
+    it('On unsuccessful sending, an error message should be received', function(done){
+        unit.send('jonwadeukgmail.com', 'error test', 'this will not arrive').then(
+            function(success){
+                //testing error response, not success
+            },
+            function(data){
+                //console.log(data.code);
+                //console.log('keys', Object.keys(data));
+                data.code.should.include('EENVELOPE');
+                done();
+            });
+    });
+    //TODO: testing for bounced emails
+});

@@ -1,15 +1,25 @@
-<h1 id="title">I've forgotten my...</h1>
-<h2 id="username" ng-click="toggle('username')">Username</h2>
-<h2 id="password" ng-click="toggle('password')">Password</h2>
-<form ng-show="email" name="emailForm" id="emailForm" novalidate ng-submit="submit()">
-    <label for="emailInput">Enter registered email address</label>
-    <input type="email" ng-model="emailInput" ng-model-options="{debounce: 1000}" name="emailInput" id="emailInput" required email>
-    <!--<span ng-show="emailForm.emailInput.$pending.email">Checking email for validity...</span>-->
-    <span ng-show="emailForm.emailInput.$error.email">This email is not registered!</span>
-    <span ng-show="emailInput && (!emailForm.emailInput.$pending.email && !emailForm.emailInput.$error.email)">Success!</span>
-</form>
+<div id="ui" ng-show="ui">
+    <h1 id="title">I've forgotten my...</h1>
+    <h2 id="username" ng-click="toggle('username')">Username</h2>
+    <h2 id="password" ng-click="toggle('password')">Password</h2>
+    <form ng-show="email" name="emailForm" id="emailForm" novalidate ng-submit="submit()">
+        <label for="emailInput">Enter registered email address</label>
+        <input type="email" ng-model="emailInput" ng-model-options="{debounce: 1000}" name="emailInput" id="emailInput" required email>
+        <!--<span ng-show="emailForm.emailInput.$pending.email">Checking email for validity...</span>-->
+        <span ng-show="emailForm.emailInput.$error.email">This email is not registered!</span>
+        <span ng-show="emailInput && (!emailForm.emailInput.$pending.email && !emailForm.emailInput.$error.email)">Success!</span>
+    </form>
 
-<br>
-<button id="helpMe" type="button" ng-disabled="!emailInput">Help Me!</button>
-<br>
+    <br>
+    <button id="helpMe" type="button" ng-disabled="!emailInput || helpMeClicked" ng-click="helpMe()">Help Me!</button>
+    <br>
+</div>
+<div id="emailSuccessMessage" ng-show="emailSuccessMessage">
+    <h1>Don’t panic!</h1>
+    <p>We’ve emailed your username to your registered email address. Check out your inbox…</p>
+</div>
+<div id="emailErrorMessage" ng-show="emailErrorMessage">
+    <h1>Oh No!</h1>
+    <p>There was a problem trying to send your username to you. Please try again later…</p>
+</div>
 <button id="back" ng-click="go('/')">Back</button>

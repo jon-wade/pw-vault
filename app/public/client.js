@@ -25,14 +25,11 @@ client.service('apiPOST', ['$http', function($http) {
     };
 }]);
 
-//TODO: unit test directive (or at the very least, E2E test!)
-client.directive('email', ['$q', '$timeout', 'apiPOST', function($q, $timeout, apiPOST) {
+
+client.directive('email', ['$q', '$timeout', 'apiPOST', 'idStore', function($q, $timeout, apiPOST, idStore) {
     return {
         require: 'ngModel',
         link: function(scope, elm, attrs, ctrl) {
-
-            //this is for the mock
-            //var email = ['jonwadeuk@gmail.com'];
 
             ctrl.$asyncValidators.email = function(modelValue) {
 
@@ -43,6 +40,7 @@ client.directive('email', ['$q', '$timeout', 'apiPOST', function($q, $timeout, a
                 apiPOST.callAPI('/email-verification', {email : hashedEmail})
                     .then(function(res) {
                         //email is registered
+                        idStore.set_id(res.data._id);
                         def.resolve();
                     }, function(rej) {
                         //email is not registered
@@ -54,7 +52,6 @@ client.directive('email', ['$q', '$timeout', 'apiPOST', function($q, $timeout, a
         }
     };
 }]);
-
 
 client.config(function($routeProvider, $locationProvider) {
     $routeProvider
@@ -149,7 +146,7 @@ client.controller('manager', ['$scope', 'idStore', '$rootScope', '$location', fu
 
 }]);
 
-client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
+client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', function($scope, idStore, $rootScope, $location, apiPOST) {
 
     $rootScope.title = 'Password Vault | Forgotten';
 
@@ -157,6 +154,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
         $location.path(destination);
     };
 
+    //these handle the toggle function
     $scope.username = true;
     $scope.password = false;
     $scope.email = false;
@@ -184,7 +182,36 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
             $scope.email = false;
 
         }
-    }
+    };
+
+    //display the user-interface
+    $scope.ui = true;
+    //display confirmation or error messages
+    $scope.emailSuccessMessage = false;
+    $scope.emailErrorMessage = false;
+
+
+    $scope.helpMe = function() {
+        //firstly get the id from store, which has to be done client-side
+        var _id=idStore.get_id();
+
+        //deactivate the Help Me button so there is only one click sent
+        $scope.helpMeClicked = true;
+
+        //then call the api endpoint /username-recovery
+
+        apiPOST.callAPI('/username-recovery', {_id: _id, email: $scope.emailInput})
+            .then(function(res) {
+                //successful username recovery
+                //hide the ui and display the message
+                $scope.ui=false;
+                $scope.emailSuccessMessage = true;
+            }, function(rej) {
+                //error in username recovery
+                $scope.ui=false;
+                $scope.emailErrorMessage = true;
+            });
+    };
 
 
 }]);

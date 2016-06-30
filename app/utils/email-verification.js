@@ -1,11 +1,7 @@
 var db = require('../db/database.js');
-var CryptoJS = require('crypto-js');
-
 
 exports.check = function (email, model) {
     return new Promise(function(resolve, reject) {
-
-        //var hashedEmail = CryptoJS.SHA256(email).toString();
 
         db.controller.read({email: email}, '_id', model).then(function(res) {
             if(res.length === 0) {
@@ -16,7 +12,8 @@ exports.check = function (email, model) {
             }
             else {
                 resolve({
-                    successMessage: 'Registered email address'
+                    successMessage: 'Registered email address',
+                    _id: res[0]._id
                 });
             }
         });
