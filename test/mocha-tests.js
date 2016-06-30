@@ -9,6 +9,7 @@ var emailVerification = require('../app/utils/email-verification.js');
 var login = require('../app/utils/login.js');
 var unit = require('./../app/utils/mailer.js');
 var usernameRecovery = require('../app/utils/username-recovery.js');
+var usernameVerification = require('../app/utils/username-verification.js');
 
 var should = chai.should();
 var expect = chai.expect;
@@ -297,6 +298,36 @@ describe('unit test index.js server', function() {
             });
     });
 
+    it('On POST /username-verification, on success should return an object with a successMessage property with a status 200...', function(done){
+        chai.request(app)
+            .post('/username-verification')
+            .send({username: 'jonwade'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /username-verification, on error should return an object with an errorMessage property with a status 404...', function(done){
+        chai.request(app)
+            .post('/username-verification')
+            .send({username: 'jonwad'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+
     it.skip('On POST /username-recovery, on success should return an object with a successMessage property with a status 200...', function(done){
         this.timeout(15000);
         chai.request(app)
@@ -383,6 +414,57 @@ describe('unit test email-verification.js', function() {
 
 });
 
+describe('unit test username-verification.js', function() {
+
+    it('it should return "Registered username" on successfully finding username in database...', function(done) {
+        //create test user
+
+        db.controller.create({
+                username: "U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=",
+                password: "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
+                email: "6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e"
+            }, mongooseConfig.userTest)
+            .then(function() {
+                usernameVerification.check('jonwade', mongooseConfig.userTest)
+                    .then(function(res) {
+                        console.log('res=', res);
+                        res.successMessage.should.include('Registered username');
+                        res.should.have.property('_id');
+                        done();
+                    },function(rej) {
+                        console.log('rej=', rej);
+                        rej.errorMessage.should.include('Not a registered username');
+                        done();
+                    });
+            });
+        db.controller.delete({}, mongooseConfig.userTest);
+    });
+
+    it('it should return "Not a registered username" on failing to find username in database...', function(done) {
+        //create test user
+        db.controller.create({
+                username: "U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=",
+                password: "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
+                email: "6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e"
+            }, mongooseConfig.userTest)
+            .then(function() {
+                usernameVerification.check('jonwad', mongooseConfig.userTest)
+                    .then(function(res) {
+                        //console.log('res=', res);
+                        res.successMessage.should.include('Registered username');
+                        res.should.have.property('_id');
+                        done();
+                    },function(rej) {
+                        //console.log('rej=', rej);
+                        rej.errorMessage.should.include('Not a registered username');
+                        done();
+                    });
+            });
+        db.controller.delete({}, mongooseConfig.userTest);
+    });
+
+});
+
 describe('unit test username-recovery.js', function() {
     this.timeout(15000);
     it.skip('on successful mailing of username, it should return object containing successMessage and mail username to jonwadeuk@gmail.com...', function(done) {
@@ -413,7 +495,7 @@ describe('unit test username-recovery.js', function() {
             'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
             'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
         }, mongooseConfig.userTest).then(
-            function(res) {
+            function() {
                 var _id = 1234567;
                 usernameRecovery.go(_id, 'jonwadeukgmail.com', mongooseConfig.userTest)
                     .then(function(res) {

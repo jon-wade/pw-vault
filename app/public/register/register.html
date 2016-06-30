@@ -1,1 +1,20 @@
 <h1 id="title">Registration</h1>
+<form id="registrationForm" name="registrationForm" novalidate ng-submit="submit()">
+    <label for="usernameInput">Enter Username</label>
+    <input type="text" id="usernameInput" ng-model="usernameInput" ng-model-options="{debounce: 1000}" name="usernameInput" required username>
+    <br>
+    <label for="emailInput">Enter Email</label>
+    <input type="email" id="emailInput" ng-model="emailInput" ng-model-options="{debounce:1000}" name="emailInput" required ng-disabled="!usernameInput" email-reg="">
+    <span ng-show="registrationForm.emailInput.$error.email">Email address already in use, please choose another.</span>
+    <span ng-show="emailInput && (!registrationForm.emailInput.$pending.email && !registrationForm.emailInput.$error.email)">Success!</span>
+    <br>
+    <label for="passwordInput">Enter Password</label>
+    <input type="password" id="passwordInput" ng-model="passwordInput" ng-model-options="{debounce: 1000}" name="passwordInput" required ng-pattern="regex" ng-disabled="!emailInput">
+    <br>
+    <label for="passwordConfirm">Confirm Password</label>
+    <input type="password" id="passwordConfirm" ng-model="passwordConfirm" ng-model-options="{debounce:1000}" name="passwordConfirm" required ng-pattern="regex" ng-disabled="!passwordInput">
+    <br>
+    <button type="submit" id="registerButton" name="registerButton" ng-disabled="!passwordConfirm">Register</button>
+    <br>
+    <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/')">Cancel</button>
+</form>

@@ -22,11 +22,11 @@
 
     <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
         <div id="username">
-            <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" ng-model-options="{ debounce: 250 }" required="">
+            <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" ng-model-options="{ debounce: 1000 }" required="">
 
         </div>
         <div id="password">
-            <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-model-options="{ debounce: 250 }" ng-pattern="regex">
+            <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-model-options="{ debounce: 1000 }" ng-pattern="regex">
 
         </div>
         <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput">Log In</button>

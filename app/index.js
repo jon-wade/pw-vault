@@ -6,6 +6,7 @@ var login = require('./utils/login.js');
 var emailVerification = require('./utils/email-verification.js');
 var mongooseConfig = require('./db/mongoose-config.js');
 var usernameRecovery = require('./utils/username-recovery.js');
+var usernameVerification = require('./utils/username-verification.js');
 
 var jsonParser = bodyParser.json();
 
@@ -26,6 +27,15 @@ app.post('/login-test', jsonParser, function(req, res) {
 
 app.post('/email-verification', jsonParser, function(req, res) {
     emailVerification.check(req.body.email, mongooseConfig.userDev)
+        .then(function(success) {
+            res.status(200).send(success);
+        }, function(error) {
+            res.status(404).send(error);
+        });
+});
+
+app.post('/username-verification', jsonParser, function(req, res) {
+    usernameVerification.check(req.body.username, mongooseConfig.userDev)
         .then(function(success) {
             res.status(200).send(success);
         }, function(error) {

@@ -91,6 +91,55 @@ describe('client.js unit test', function() {
 
     });
 
+    //TODO: emailReg directive unit test
+    xdescribe('unit test emailReg directive', function() {
+
+        var scope, html;
+
+        beforeEach(inject(function($compile, $rootScope) {
+            scope = $rootScope.$new();
+            html = $compile('<input type="email" ng-model="emailInput" ng-model-options="{debounce: 1000}" name="emailInput" id="emailInput" required email>' + '<span ng-show="emailForm.emailInput.$error.email">This email is not registered!</span>'+ '<span ng-show="emailInput && (!emailForm.emailInput.$pending.email && !emailForm.emailInput.$error.email)">Success!</span>')(scope);
+
+        }));
+
+        it('on successful validation, should set class ng-valid in the input field...', inject(function($httpBackend, idStore) {
+
+            scope.emailInput = 'jonwadeuk@gmail.com';
+            var response = {};
+            var hashedEmail = CryptoJS.SHA256(scope.emailInput).toString(CryptoJS.enc.Hex);
+            $httpBackend.expect('POST', '/email-verification', {email: hashedEmail}).respond(200, response, null, 'success');
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(html[0].outerHTML).toContain('ng-valid');
+            expect(idStore.get_id()).not.toBe('');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('on unsuccessful validation, should set class ng-invalid in the input field...', inject(function($httpBackend, idStore) {
+
+            scope.emailInput = 'jonwadeku@gmail.com';
+            var response = {};
+            var hashedEmail = CryptoJS.SHA256(scope.emailInput).toString(CryptoJS.enc.Hex);
+            $httpBackend.expect('POST', '/email-verification', {email: hashedEmail}).respond(404, response, null, 'error');
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(html[0].outerHTML).toContain('ng-invalid');
+            expect(idStore.get_id()).toBe('');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+    });
+
     //home controller
     describe('home controller unit test', function() {
         var ctrl, scope, rootScope, location;

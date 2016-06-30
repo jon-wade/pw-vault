@@ -25,7 +25,6 @@ client.service('apiPOST', ['$http', function($http) {
     };
 }]);
 
-
 client.directive('email', ['$q', '$timeout', 'apiPOST', 'idStore', function($q, $timeout, apiPOST, idStore) {
     return {
         require: 'ngModel',
@@ -45,6 +44,61 @@ client.directive('email', ['$q', '$timeout', 'apiPOST', 'idStore', function($q, 
                     }, function(rej) {
                         //email is not registered
                         def.reject();
+                    });
+
+                return def.promise;
+            };
+        }
+    };
+}]);
+
+//TODO: unit test emailReg (just switched rej and res around and removed idStore.set_id) - need template code first
+client.directive('emailReg', ['$q', 'apiPOST', function($q, apiPOST) {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+
+            ctrl.$asyncValidators.email = function(modelValue) {
+
+                var def = $q.defer();
+
+                var hashedEmail = CryptoJS.SHA256(modelValue).toString(CryptoJS.enc.Hex);
+
+                apiPOST.callAPI('/email-verification', {email : hashedEmail})
+                    .then(function(res) {
+                        //email is registered
+                        def.reject();
+                    }, function(rej) {
+                        //email is not registered
+                        def.resolve();
+                    });
+
+                return def.promise;
+            };
+        }
+    };
+}]);
+
+//TODO: unit test userReg (as above) - need template code first
+client.directive('userReg', ['$q', 'apiPOST', function($q, apiPOST) {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+
+            //not sure if this should be .username or .userReg - think its to allow the display of error message, $error.username
+            ctrl.$asyncValidators.username = function(modelValue) {
+
+                var def = $q.defer();
+
+                //username gets encrypted on server side before storing in database, so send username in plaintext
+                //need a new endpoint, /username-verification
+                apiPOST.callAPI('/username-verification', {username : modelValue})
+                    .then(function(res) {
+                        //username is registered
+                        def.reject();
+                    }, function(rej) {
+                        //username is not registered
+                        def.resolve();
                     });
 
                 return def.promise;
@@ -222,7 +276,11 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', f
 
     $scope.go = function (destination) {
         $location.path(destination);
-    }
+    };
+
+    //TODO: unit test from here
+    //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
+    $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
 
 
 }]);
