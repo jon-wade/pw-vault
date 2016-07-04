@@ -1,6 +1,4 @@
 //mongoose/mongodb set-up
-
-//TODO: Needs to be unit tested
 var mongoose = require('mongoose');
 
 var environment = {
@@ -17,8 +15,17 @@ var User = mongoose.Schema({
 
 
 var test = mongoose.createConnection(environment.test);
+//console.log('test=', typeof test);
+//console.log('test keys=', Object.keys(test));
 var dev = mongoose.createConnection(environment.development);
+//console.log('dev=', typeof dev);
+//console.log('dev keys=', Object.keys(dev));
 
 exports.userTest = test.model('testUser', User);
+//console.log('userTest=', typeof exports.userTest());
+//console.log('userTest keys=', Object.keys(exports.userTest));
+
 exports.userDev = dev.model('devUser', User);
+//console.log('userTest=', typeof exports.userDev());
+//console.log('userTest keys=', Object.keys(exports.userDev));
 

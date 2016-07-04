@@ -5,6 +5,8 @@ var mockery = require('mockery');
 chai.use(chaiHttp);
 var should = chai.should();
 
+console.log('still need to isolate express dependencies...');
+
 describe('login.js unit test', function() {
 
     var login, mongooseConfig;
@@ -1026,8 +1028,29 @@ describe('database.js unit test', function() {
 
 });
 
-//TODO: remaining unit tests
-describe.skip('mongoose-config.js unit test', function() {});
+describe('mongoose-config.js unit test', function() {
+
+    var mongooseConfig = require('./../app/db/mongoose-config.js')
+
+    it('should return an object from mongooseConfig.userTest with a method called schema...', function(done) {
+        var testObject = mongooseConfig.userTest();
+
+        testObject.should.be.a('object');
+        testObject.should.have.property('schema');
+        done();
+
+    });
+
+    it('should return an object from mongooseConfig.userDev with a method called schema...', function(done) {
+        var testObject = mongooseConfig.userDev();
+
+        testObject.should.be.a('object');
+        testObject.should.have.property('schema');
+        done();
+
+    });
+
+});
 
 
 
