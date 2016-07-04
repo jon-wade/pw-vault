@@ -85,7 +85,7 @@ client.directive('userReg', ['$q', 'apiPOST', function($q, apiPOST) {
         require: 'ngModel',
         link: function(scope, elm, attrs, ctrl) {
 
-            //not sure if this should be .username or .userReg - think its to allow the display of error message, $error.username
+            //allows the display of error message, $error.username
             ctrl.$asyncValidators.username = function(modelValue) {
 
                 var def = $q.defer();
@@ -270,7 +270,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
 }]);
 
-client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
+client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', function($scope, idStore, $rootScope, $location, apiPOST) {
 
     $rootScope.title = 'Password Vault | Register';
 
@@ -281,6 +281,32 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', f
     //TODO: unit test from here
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
     $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
+
+    $scope.register = function() {
+
+        var username = $scope.usernameInput;
+        //hash password and email address
+
+        var hashedEmail = CryptoJS.SHA256($scope.emailInput).toString(CryptoJS.enc.Hex);
+        var hashedPassword = CryptoJS.SHA256($scope.passwordInput).toString(CryptoJS.enc.Hex);
+
+        //post to /create endpoint
+
+        apiPOST.callAPI('/create', {username: username, password: hashedPassword, email: hashedEmail}).then(function(res) {
+            //successful registration of new user
+            console.log('successfully registered');
+            //TODO: update user interface
+
+        }, function(rej) {
+            //failed registration of new user
+            console.log('error in registration');
+            //TODO: update user interface
+
+        });
+
+    };
+
+
 
 
 }]);

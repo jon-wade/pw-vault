@@ -1,7 +1,134 @@
-div.errorMessages {
-    margin: 10px;
-    padding: 20px;
-    font-size: 0.75em;
-    background-color: #FFDCEE;
-    width: 200px;
+/* general rules */
+
+body, html {
+    background-color: black;
+    color: white;
+    box-sizing: border-box;
+    border:0;
+    margin:0;
+    padding:0;
 }
+
+a:link, a:hover, a:visited {
+    font-size:0.7em;
+    color: white;
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* background styles */
+
+div#home {
+    background: url('../img/home-background.jpg');
+    background-size: cover;
+    background-position: center center;
+    min-height: 100vh;
+}
+
+div#registration {
+    background: url('../img/registration-background.jpg');
+    background-size: cover;
+    background-position: center center;
+    min-height: 100vh;
+}
+
+/* layout divs */
+
+div#login, div#welcome {
+    width:49%;
+    margin-top: 200px;
+    /*border: 1px dashed white;*/
+}
+
+div.container {
+    width: 60%;
+    margin: 0 auto;
+    /*border: 1px dashed yellow;*/
+}
+
+div.registrationForm {
+    width: 60%;
+    margin: 0px auto 0 auto;
+    /*border: 1px dashed white;*/
+}
+
+div.registrationForm h1#title {
+    margin-top: 0px;
+    padding-top: 150px;
+    text-align: center;
+}
+
+div#welcome {
+    float: left;
+}
+
+div#login {
+    float: right;
+}
+
+/* form elements */
+
+div#login div#username input, div#login div#password input, div.registrationForm input {
+    margin: 25px 0;
+    width: 96%;
+    padding: 10px 2% 10px 2%;
+    border: 0;
+    border-radius: 5px;
+}
+
+div#login button#submitButton, div#welcome button#registerButton, div.registrationForm button {
+    display: block;
+    width: 100px;
+    border-radius: 5px;
+    border: 0;
+}
+
+div.registrationForm button {
+    margin: 30px auto 10px auto;
+}
+
+div#login button#submitButton {
+    margin: 100px auto 0 auto;
+}
+
+div#welcome button#registerButton {
+    margin: 104px auto 0 auto;
+}
+
+div#login button#submitButton[disabled=disabled], div.registrationForm button[disabled=disabled] {
+    background-color: lightgrey;
+    color: darkgrey;
+}
+
+/* error messages */
+
+div.errorMessages {
+    width: 100%;
+    padding-top:5px;
+    padding-bottom: 5px;
+    font-size: 1em;
+    background-color: rebeccapurple;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+div.errorMessages img {
+    float: left;
+    padding: 3px 5px 0 5px;
+}
+
+div.errorMessages p {
+    overflow: hidden;
+    padding: 8px 10px 5px 5px;
+    margin: 0 0 5px 0;
+    vertical-align: middle;
+}
+
+
+
+
+
+
+
+

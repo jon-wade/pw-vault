@@ -1,246 +1,654 @@
 var chai = require('chai');
-var db = require('../app/db/database.js');
-var mongoose = require('mongoose');
-var mongooseConfig = require('../app/db/mongoose-config.js');
 var chaiHttp = require('chai-http');
-
-var index = require('../app/index.js');
-var emailVerification = require('../app/utils/email-verification.js');
-var login = require('../app/utils/login.js');
-var unit = require('./../app/utils/mailer.js');
-var usernameRecovery = require('../app/utils/username-recovery.js');
-var usernameVerification = require('../app/utils/username-verification.js');
-
-var should = chai.should();
-var expect = chai.expect;
-
-var app = index.app;
+var mockery = require('mockery');
 
 chai.use(chaiHttp);
+var should = chai.should();
 
-describe('unit test database.js functions', function() {
+describe('login.js unit test', function() {
 
-    it('should successfully create a new user in the database...', function(done) {
-        //clean the database before starting the test
-        db.controller.delete({}, mongooseConfig.userTest)
-            //create new user
-            .then(function(){
-                db.controller.create({
-                        'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
-                        'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
-                        'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-                    }, mongooseConfig.userTest)
-                    .then(function(res) {
-                        res.should.be.a('object');
-                        res.username.should.equal('U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=');
-                        res.password.should.equal('e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae');
-                        res.should.have.property('_id');
-                        done();
-                    }, function(rej) {
-                        rej.should.be.undefined;
-                        done();
-                    });
-            });
+    var login, mongooseConfig;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: true
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        var mockDb = {};
+        mockDb.controller = {
+            read: function(username, password, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest){
+                        reject('mocked db access error');
+                    }
+                    else {
+                        resolve([{
+                            _id: '57786733eeb287e63a404933',
+                            username: 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
+                            password: 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'
+                        }]);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        //this is the crypto library
+        mockery.registerAllowables(['crypto-js', './core', './x64-core', './lib-typedarrays', './enc-utf16', './md5', './sha1', './sha256', './sha224', './enc-base64', './sha512', './sha384', './sha3', './ripemd160', './hmac', './pbkdf2', './evpkdf', './cipher-core', './mode-cfb', './mode-ctr', './mode-ctr-gladman', './mode-ofb', './mode-ecb', './pad-ansix923', './pad-iso10126', './pad-iso97971', './pad-zeropadding', './pad-nopadding', './format-hex', './aes', './tripledes', './rc4', './rabbit', './rabbit-legacy', './../app/utils/login.js', './secret.js']);
+
+        login = require('./../app/utils/login.js');
+
+        done();
+
+
     });
 
-    it('should successfully read the database and find an existing user returning all fields associated with that user...', function(done) {
-        db.controller.read({
-                'username':'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
-            }, {}, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.a('array');
-                res[0].should.have.property('_id');
-                res[0].username.should.equal('U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=');
-                res[0].password.should.equal('e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae');
-                done();
-            }, function(rej) {
-                rej.should.be.undefined;
-                done();
-            });
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
     });
 
-    it('when searching for a user that does not exist, should successfully respond with empty array ...', function(done) {
-        db.controller.read({'username': 'jonwade'}, {}, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.a('array');
-                res.length.should.equal(0);
-                done();
-            }, function(rej) {
-                rej.should.be.undefined;
-                done();
-            });
+
+
+    it('should return an _id when username and password is found and match in the db...', function (done) {
+
+        login.check('jonwade', 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae', mongooseConfig.userTest).then(function (res) {
+            //console.log('resolved...', res);
+            res.should.be.a('object');
+            res.should.have.property('_id');
+            done();
+        }, function (rej) {
+            //console.log('rejected...', rej);
+            rej.should.be.a('object');
+            rej.should.have.property('errorMessage');
+            done();
+        });
+
     });
 
-    //TODO: unit test finding an _id (which throws an error from db)
+    it('should return an error when username is not found...', function (done) {
 
-    it('should throw error when trying to create a duplicate username...', function(done) {
-        db.controller.create({
-                'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
-                'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
-                'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.undefined;
-                done();
-            }, function(rej) {
-                rej.should.be.a('object');
-                rej.name.should.equal('MongoError');
-                rej.code.should.equal(11000);
-                rej.message.should.contain('U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=');
-                done();
-            });
+        login.check('jonwad', 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae', mongooseConfig.userTest).then(function (res) {
+            //console.log('resolved...', res);
+            res.should.be.a('object');
+            res.should.have.property('_id');
+            done();
+        }, function (rej) {
+            //console.log('rejected...', rej);
+            rej.should.be.a('object');
+            rej.should.have.property('errorMessage');
+            done();
+        });
+
     });
 
-    it('should throw error when trying to create a username with less than 44 characters...', function(done) {
-        db.controller.create({
-                'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLG',
-                'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
-                'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.undefined;
-                done();
-            }, function(rej) {
-                rej.should.be.a('object');
-                rej.name.should.equal('ValidationError');
-                rej.errors.username.message.should.contain('shorter than the minimum allowed length');
-                rej.errors.username.value.should.equal('U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLG');
-                done();
-            });
-    });
+    it('should return an error when an incorrect model is passed...', function (done) {
 
-    it('should throw error when trying to create a password with less than 64 characters...', function(done) {
-        db.controller.create({
-                'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
-                'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69',
-                'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.undefined;
-                done();
-            }, function(rej) {
-                rej.should.be.a('object');
-                rej.name.should.equal('ValidationError');
-                rej.errors.password.message.should.contain('shorter than the minimum allowed length');
-                rej.errors.password.value.should.equal('e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69');
-                done();
-            });
-    });
-
-    it('should successfully update an existing user...', function(done) {
-        db.controller.update({
-                username: 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
-            },{
-                password: 'abcde71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                //console.log('res=', res);
-                res.should.be.a('object');
-                res.username.should.equal('U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=');
-                done();
-            }, function(rej) {
-                rej.should.be.undefined;
-                done();
-            });
-    });
-
-    it('should not update a non-existent user...', function(done) {
-        db.controller.update({
-                username: 'ABCsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
-            },{
-                password: 'abcde71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                expect(res).to.equal(null);
-                done();
-            }, function(rej) {
-                rej.should.be.undefined;
-                done();
-            });
-    });
-
-    it('should successfully delete an existing user, returning "n" as 1...', function(done) {
-        db.controller.delete({
-                'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.a('object');
-                res.result.ok.should.equal(1);
-                res.result.n.should.equal(1);
-                done();
-            }, function(rej) {
-                rej.should.be.undefined;
-                done();
-            });
-    });
-
-    it('should return "n" as zero when you try to delete a user that does not exist', function(done) {
-        db.controller.delete({
-                'username': 'sdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
-            }, mongooseConfig.userTest)
-            .then(function(res) {
-                res.should.be.a('object');
-                res.result.ok.should.equal(1);
-                res.result.n.should.equal(0);
-                done();
-            }, function(rej) {
-                rej.should.be.undefined;
-                done();
-            });
+        login.check('jonwade', 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae', mongooseConfig.userDev).then(function (res) {
+            //console.log('resolved...', res);
+            res.should.be.a('object');
+            res.should.have.property('_id');
+            done();
+        }, function (rej) {
+            //console.log('rejected...', rej);
+            rej.should.be.a('object');
+            rej.should.have.property('errorMessage');
+            rej.should.have.property('error');
+            done();
+        });
 
     });
 
 });
 
-describe('login.js unit test', function() {
+describe('mailer.js unit test', function() {
 
-    it('should return an _id when username and password is found...', function(done) {
-        db.controller.create({
-                username: "U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=",
-                password: "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
-                email: "6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e"
-            }, mongooseConfig.userTest)
-            .then(function() {
-                login.check('jonwade', 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae', mongooseConfig.userTest).then(function(res) {
-                    //console.log('res=', res);
-                    res.should.be.a('object');
-                    res.should.have.property('_id');
-                    done();
-                }, function(rej) {
-                    console.log('rej=', rej);
-                    done();
-                });
+    var mailer;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        var mockNodemailer = {
+            createTransport: function() {
+                //this is just returning an object with a sendMail method
+                return {
+                    sendMail: function(mailOptions, callback) {
+                        if (mailOptions.to === 'jonwadeuk@gmail.com') {
+                            //console.log('calling send mail with mailOptions...', mailOptions);
+                            var mockResponse = {
+                                response: '250 Great success',
+                                accepted: ['jonwadeuk@gmail.com'],
+                                envelope: {
+                                    to: ['jonwadeuk@gmail.com'],
+                                    from: 'admin@jonwade.codes'
+                                }
+                            };
+                            callback(false, mockResponse);
+                        }
+                        else if (mailOptions.to === 'jonwadeukgmail.com') {
+                            var mockError = {
+                                code: 'EENVELOPE'
+                            };
+                            callback(mockError);
+                        }
+
+                    }
+                };
+            }
+        };
+
+        mockery.registerMock('nodemailer', mockNodemailer);
+
+        mailer = require('./../app/utils/mailer.js');
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+    });
+
+    it('On successful sending, data should be an object, res.response should be "250 Great success", res.accepted[0] should be "jonwadeuk@gmail.com", res.envelope.to[0] should be "jonwadeuk@gmail.com, res.envelope.from should be "admin@jonwade.codes" ...', function(done) {
+
+        mailer.send('jonwadeuk@gmail.com', 'success test', 'hello world!').then(function (res) {
+            res.should.be.a('object');
+            res.response.should.equal('250 Great success');
+            res.accepted[0].should.equal('jonwadeuk@gmail.com');
+            res.envelope.to[0].should.equal('jonwadeuk@gmail.com');
+            res.envelope.from.should.equal('admin@jonwade.codes');
+            done();
+        }, function(rej) {
+            //err return from .send() promise
+        });
+    });
+
+    it('On unsuccessful sending, an error message should be received', function(done){
+        mailer.send('jonwadeukgmail.com', 'error test', 'this will not arrive').then(
+            function(success){
+                //testing error response, not success
+            },
+            function(rej){
+                //console.log(rej);
+                //console.log('keys', Object.keys(rej));
+                rej.code.should.include('EENVELOPE');
+                done();
             });
     });
 
-    it('should return an error when username and password is not found...', function(done) {
-        login.check('jonwad', 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae', mongooseConfig.userTest).then(function(res) {
-            console.log('res=', res);
+});
+
+describe('registration.js unit test', function() {
+
+    var mongooseConfig, registration, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        mockDb = {};
+        mockDb.controller = {
+            create: function(userObj, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest){
+                        reject('mocked db access error');
+                    }
+                    else if (userObj.password !== 'hashedPassword' || userObj.email !== 'encryptedEmail') {
+                        reject({});
+                    }
+                    else if(userObj.password === 'hashedPassword' && userObj.email === 'duplicateEmail') {
+                        reject({});
+                    }
+                    else {
+                        resolve({});
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        registration = require('./../app/utils/registration.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return successMessage "user successfully created"...', function(done) {
+        registration.create('testuser', 'hashedPassword', 'encryptedEmail', mongooseConfig.userTest).then(function(res) {
+            //successful registration
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('user successfully created');
+            done();
+        }, function(rej) {
+            //failed registration
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('user creation failed');
+            done();
+        });
+
+    });
+
+    it('should return errorMessage "user creation failed" when trying to create a duplicate user with a duplicate email...', function(done) {
+        registration.create('testuser', 'hashedPassword', 'duplicateEmail', mongooseConfig.userTest).then(function(res) {
+            //successful registration
+            //console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('user successfully created');
+            done();
+        }, function(rej) {
+            //failed registration
+            //console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('user creation failed');
+            done();
+        });
+
+    });
+});
+
+describe('email-verification.js unit test', function() {
+
+    var mongooseConfig, emailVerification, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, params, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest) {
+                        reject('mocked db access error');
+                    }
+                    else if (query.email !== 'encryptedEmail') {
+                        resolve([]);
+                    }
+                    else {
+                        resolve([{
+                            _id: '57786733eeb287e63a404933'
+                        }]);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        emailVerification = require('./../app/utils/email-verification.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return "Registered email address" on successfully finding email in database...', function(done) {
+        emailVerification.check('encryptedEmail', mongooseConfig.userTest).then(function(res) {
+            res.successMessage.should.include('Registered email address');
+            res.should.have.property('_id');
+            done();
+        }, function(rej) {
+            rej.errorMessage.should.include('Not a registered email address');
+            done();
+
+        });
+    });
+
+    it('should return "Not a registered email address" on failing to find email in database...', function(done) {
+        emailVerification.check('wrongEmail', mongooseConfig.userTest).then(function(res) {
+            //console.log('res=', res);
+            res.successMessage.should.include('Registered email address');
+            res.should.have.property('_id');
+            done();
+        }, function(rej) {
+            //console.log('rej=', rej);
+            rej.errorMessage.should.include('Not a registered email address');
+            done();
+
+        });
+    });
+
+});
+
+describe('username-recovery.js unit test', function() {
+
+    var usernameRecovery, mockDb, mockMailer, mongooseConfig;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        //mongooseConfig Mock
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, params, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest) {
+                        reject('mocked db access error');
+                    }
+                    else if (query._id !== '57786733eeb287e63a404933') {
+                        reject();
+                    }
+                    else {
+                        resolve([{
+                            _id: '57786733eeb287e63a404933',
+                            username: 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
+                        }]);
+                    }
+                });
+            }
+        };
+
+        //mockMailer
+        mockMailer = {
+            send: function(email, subject, message) {
+                return new Promise(function(resolve, reject) {
+                    if (email === 'jonwadeuk@gmail.com') {
+                        resolve();
+                    }
+                    else if (email === 'jonwadeukgmail.com') {
+                        reject();
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+        mockery.registerMock('../utils/mailer.js', mockMailer);
+        mockery.registerAllowable('../utils/secret.js');
+
+        usernameRecovery = require('./../app/utils/username-recovery.js');
+        done();
+
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+    });
+
+    it('on successful mailing of username, it should return object containing a successMessage property...', function(done) {
+        usernameRecovery.go('57786733eeb287e63a404933', 'jonwadeuk@gmail.com', mongooseConfig.userTest).then(function(res) {
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            done();
+        }, function(rej) {
+            should.have(rej, null);
+            done();
+        });
+    });
+
+    it('should return an object with an errorMessage property if email address is incorrectly formatted...', function(done) {
+        usernameRecovery.go('57786733eeb287e63a404933', 'jonwadeukgmail.com', mongooseConfig.userTest).then(function(res) {
+            should.have(res, null);
             done();
         }, function(rej) {
             rej.should.be.a('object');
-            rej.errorMessage.should.equal('Username and password combination do not match existing user.');
-            db.controller.delete({}, mongooseConfig.userTest);
+            rej.should.have.a.property('errorMessage');
+            done();
+        });
+    });
+
+    it('should return an object with an errorMessage if no match in the database against the submitted id...', function(done) {
+        usernameRecovery.go('1234567', 'jonwadeuk@gmail.com', mongooseConfig.userTest).then(function(res) {
+            should.have(res, null);
+            done();
+        }, function(rej) {
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            done();
+        })
+    });
+
+
+
+
+});
+
+describe('username-verification.js unit test', function() {
+
+    var mongooseConfig, mockDb, usernameVerification;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        //mongooseConfig Mock
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, params, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest) {
+                        reject('mocked db access error');
+                    }
+                    else {
+                        resolve([{
+                            _id: '57786733eeb287e63a404933',
+                            username: 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
+                        }]);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+        mockery.registerAllowable('../utils/secret.js');
+
+        usernameVerification = require('./../app/utils/username-verification.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+    });
+
+    it('should return "Registered username" on successfully finding username in database...', function(done) {
+        usernameVerification.check('jonwade', mongooseConfig.userTest).then(function(res) {
+            res.successMessage.should.include('Registered username');
+            res.should.have.property('_id');
+            done();
+        }, function(rej) {
+            rej.errorMessage.should.include('Not a registered username');
+            done();
+        });
+    });
+
+    it('should return "Not a registered username" on failing to find username in database...', function(done) {
+        usernameVerification.check('jonwad', mongooseConfig.userTest).then(function(res) {
+            res.successMessage.should.include('Registered username');
+            res.should.have.property('_id');
+            done();
+        }, function(rej) {
+            rej.errorMessage.should.include('Not a registered username');
             done();
         });
     });
 
 });
 
-describe('unit test index.js server', function() {
+describe('index.js unit test', function() {
 
-    it('On GET /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
-        chai.request(app)
-            .get('/')
-            .end(function(err, res) {
-                res.should.have.status(200);
-                res.text.should.include('<head>');
-                res.notFound.should.equal(false);
-                done();
-            });
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfigMock = {};
+
+        mongooseConfigMock.userDev = {};
+
+        loginMock = {
+            check: function(username, password, model) {
+                return new Promise(function(resolve, reject) {
+                    if (username === 'jonwade' && password === 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae') {
+                        resolve({
+                            _id : '57786733eeb287e63a404933'
+                        });
+                    }
+                    else {
+                        reject({
+                            errorMessage: 'Username and password combination do not match existing user.'
+                        });
+                    }
+                });
+
+            }
+        };
+
+        emailVerificationMock = {
+            check: function(email, model) {
+                return new Promise(function(resolve, reject) {
+                    if (email !== '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e') {
+                        reject({
+                            errorMessage: 'Not a registered email address.'
+                        });
+                    }
+                    else {
+                        resolve({
+                            successMessage: 'Registered email address',
+                            _id: '57786733eeb287e63a404933'
+                        });
+                    }
+                });
+            }
+
+        };
+
+        usernameVerificationMock = {
+            check: function(username, model) {
+                return new Promise(function(resolve, reject) {
+                    if(username === 'jonwade') {
+                        resolve({
+                            successMessage: 'Registered username',
+                            _id: '57786733eeb287e63a404933'
+
+                        });
+                    }
+                    else {
+                        reject({
+                            errorMessage: 'Not a registered username'
+                        });
+                    }
+                });
+            }
+        };
+
+        usernameRecoveryMock = {
+            go: function(id, email, model) {
+                return new Promise(function(resolve, reject) {
+                    if (email === 'jonwadeukgmail.com') {
+                        reject({
+                            errorMessage: 'Email incorrectly formatted'
+                        });
+                    }
+                    else if (id === '57786733eeb287e63a404933') {
+                        resolve({
+                            successMessage: 'Username has been successfully dispatched by the mailer program.'
+                        });
+                    }
+                    else {
+                        reject({
+                            errorMessage: 'No username found that matches _id.'
+                        });
+                    }
+                });
+            }
+
+        };
+
+        registrationMock = {
+            create: function(username, password, email, model) {
+                return new Promise(function(resolve, reject) {
+                    if(username !=='testuser' || password !=='testpassword' || email !== 'testemail') {
+                        reject({errorMessage: 'user creation failed'});
+                    }
+                    else {
+                        resolve({successMessage: 'user successfully created'});
+                    }
+                });
+
+            }
+        };
+
+        mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
+        mockery.registerMock('./utils/login.js', loginMock);
+        mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
+        mockery.registerMock('./utils/username-verification.js', usernameVerificationMock);
+        mockery.registerMock('./utils/username-recovery.js', usernameRecoveryMock);
+        mockery.registerMock('./utils/registration.js', registrationMock);
+
+        index = require('./../app/index.js');
+        app = index.app;
+
+        done();
+
     });
 
-    it('On POST /login-test, on success should return an object with an _id property with a status 200...', function(done){
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+    });
+
+    it('On POST /login-test, on success should return an object with an _id property with a status 200...', function(done) {
         chai.request(app)
             .post('/login-test')
             .send({username: 'jonwade', password:  'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'})
@@ -327,12 +735,10 @@ describe('unit test index.js server', function() {
             });
     });
 
-
-    it.skip('On POST /username-recovery, on success should return an object with a successMessage property with a status 200...', function(done){
-        this.timeout(15000);
+    it('On POST /username-recovery, on success should return return an object with a successMessage property with a status 200...', function(done) {
         chai.request(app)
             .post('/username-recovery')
-            .send({_id: '5773272b231c75eb281e4460', email: 'jonwadeuk@gmail.com'})
+            .send({_id : '57786733eeb287e63a404933', email: 'jonwadeuk@gmail.com'})
             .end(function(err, res) {
                 should.equal(err, null);
                 res.should.have.status(200);
@@ -344,11 +750,10 @@ describe('unit test index.js server', function() {
             });
     });
 
-    it('On POST /username-recovery, on _id lookup failure should return an object with a errorMessage property with a status 404...', function(done){
-        this.timeout(15000);
+    it('On POST /username-recovery, on _id error should return an object with an errorMessage property with a status 404...', function(done) {
         chai.request(app)
             .post('/username-recovery')
-            .send({_id: '5773272b231c75eb281e4462', email: 'jonwadeuk@gmail.com'})
+            .send({_id : '12386733eeb287e63a404933', email: 'jonwadeuk@gmail.com'})
             .end(function(err, res) {
                 res.should.have.status(404);
                 res.should.be.json;
@@ -359,8 +764,8 @@ describe('unit test index.js server', function() {
             });
     });
 
-    it('On POST /username-recovery, on email format failure should return an object with a errorMessage property with a status 404...', function(done){
-        this.timeout(15000);
+    it('On POST /username-recovery, on email format failure should return an object with a errorMessage property with a status 404...', function(done) {
+
         chai.request(app)
             .post('/username-recovery')
             .send({_id: '5773272b231c75eb281e4460', email: 'jonwadeukgmail.com'})
@@ -372,8 +777,48 @@ describe('unit test index.js server', function() {
                 res.body.errorMessage.should.be.a('string');
                 done();
             });
+
     });
 
+    it('On POST /create, on success should return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/create')
+            .send({username: 'testuser', email: 'testemail', password: 'testpassword'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /create, on error should return an object with an errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/create')
+            .send({username: 'errorcase', email: 'testemail', password: 'testpassword'})
+            .end(function(err, res) {
+                err.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On GET /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
+        chai.request(app)
+            .get('/')
+            .end(function(err, res) {
+                res.should.have.status(200);
+                res.text.should.include('<head>');
+                res.notFound.should.equal(false);
+                done();
+            });
+    });
 
     it('On GET page that does not exist, should return the home page, with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)
@@ -385,180 +830,204 @@ describe('unit test index.js server', function() {
                 done();
             });
     });
-});
-
-describe('unit test email-verification.js', function() {
-
-    it('it should return "Registered email address" on successfully finding email in database...', function(done) {
-        //create test user
-
-        db.controller.create({
-                username: "U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=",
-                password: "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
-                email: "6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e"
-            }, mongooseConfig.userTest)
-            .then(function() {
-                emailVerification.check('6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e', mongooseConfig.userTest)
-                    .then(function(res) {
-                        res.successMessage.should.include('Registered email address');
-                        res.should.have.property('_id');
-                        done();
-                    },function(rej) {
-                        console.log('rej=', rej);
-                        rej.errorMessage.should.include('Not a registered email address');
-                        done();
-                    });
-            });
-        db.controller.delete({}, mongooseConfig.userTest);
-    });
 
 });
 
-describe('unit test username-verification.js', function() {
+describe('database.js unit test', function() {
 
-    it('it should return "Registered username" on successfully finding username in database...', function(done) {
-        //create test user
+    var schema, db;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
 
-        db.controller.create({
-                username: "U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=",
-                password: "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
-                email: "6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e"
-            }, mongooseConfig.userTest)
-            .then(function() {
-                usernameVerification.check('jonwade', mongooseConfig.userTest)
-                    .then(function(res) {
-                        console.log('res=', res);
-                        res.successMessage.should.include('Registered username');
-                        res.should.have.property('_id');
-                        done();
-                    },function(rej) {
-                        console.log('rej=', rej);
-                        rej.errorMessage.should.include('Not a registered username');
-                        done();
+        schema = {
+            remove: function(data, callback) {
+                if (data === 'non existent user') {
+                    callback(false, {
+                        result: {
+                            ok: 1,
+                            n: 0
+                        }
                     });
-            });
-        db.controller.delete({}, mongooseConfig.userTest);
-    });
-
-    it('it should return "Not a registered username" on failing to find username in database...', function(done) {
-        //create test user
-        db.controller.create({
-                username: "U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=",
-                password: "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
-                email: "6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e"
-            }, mongooseConfig.userTest)
-            .then(function() {
-                usernameVerification.check('jonwad', mongooseConfig.userTest)
-                    .then(function(res) {
-                        //console.log('res=', res);
-                        res.successMessage.should.include('Registered username');
-                        res.should.have.property('_id');
-                        done();
-                    },function(rej) {
-                        //console.log('rej=', rej);
-                        rej.errorMessage.should.include('Not a registered username');
-                        done();
+                }
+                else if(data === 'existing user') {
+                    callback(false, {
+                        result: {
+                            ok: 1,
+                            n: 1
+                        }
                     });
-            });
-        db.controller.delete({}, mongooseConfig.userTest);
-    });
-
-});
-
-describe('unit test username-recovery.js', function() {
-    this.timeout(15000);
-    it.skip('on successful mailing of username, it should return object containing successMessage and mail username to jonwadeuk@gmail.com...', function(done) {
-        db.controller.create({
-            'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
-            'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
-            'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-        }, mongooseConfig.userTest).then(
-            function(res) {
-                var _id = res._id;
-                usernameRecovery.go(_id, 'jonwadeuk@gmail.com', mongooseConfig.userTest)
-                    .then(function(res) {
-                        res.should.be.a('object');
-                        res.should.have.a.property('successMessage');
-                        done();
-                    }, function(rej) {
-                        should.have(rej, null);
-                        done();
+                }
+                else {
+                    callback({
+                        errorMessage: 'delete function error'
                     });
+                }
+            },
+            create: function(data, callback) {
+                if (data === 'testuser') {
+                    callback(false, {})
+                }
+                else {
+                    callback({errorMessage: 'create function error'});
+                }
+
+            },
+            findOneAndUpdate: function(data, content, callback) {
+                if (data === 'existing user') {
+                    callback(false, {});
+                }
+                else {
+                    callback({errorMessage: 'update function error'})
+                }
+
+            },
+            find: function(data, fields, callback) {
+                if (data === 'existing user') {
+                    callback(false, [{_id: ''}]);
+                }
+                else if (data !== 'errorcase') {
+                    callback(false, []);
+                }
+                else {
+                    callback({errorMessage: 'read function error'});
+                }
             }
-        );
-        db.controller.delete({}, mongooseConfig.userTest);
+        };
+
+        db = require('./../app/db/database.js');
+
+        done();
+
     });
 
-    it('should return an object with an errorMessage if email address is incorrectly formatted...', function(done) {
-        db.controller.create({
-            'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
-            'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
-            'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-        }, mongooseConfig.userTest).then(
-            function() {
-                var _id = 1234567;
-                usernameRecovery.go(_id, 'jonwadeukgmail.com', mongooseConfig.userTest)
-                    .then(function(res) {
-                        should.have(res, null);
-                        done();
-                    }, function(rej) {
-                        rej.should.be.a('object');
-                        rej.should.have.a.property('errorMessage');
-                        done();
-                    });
-            }
-        );
-        db.controller.delete({}, mongooseConfig.userTest);
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
     });
 
+    it('should return "n" as zero when you try to delete a user that does not exist', function(done) {
+        db.controller.delete('non existent user', schema)
+            .then(function(res) {
+                res.should.be.a('object');
+                res.result.ok.should.equal(1);
+                res.result.n.should.equal(0);
+                done();
 
-    it('should return an object with an errorMessage if no match in the database against the submitted id...', function(done) {
-        db.controller.create({
-            'username': 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g=',
-            'password': 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae',
-            'email': '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
-        }, mongooseConfig.userTest).then(
-            function(res) {
-                var _id = 1234567;
-                usernameRecovery.go(_id, 'jonwadeuk@gmail.com', mongooseConfig.userTest)
-                    .then(function(res) {
-                        should.have(res, null);
-                        done();
-                    }, function(rej) {
-                        rej.should.be.a('object');
-                        rej.should.have.a.property('errorMessage');
-                        done();
-                    });
-            }
-        );
-        db.controller.delete({}, mongooseConfig.userTest);
-    });
-
-});
-
-describe('mailer unit test', function(){
-    this.timeout(15000);
-    it.skip('On successful sending, data should be an object, data.response should be "250 Great success", data.accepted[0] should be "jonwadeuk@gmail.com", data.envelope.to[0] should be "jonwadeuk@gmail.com, data.envelope.from should be "admin@jonwade.codes" ...', function(done){
-        unit.send('jonwadeuk@gmail.com', 'success test', 'hello world!').then(function(data){
-            data.should.be.a('object');
-            data.response.should.equal('250 Great success');
-            data.accepted[0].should.equal('jonwadeuk@gmail.com');
-            data.envelope.to[0].should.equal('jonwadeuk@gmail.com');
-            data.envelope.from.should.equal('admin@jonwade.codes');
-            done();
+        }, function(rej) {
+                rej.should.be.undefined;
+                done();
         });
     });
-    it('On unsuccessful sending, an error message should be received', function(done){
-        unit.send('jonwadeukgmail.com', 'error test', 'this will not arrive').then(
-            function(success){
-                //testing error response, not success
-            },
-            function(data){
-                //console.log(data.code);
-                //console.log('keys', Object.keys(data));
-                data.code.should.include('EENVELOPE');
+
+    it('should successfully delete an existing user, returning "n" as 1...', function(done) {
+        db.controller.delete('existing user', schema)
+            .then(function(res) {
+                res.should.be.a('object');
+                res.result.ok.should.equal(1);
+                res.result.n.should.equal(1);
+                done();
+            }, function(rej) {
+                rej.should.be.undefined;
                 done();
             });
     });
-    //TODO: testing for bounced emails
+
+    it('should throw an error if there was a problem with the deletion function...', function(done) {
+        db.controller.delete('errorcase', schema)
+            .then(function(res) {
+                //no test here as checking error return
+            }, function(rej) {
+                rej.should.be.a('object');
+                rej.should.have.property('errorMessage');
+                done();
+            });
+    });
+
+    it('should successfully create a new user in the database...', function(done) {
+        db.controller.create('testuser', schema)
+            .then(function(res) {
+                res.should.be.a('object');
+                done();
+            }, function(rej) {
+                //no test here
+            });
+    });
+
+    it('should throw an error if there was a problem with the creation function...', function(done) {
+        db.controller.create('errorcase', schema)
+            .then(function(res) {
+                //no test here as checking error return
+            }, function(rej) {
+                rej.should.be.a('object');
+                rej.should.have.property('errorMessage');
+                done();
+            });
+    });
+
+    it('should successfully update an existing user...', function(done) {
+        db.controller.update('existing user', {}, schema)
+            .then(function(res) {
+                res.should.be.a('object');
+                done();
+            }, function(rej) {
+                //no test here
+            });
+    });
+
+    it('should throw an error if there was a problem with the update function...', function(done) {
+        db.controller.update('errorcase', {}, schema)
+            .then(function(res) {
+                //no test here as checking error return
+            }, function(rej) {
+                rej.should.be.a('object');
+                rej.should.have.property('errorMessage');
+                done();
+            });
+    });
+
+    it('should successfully read the database and find an existing user returning all fields associated with that user...', function(done) {
+        db.controller.read('existing user', 'test fields', schema)
+            .then(function(res) {
+                res.should.be.a('array');
+                res[0].should.have.property('_id');
+                done();
+            }, function(rej) {
+                //no test here
+            });
+        });
+
+
+    it('when searching for a user that does not exist, should successfully respond with empty array ...', function(done) {
+        db.controller.read('non existent user', 'test fields', schema)
+            .then(function(res) {
+                res.should.be.a('array');
+                res.length.should.equal(0);
+                done();
+            }, function(rej) {
+                //no test here
+            });
+
+    });
+
+    it('should throw an error if there was a problem with the read function...', function(done) {
+        db.controller.read('errorcase', 'test fields', schema)
+            .then(function(res) {
+                //no test here as checking error return
+            }, function(rej) {
+                rej.should.be.a('object');
+                rej.should.have.property('errorMessage');
+                done();
+            });
+    });
+
 });
+
+//TODO: remaining unit tests
+describe.skip('mongoose-config.js unit test', function() {});
+
+
+

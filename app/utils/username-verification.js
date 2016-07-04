@@ -7,6 +7,8 @@ exports.check = function (username, model) {
         //get encryption key
         var encryptionKey = secret.key().get_Key();
 
+        //console.log('encryptionKey', encryptionKey);
+
         //decrypt username stored in db
         var decrypt = function(ciphertext) {
             var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), encryptionKey);
@@ -15,6 +17,7 @@ exports.check = function (username, model) {
 
         db.controller.read({}, 'username', model)
             .then(function(res) {
+                //console.log('db res=', res);
                 var result = res.filter(function(item) {
                     return decrypt(item.username) === username;
                 });

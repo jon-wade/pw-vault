@@ -10,10 +10,11 @@ var environment = {
 };
 
 var User = mongoose.Schema({
-    username: {type: String, minlength: 44, unique: true, required: true},
+    username: {type: String, minlength: 44, index: {unique: true}, required: true},
     password: {type: String, minlength: 64, required: true},
-    email: {type: String, minlength:64, unique: true, required: true}
+    email: {type: String, minlength:64, index: {unique: true}, required: true}
 });
+
 
 var test = mongoose.createConnection(environment.test);
 var dev = mongoose.createConnection(environment.development);
