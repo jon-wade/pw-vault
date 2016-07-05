@@ -206,32 +206,20 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
     };
 
     //these handle the toggle function
-    $scope.username = true;
+    $scope.username = false;
     $scope.password = false;
     $scope.email = false;
 
     $scope.toggle = function(input) {
-        if($scope.username===true && input==='username') {
+        if(input==='username') {
             $scope.username = true;
             $scope.password = false;
             $scope.email = true;
         }
-        else if ($scope.username===false && input==='username') {
-            $scope.username = !$scope.username;
-            $scope.password = !$scope.password;
-            $scope.email = true;
-        }
-        else if ($scope.password===true && input==='password') {
+        else if (input==='password') {
             $scope.username = false;
             $scope.password = true;
             $scope.email = false;
-
-        }
-        else if ($scope.password===false && input==='password') {
-            $scope.username = !$scope.username;
-            $scope.password = !$scope.password;
-            $scope.email = false;
-
         }
     };
 

@@ -38,22 +38,22 @@ div#registration {
 div#login, div#welcome {
     width:49%;
     margin-top: 200px;
-    /*border: 1px dashed white;*/
+    border: 1px dashed white;
 }
 
 div.container {
     width: 60%;
     margin: 0 auto;
-    /*border: 1px dashed yellow;*/
+    border: 1px dashed yellow;
 }
 
-div.registrationForm {
+div.registrationForm, div#ui {
     width: 60%;
     margin: 0px auto 0 auto;
-    /*border: 1px dashed white;*/
+    border: 1px dashed white;
 }
 
-div.registrationForm h1#title {
+div.registrationForm h1#title, div#ui h1#title {
     margin-top: 0px;
     padding-top: 150px;
     text-align: center;
@@ -79,6 +79,19 @@ div#registrationMessages p.message {
     font-size: 1em;
 }
 
+div#ui h2 {
+    text-align: center;
+    /*border: 1px dashed pink;*/
+    margin: 0 auto 30px auto;
+    border-radius: 5px;
+    background-color: grey;
+    padding: 5px 0;
+}
+
+div#ui h2.selected {
+    background-color: rebeccapurple;
+}
+
 div#welcome {
     float: left;
 }
@@ -89,7 +102,7 @@ div#login {
 
 /* form elements */
 
-div#login div#username input, div#login div#password input, div.registrationForm input {
+div#login div#username input, div#login div#password input, div.registrationForm input, div#ui input {
     margin: 25px 0;
     width: 96%;
     padding: 10px 2% 10px 2%;
@@ -97,14 +110,14 @@ div#login div#username input, div#login div#password input, div.registrationForm
     border-radius: 5px;
 }
 
-div#login button#submitButton, div#welcome button#registerButton, div.registrationForm button {
+div#login button#submitButton, div#welcome button#registerButton, div.registrationForm button, div#ui button {
     display: block;
     width: 100px;
     border-radius: 5px;
     border: 0;
 }
 
-div.registrationForm button {
+div.registrationForm button, div#ui button {
     margin: 30px auto 10px auto;
 }
 
@@ -116,7 +129,7 @@ div#welcome button#registerButton {
     margin: 104px auto 0 auto;
 }
 
-div#login button#submitButton[disabled=disabled], div.registrationForm button[disabled=disabled] {
+div#login button#submitButton[disabled=disabled], div.registrationForm button[disabled=disabled], div#ui button[disabled=disabled] {
     background-color: lightgrey;
     color: darkgrey;
 }
