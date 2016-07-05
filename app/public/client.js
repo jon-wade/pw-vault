@@ -201,25 +201,34 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
     $rootScope.title = 'Password Vault | Forgotten';
 
+    //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
+    $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
+
     $scope.go = function (destination) {
         $location.path(destination);
     };
+
 
     //these handle the toggle function
     $scope.username = false;
     $scope.password = false;
     $scope.email = false;
 
+    //TODO: unit test from here again
+    $scope.changePassword = false;
+
     $scope.toggle = function(input) {
         if(input==='username') {
             $scope.username = true;
             $scope.password = false;
             $scope.email = true;
+            $scope.changePassword = false;
         }
         else if (input==='password') {
             $scope.username = false;
             $scope.password = true;
             $scope.email = false;
+            $scope.changePassword = true;
         }
     };
 
@@ -231,25 +240,37 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
 
     $scope.helpMe = function() {
+
         //firstly get the id from store, which has to be done client-side
         var _id=idStore.get_id();
 
         //deactivate the Help Me button so there is only one click sent
         $scope.helpMeClicked = true;
 
-        //then call the api endpoint /username-recovery
+        //if its username recovery via email
+        if ($scope.email) {
 
-        apiPOST.callAPI('/username-recovery', {_id: _id, email: $scope.emailInput})
-            .then(function(res) {
-                //successful username recovery
-                //hide the ui and display the message
-                $scope.ui=false;
-                $scope.emailSuccessMessage = true;
-            }, function(rej) {
-                //error in username recovery
-                $scope.ui=false;
-                $scope.emailErrorMessage = true;
-            });
+            //then call the api endpoint /username-recovery
+            apiPOST.callAPI('/username-recovery', {_id: _id, email: $scope.emailInput})
+                .then(function(res) {
+                    //successful username recovery
+                    //hide the ui and display the message
+                    $scope.ui=false;
+                    $scope.emailSuccessMessage = true;
+                }, function(rej) {
+                    //error in username recovery
+                    $scope.ui=false;
+                    $scope.emailErrorMessage = true;
+                });
+        }
+        else if($scope.changePassword) {
+            //then call a new endpoint...
+
+            console.log('calling update password endpoint');
+
+        }
+
+
     };
 
 

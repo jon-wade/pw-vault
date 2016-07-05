@@ -33,24 +33,31 @@ div#registration {
     min-height: 100vh;
 }
 
+div#forgotten {
+    background: url('../img/forgotten-background.jpg');
+    background-size: cover;
+    background-position: center center;
+    min-height: 100vh;
+}
+
 /* layout divs */
 
 div#login, div#welcome {
     width:49%;
     margin-top: 200px;
-    border: 1px dashed white;
+    /*border: 1px dashed white;*/
 }
 
 div.container {
     width: 60%;
     margin: 0 auto;
-    border: 1px dashed yellow;
+    /*border: 1px dashed yellow;*/
 }
 
 div.registrationForm, div#ui {
     width: 60%;
     margin: 0px auto 0 auto;
-    border: 1px dashed white;
+    /*border: 1px dashed white;*/
 }
 
 div.registrationForm h1#title, div#ui h1#title {
@@ -80,16 +87,18 @@ div.displayMessage p.message, div#registrationMessages p.message {
 }
 
 div#ui h2 {
+    padding: 10px 0;
     text-align: center;
-    /*border: 1px dashed pink;*/
+
     margin: 0 auto 30px auto;
     border-radius: 5px;
     background-color: grey;
-    padding: 5px 0;
 }
+
 
 div#ui h2.selected {
     background-color: rebeccapurple;
+    border: 3px solid black;
 }
 
 div#welcome {
@@ -110,11 +119,16 @@ div#login div#username input, div#login div#password input, div.registrationForm
     border-radius: 5px;
 }
 
+div#forgotten div.container div#ui form#changePasswordForm input {
+    margin: 20px 0px 5px 0px;
+}
+
 button {
     display: block;
     width: 100px;
     border-radius: 5px;
     border: 0;
+    padding: 5px 0;
 }
 
 div.registrationForm button, div#ui button, div#forgotten div.container button#back {
