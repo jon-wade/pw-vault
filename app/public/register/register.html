@@ -1,6 +1,7 @@
 <div id="registration">
     <div class="container">
-        <div class="registrationForm">
+        <!-- registration form here -->
+        <div class="registrationForm" ng-show="registrationForm">
             <h1 id="title">Registration</h1>
             <form id="registrationForm" name="registrationForm" novalidate ng-submit="register()">
 
@@ -43,8 +44,6 @@
                     <p class="errorText">Please input a password.</p>
                 </div>
 
-
-
                 <!-- show confirm password field when rest of form is complete -->
                 <div id="confirmPassword" ng-show="passwordInput && (!registrationForm.passwordInput.$error.required && !registrationForm.passwordInput.$error.pattern)">
 
@@ -66,6 +65,17 @@
                 <button type="submit" id="registerButton" name="registerButton" ng-disabled="!passwordConfirm">Register</button>
                 <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/')">Cancel</button>
             </form>
+        </div>
+        <!-- registration and error confirmation here -->
+        <div id="registrationMessages" ng-show="registrationSuccess">
+            <h1>Way to go...!!!</h1>
+            <p>You have successfully registered for Password Vault.</p>
+            <p class="message">You will be automagically logged-in to the app in <span ng-bind="timer"></span> seconds.</p>
+        </div>
+        <div id="errorMessage" ng-show="registrationError">
+            <h1>Oh no...!!!</h1>
+            <p>Sorry! We’ve had a problem processing your registration. You’ll have to try again - gutted!!<p>
+            <p class="message">To make it easier, you will be automagically returned to the homepage in <span ng-bind="timer"></span> seconds.</p>
         </div>
     </div>
 </div>

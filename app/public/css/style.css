@@ -59,6 +59,26 @@ div.registrationForm h1#title {
     text-align: center;
 }
 
+div#registrationMessages {
+    text-align: center;
+}
+
+div#registrationMessages h1 {
+    margin-top: 0px;
+    padding-top: 325px;
+    font-size: 4em;
+}
+
+div#registrationMessages p {
+    font-size: 2em;
+    margin-bottom: 0px;
+}
+
+div#registrationMessages p.message {
+    margin-top: 20px;
+    font-size: 1em;
+}
+
 div#welcome {
     float: left;
 }

@@ -52,7 +52,6 @@ client.directive('email', ['$q', '$timeout', 'apiPOST', 'idStore', function($q, 
     };
 }]);
 
-//TODO: unit test emailReg (just switched rej and res around and removed idStore.set_id) - need template code first
 client.directive('emailReg', ['$q', 'apiPOST', function($q, apiPOST) {
     return {
         require: 'ngModel',
@@ -79,7 +78,6 @@ client.directive('emailReg', ['$q', 'apiPOST', function($q, apiPOST) {
     };
 }]);
 
-//TODO: unit test userReg (as above) - need template code first
 client.directive('userReg', ['$q', 'apiPOST', function($q, apiPOST) {
     return {
         require: 'ngModel',
@@ -91,7 +89,6 @@ client.directive('userReg', ['$q', 'apiPOST', function($q, apiPOST) {
                 var def = $q.defer();
 
                 //username gets encrypted on server side before storing in database, so send username in plaintext
-                //need a new endpoint, /username-verification
                 apiPOST.callAPI('/username-verification', {username : modelValue})
                     .then(function(res) {
                         //username is registered
@@ -270,7 +267,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
 }]);
 
-client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', function($scope, idStore, $rootScope, $location, apiPOST) {
+client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', '$interval', function($scope, idStore, $rootScope, $location, apiPOST, $interval) {
 
     $rootScope.title = 'Password Vault | Register';
 
@@ -278,9 +275,12 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
         $location.path(destination);
     };
 
-    //TODO: unit test from here
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
     $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
+
+    $scope.registrationForm = true;
+    $scope.registrationSuccess = false;
+    $scope.registrationError = false;
 
     $scope.register = function() {
 
@@ -294,16 +294,31 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
 
         apiPOST.callAPI('/create', {username: username, password: hashedPassword, email: hashedEmail}).then(function(res) {
             //successful registration of new user
-            console.log('successfully registered');
-            //TODO: update user interface
-
+            //console.log('successfully registered', res);
+            idStore.set_id(res.data);
+            $scope.registrationSuccess = true;
+            $scope.registrationForm = false;
+            $scope.redirect(10, '/manager');
         }, function(rej) {
             //failed registration of new user
-            console.log('error in registration');
-            //TODO: update user interface
-
+            //console.log('error in registration', rej);
+            $scope.registrationError = true;
+            $scope.registrationForm = false;
+            $scope.redirect(10, '/home');
         });
 
+    };
+
+    $scope.redirect = function(number, path) {
+
+         $scope.timer = number;
+         if (number === 0) {
+             return $scope.go(path);
+         }
+         $interval(function() {
+            number--;
+            $scope.redirect(number, path);
+        }, 1000);
     };
 
 

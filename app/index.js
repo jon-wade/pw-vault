@@ -59,8 +59,8 @@ app.post('/username-recovery', jsonParser, function(req, res) {
 app.post('/create', jsonParser, function(req, res) {
     registration.create(req.body.username, req.body.password, req.body.email, mongooseConfig.userDev)
         .then(function(success) {
-            //console.log('success=', success);
-            res.status(200).send(success);
+            //console.log('success.data._id=', success.data._id);
+            res.status(200).send(success.data._id);
         }, function(error) {
             //console.log('error=', error);
             res.status(404).send(error);

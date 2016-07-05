@@ -5,8 +5,6 @@ var mockery = require('mockery');
 chai.use(chaiHttp);
 var should = chai.should();
 
-console.log('still need to isolate express dependencies...');
-
 describe('login.js unit test', function() {
 
     var login, mongooseConfig;
@@ -526,6 +524,8 @@ describe('username-verification.js unit test', function() {
 
 describe('index.js unit test', function() {
 
+    console.log('still need to isolate express dependencies for index.js test...');
+
     var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock;
     beforeEach(function(done) {
         mockery.enable({
@@ -623,7 +623,7 @@ describe('index.js unit test', function() {
                         reject({errorMessage: 'user creation failed'});
                     }
                     else {
-                        resolve({successMessage: 'user successfully created'});
+                        resolve({successMessage: 'user successfully created', data: {_id: '1234'}});
                     }
                 });
 
@@ -782,17 +782,16 @@ describe('index.js unit test', function() {
 
     });
 
-    it('On POST /create, on success should return an object with a successMessage property with a status 200...', function(done) {
+    it('On POST /create, on success should return an object with a data property with a status 200...', function(done) {
         chai.request(app)
             .post('/create')
             .send({username: 'testuser', email: 'testemail', password: 'testpassword'})
             .end(function(err, res) {
+                //console.log('res=', res);
                 should.equal(err, null);
                 res.should.have.status(200);
-                res.should.be.json;
-                res.body.should.be.a('object');
-                res.body.should.have.property('successMessage');
-                res.body.successMessage.should.be.a('string');
+                res.text.should.equal('1234');
+                res.text.should.be.a('string');
                 done();
             });
     });
