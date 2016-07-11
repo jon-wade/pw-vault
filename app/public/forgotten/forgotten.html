@@ -90,6 +90,21 @@
             <h1>Oh No!</h1>
             <p>There was a problem trying to send your username to you. Please try again later…</p>
         </div>
+
+
+        <!-- password success and error messages -->
+        <div class="displayMessage" id="passwordSuccessMessage" ng-show="passwordSuccessMessage">
+            <h1>Yay!!</h1>
+            <p>Your password has been changed. Go back to the homepage to login.</p>
+        </div>
+        <div class="displayMessage" id="passwordErrorMessage" ng-show="passwordErrorMessage">
+            <h1>Oh No!</h1>
+            <p>Something went wrong updating your password. Please try again later.</p>
+        </div>
+
+        <!-- back button -->
+
         <button id="back" ng-click="go('/')">Back</button>
+
     </div>
 </div>

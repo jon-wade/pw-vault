@@ -275,6 +275,166 @@ describe('registration.js unit test', function() {
     });
 });
 
+describe('password-update.js unit test', function() {
+
+    var mongooseConfig, passwordUpdate, mockDb, usernameVerificationMock, emailVerificationMock;
+
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        mockDb = {};
+        mockDb.controller = {
+            update: function(item, content, model) {
+                return new Promise(function(resolve, reject) {
+                    //console.log('item._id=', item._id);
+                    if(model != mongooseConfig.userTest) {
+                        reject('mocked db access error');
+                    }
+                    else if (item._id === '57786733eeb287e63a404933') {
+                        resolve({});
+                    }
+                    else {
+                        reject({});
+                    }
+                });
+            }
+        };
+
+        //emailVerificationMock
+        emailVerificationMock = {
+            check: function(email, model) {
+                return new Promise(function(resolve, reject) {
+                    if(email === 'jonwadeuk@gmail.com') {
+                        resolve({
+                            successMessage: 'Registered email address',
+                            _id: '57786733eeb287e63a404933'
+                        });
+                    }
+                    if(email === 'test@test.com') {
+                        resolve({
+                            successMessage: 'Registered email address',
+                            _id: '577b4a7b01591dba09030cf8'
+                        });
+                    }
+                    else {
+                        reject({
+                            errorMessage: 'not a registered email address.'
+                        });
+                    }
+                });
+            }
+
+        };
+
+        //usernameVerificationMock
+        usernameVerificationMock = {
+            check: function(username, model) {
+                return new Promise(function(resolve, reject) {
+                    if(username === 'jonwade') {
+                        resolve({
+                            successMessage: 'Registered username',
+                            _id: '57786733eeb287e63a404933'
+
+                        });
+                    }
+                    else if (username === 'testuser') {
+                        resolve({
+                            successMessage: 'Registered username',
+                            _id: '577b4a7b01591dba09030cf8'
+                        });
+                    }
+                    else {
+                        reject({
+                            errorMessage: 'not a registered username'
+                        });
+                    }
+                });
+            }
+        };
+
+
+        mockery.registerMock('../db/database.js', mockDb);
+        mockery.registerMock('../utils/username-verification.js', usernameVerificationMock);
+        mockery.registerMock('../utils/email-verification.js', emailVerificationMock);
+
+        passwordUpdate = require('../app/utils/password-update.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return "ids match, all is well..." if the id of the email and the username are the same...', function(done) {
+        passwordUpdate.go('jonwade', 'jonwadeuk@gmail.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+            //should be in this branch as we're testing a success
+            //console.log('res=', res);
+            res.should.be.a('object');
+            res.successMessage.should.include('all is well');
+            done();
+        }, function(rej) {
+            //shouldn't be in this branch so no done()
+            //console.log('rej=', rej);
+        });
+
+    });
+
+    it('should return "not a registered username" if the username cannot be found in the database...', function(done) {
+        passwordUpdate.go('jonwad', 'jonwadeuk@gmail.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+            //should be in this branch as we're testing a success
+            //console.log('res=', res);
+        }, function(rej) {
+            //shouldn't be in this branch so no done()
+            //console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.errorMessage.should.include('not a registered username');
+            done();
+        });
+
+    });
+
+    it('should return "not a registered email" if the email cannot be found in the database...', function(done) {
+        passwordUpdate.go('jonwade', 'error@error.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+            //should be in this branch as we're testing a success
+            //console.log('res=', res);
+        }, function(rej) {
+            //shouldn't be in this branch so no done()
+            //console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.errorMessage.should.include('not a registered email');
+            done();
+        });
+
+    });
+
+    it('should return "the _ids for the username and email do not match and we cannot update the password..." if the id of the email and the username are not the same...', function(done) {
+        passwordUpdate.go('jonwade', 'test@test.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+            //should be in this branch as we're testing a success
+            //console.log('res=', res);
+        }, function(rej) {
+            //shouldn't be in this branch so no done()
+            //console.log('rej=', rej);
+            rej.should.be.a('string');
+            rej.should.include('do not match');
+            done();
+        });
+
+    });
+
+});
+
 describe('email-verification.js unit test', function() {
 
     var mongooseConfig, emailVerification, mockDb;
@@ -345,6 +505,76 @@ describe('email-verification.js unit test', function() {
             rej.errorMessage.should.include('Not a registered email address');
             done();
 
+        });
+    });
+
+});
+
+describe('username-verification.js unit test', function() {
+
+    var mongooseConfig, mockDb, usernameVerification;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        //mongooseConfig Mock
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, params, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest) {
+                        reject('mocked db access error');
+                    }
+                    else {
+                        resolve([{
+                            _id: '57786733eeb287e63a404933',
+                            username: 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
+                        }]);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+        mockery.registerAllowable('../utils/secret.js');
+
+        usernameVerification = require('./../app/utils/username-verification.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+    });
+
+    it('should return "Registered username" on successfully finding username in database...', function(done) {
+        usernameVerification.check('jonwade', mongooseConfig.userTest).then(function(res) {
+            res.successMessage.should.include('Registered username');
+            res.should.have.property('_id');
+            done();
+        }, function(rej) {
+            rej.errorMessage.should.include('Not a registered username');
+            done();
+        });
+    });
+
+    it('should return "Not a registered username" on failing to find username in database...', function(done) {
+        usernameVerification.check('jonwad', mongooseConfig.userTest).then(function(res) {
+            res.successMessage.should.include('Registered username');
+            res.should.have.property('_id');
+            done();
+        }, function(rej) {
+            rej.errorMessage.should.include('Not a registered username');
+            done();
         });
     });
 
@@ -452,81 +682,11 @@ describe('username-recovery.js unit test', function() {
 
 });
 
-describe('username-verification.js unit test', function() {
-
-    var mongooseConfig, mockDb, usernameVerification;
-    beforeEach(function(done) {
-        mockery.enable({
-            useCleanCache: true,
-            warnOnUnregistered: false
-        });
-
-        //mongooseConfig Mock
-        mongooseConfig = {};
-        mongooseConfig.userTest = {};
-        mongooseConfig.userDev = {};
-
-        //mockDb
-        mockDb = {};
-        mockDb.controller = {
-            read: function(query, params, model) {
-                return new Promise(function(resolve, reject) {
-                    if(model != mongooseConfig.userTest) {
-                        reject('mocked db access error');
-                    }
-                    else {
-                        resolve([{
-                            _id: '57786733eeb287e63a404933',
-                            username: 'U2FsdGVkX1/NBSdklPl+/Fs252YIHGOc5/+9KjLGw+g='
-                        }]);
-                    }
-                });
-            }
-        };
-
-        mockery.registerMock('../db/database.js', mockDb);
-        mockery.registerAllowable('../utils/secret.js');
-
-        usernameVerification = require('./../app/utils/username-verification.js');
-
-        done();
-    });
-
-    afterEach(function(done) {
-        mockery.deregisterAll();
-        mockery.disable();
-        done();
-    });
-
-    it('should return "Registered username" on successfully finding username in database...', function(done) {
-        usernameVerification.check('jonwade', mongooseConfig.userTest).then(function(res) {
-            res.successMessage.should.include('Registered username');
-            res.should.have.property('_id');
-            done();
-        }, function(rej) {
-            rej.errorMessage.should.include('Not a registered username');
-            done();
-        });
-    });
-
-    it('should return "Not a registered username" on failing to find username in database...', function(done) {
-        usernameVerification.check('jonwad', mongooseConfig.userTest).then(function(res) {
-            res.successMessage.should.include('Registered username');
-            res.should.have.property('_id');
-            done();
-        }, function(rej) {
-            rej.errorMessage.should.include('Not a registered username');
-            done();
-        });
-    });
-
-});
-
 describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -630,12 +790,28 @@ describe('index.js unit test', function() {
             }
         };
 
+        passwordUpdateMock = {
+            go: function(username, email, password, model) {
+                return new Promise(function(resolve, reject) {
+                    if(username !=='testuser' || password !=='testpassword' || email !== 'testemail') {
+                        reject({errorMessage: 'password update failed'});
+                    }
+                    else {
+                        resolve({successMessage: 'password update successful', data: {_id: '1234'}});
+                    }
+
+                });
+            }
+
+        };
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
         mockery.registerMock('./utils/username-verification.js', usernameVerificationMock);
         mockery.registerMock('./utils/username-recovery.js', usernameRecoveryMock);
         mockery.registerMock('./utils/registration.js', registrationMock);
+        mockery.registerMock('./utils/password-update.js', passwordUpdateMock);
 
         index = require('./../app/index.js');
         app = index.app;
@@ -799,6 +975,34 @@ describe('index.js unit test', function() {
     it('On POST /create, on error should return an object with an errorMessage property with a status 404...', function(done) {
         chai.request(app)
             .post('/create')
+            .send({username: 'errorcase', email: 'testemail', password: 'testpassword'})
+            .end(function(err, res) {
+                err.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /update-password, on success should return an object with a data property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/update-password')
+            .send({username: 'testuser', email: 'testemail', password: 'testpassword'})
+            .end(function(err, res) {
+                //console.log('res=', res);
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.text.should.equal('1234');
+                res.text.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /update-password, on error should return an object with an errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/update-password')
             .send({username: 'errorcase', email: 'testemail', password: 'testpassword'})
             .end(function(err, res) {
                 err.should.have.status(404);

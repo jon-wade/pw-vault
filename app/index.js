@@ -9,6 +9,7 @@ var emailVerification = require('./utils/email-verification.js');
 var usernameRecovery = require('./utils/username-recovery.js');
 var usernameVerification = require('./utils/username-verification.js');
 var registration = require('./utils/registration.js');
+var passwordUpdate = require('./utils/password-update.js');
 
 var jsonParser = bodyParser.json();
 
@@ -66,6 +67,18 @@ app.post('/create', jsonParser, function(req, res) {
             res.status(404).send(error);
         });
 });
+
+app.post('/update-password', jsonParser, function(req, res) {
+    passwordUpdate.go(req.body.username, req.body.email, req.body.password, mongooseConfig.userDev).then(function(success) {
+        //console.log('success=', success);
+        res.status(200).send(success.data._id);
+    }, function(error) {
+        //console.log('error=', error);
+        res.status(404).send(error);
+
+    });
+});
+
 
 //this sends request for endpoints that don't exist back to angular for routing (as well as dealing with error pages)
 app.get('*', function(req, res) {

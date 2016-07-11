@@ -214,7 +214,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
     $scope.password = false;
     $scope.email = false;
 
-    //TODO: unit test from here again
+
     $scope.changePassword = false;
 
     $scope.toggle = function(input) {
@@ -264,15 +264,29 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
                 });
         }
         else if($scope.changePassword) {
-            //then call a new endpoint...
 
-            console.log('calling update password endpoint');
+            //TODO: unit test from here again
+            var username = $scope.usernameInput;
 
+            //hash password and email address
+            var hashedEmail = CryptoJS.SHA256($scope.pwEmailInput).toString(CryptoJS.enc.Hex);
+            var hashedPassword = CryptoJS.SHA256($scope.passwordInput).toString(CryptoJS.enc.Hex);
+
+            //then call a new /update-password endpoint
+            console.log('calling /update-password endpoint');
+            apiPOST.callAPI('/update-password', {username: username, email: hashedEmail, password: hashedPassword}).then(function(res){
+                //successfully updated password in db
+                console.log('res=', res);
+                $scope.ui=false;
+                $scope.passwordSuccessMessage = true;
+            }, function(rej) {
+                //error updating password in db
+                console.log('rej=', rej);
+                $scope.ui=false;
+                $scope.passwordErrorMessage = true;
+            });
         }
-
-
     };
-
 
 }]);
 

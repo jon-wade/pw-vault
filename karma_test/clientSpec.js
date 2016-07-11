@@ -278,40 +278,44 @@ describe('client.js unit test', function() {
             expect(location.path).toHaveBeenCalledWith('/test');
         });
 
-        it('$scope.toggle("username") and $scope.username=true should set $scope.username=true, $scope.password=false and $scope.email = true', function() {
+        it('$scope.toggle("username") and $scope.username=true should set $scope.username=true, $scope.password=false, $scope.email = true and $scope.changePassword=false', function() {
             scope.username=true;
             scope.password=false;
             scope.toggle('username');
             expect(scope.username).toBe(true);
             expect(scope.password).toBe(false);
             expect(scope.email).toBe(true);
+            expect(scope.changePassword).toBe(false);
         });
 
-        it('$scope.toggle("username") and $scope.username=false should set $scope.username=true, $scope.password=false and $scope.email = true', function() {
+        it('$scope.toggle("username") and $scope.username=false should set $scope.username=true, $scope.password=false, $scope.email = true, $scope.changePassword=false', function() {
             scope.username=false;
             scope.password=true;
             scope.toggle('username');
             expect(scope.username).toBe(true);
             expect(scope.password).toBe(false);
             expect(scope.email).toBe(true);
+            expect(scope.changePassword).toBe(false);
         });
 
-        it('$scope.toggle("password") and $scope.password=false should set $scope.password=true, $scope.username=false and $scope.email = false', function() {
+        it('$scope.toggle("password") and $scope.password=false should set $scope.password=true, $scope.username=false, $scope.email = false & scope.changePassword=true', function() {
             scope.username=true;
             scope.password=false;
             scope.toggle('password');
             expect(scope.username).toBe(false);
             expect(scope.password).toBe(true);
             expect(scope.email).toBe(false);
+            expect(scope.changePassword).toBe(true);
         });
 
-        it('$scope.toggle("password") and $scope.password=true should set $scope.password=true, $scope.username=false and $scope.email = false', function() {
+        it('$scope.toggle("password") and $scope.password=true should set $scope.password=true, $scope.username=false, $scope.email = false and $scope.changePassword=true', function() {
             scope.username=false;
             scope.password=true;
             scope.toggle('password');
             expect(scope.username).toBe(false);
             expect(scope.password).toBe(true);
             expect(scope.email).toBe(false);
+            expect(scope.changePassword).toBe(true);
         });
 
         it('should initially correctly set the valued of $scope.ui, $scope.emailSuccessMessage and $scope.emailErrorMessage', function() {
@@ -320,9 +324,10 @@ describe('client.js unit test', function() {
             expect(scope.emailErrorMessage).toBe(false);
         });
 
-        it('On success $scope.helpMe() should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a successful response... ', inject(function($httpBackend) {
+        it('On success $scope.helpMe() and $scope.email=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a successful response... ', inject(function($httpBackend) {
             //mock _id and email
             idStr.set_id('1234');
+            scope.email = true;
             scope.emailInput = 'jonwadeuk@gmail.com';
 
             var response = {};
@@ -341,10 +346,11 @@ describe('client.js unit test', function() {
 
         }));
 
-        it('On failure $scope.helpMe() should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a failure response... ', inject(function($httpBackend) {
+        it('On failure $scope.helpMe() and $scope.email=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a failure response... ', inject(function($httpBackend) {
             //mock _id and email
             idStr.set_id('4321');
             scope.emailInput = 'jonwadeuk@gmail.com';
+            scope.email = true;
 
             var response = {};
             $httpBackend.expect('POST', '/username-recovery', {_id: '4321', email: 'jonwadeuk@gmail.com'}).respond(404, response, null, 'error');
@@ -361,7 +367,6 @@ describe('client.js unit test', function() {
             $httpBackend.verifyNoOutstandingExpectation();
 
         }));
-
 
     });
 

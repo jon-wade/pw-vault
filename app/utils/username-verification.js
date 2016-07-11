@@ -3,6 +3,7 @@ var CryptoJS = require('crypto-js');
 var secret = require('./secret.js');
 
 exports.check = function (username, model) {
+    //console.log('looking for username=', username);
     return new Promise(function(resolve, reject) {
         //get encryption key
         var encryptionKey = secret.key().get_Key();
@@ -17,10 +18,12 @@ exports.check = function (username, model) {
 
         db.controller.read({}, 'username', model)
             .then(function(res) {
-                //console.log('db res=', res);
+                //console.log('response from db read looking for usernames=', res);
                 var result = res.filter(function(item) {
                     return decrypt(item.username) === username;
                 });
+                //console.log('decrypted results=', result);
+                //console.log('res[0]._id=', res[0]._id);
                 if(result.length === 0) {
                     //no registered username in the database
                     reject({
@@ -30,7 +33,7 @@ exports.check = function (username, model) {
                 else {
                     resolve({
                         successMessage: 'Registered username',
-                        _id: res[0]._id
+                        _id: result[0]._id
                     });
                 }
             });
