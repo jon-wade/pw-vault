@@ -41,7 +41,7 @@ client.directive('email', ['$q', '$timeout', 'apiPOST', 'idStore', function($q, 
                         //email is registered
                         idStore.set_id(res.data._id);
                         def.resolve();
-                    }, function(rej) {
+                    }, function() {
                         //email is not registered
                         def.reject();
                     });
@@ -64,10 +64,10 @@ client.directive('emailReg', ['$q', 'apiPOST', function($q, apiPOST) {
                 var hashedEmail = CryptoJS.SHA256(modelValue).toString(CryptoJS.enc.Hex);
 
                 apiPOST.callAPI('/email-verification', {email : hashedEmail})
-                    .then(function(res) {
+                    .then(function() {
                         //email is registered
                         def.reject();
-                    }, function(rej) {
+                    }, function() {
                         //email is not registered
                         def.resolve();
                     });
@@ -90,10 +90,10 @@ client.directive('userReg', ['$q', 'apiPOST', function($q, apiPOST) {
 
                 //username gets encrypted on server side before storing in database, so send username in plaintext
                 apiPOST.callAPI('/username-verification', {username : modelValue})
-                    .then(function(res) {
+                    .then(function() {
                         //username is registered
                         def.reject();
-                    }, function(rej) {
+                    }, function() {
                         //username is not registered
                         def.resolve();
                     });
@@ -129,6 +129,18 @@ client.config(function($routeProvider, $locationProvider) {
             {
                 templateUrl: './register/register.html',
                 controller: 'register'
+            })
+
+        .when('/view-site',
+            {
+                templateUrl: './view-site/view-site.html',
+                controller: 'viewSite'
+            })
+
+        .when('/add-site',
+            {
+                templateUrl: './add-site/add-site.html',
+                controller: 'addSite'
             })
 
 
@@ -194,6 +206,10 @@ client.controller('manager', ['$scope', 'idStore', '$rootScope', '$location', fu
         $location.path('/');
     };
 
+    $scope.go = function (destination) {
+        $location.path(destination);
+    };
+
 
 }]);
 
@@ -252,12 +268,12 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
 
             //then call the api endpoint /username-recovery
             apiPOST.callAPI('/username-recovery', {_id: _id, email: $scope.emailInput})
-                .then(function(res) {
+                .then(function() {
                     //successful username recovery
                     //hide the ui and display the message
                     $scope.ui=false;
                     $scope.emailSuccessMessage = true;
-                }, function(rej) {
+                }, function() {
                     //error in username recovery
                     $scope.ui=false;
                     $scope.emailErrorMessage = true;
@@ -272,13 +288,13 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
             var hashedPassword = CryptoJS.SHA256($scope.passwordInput).toString(CryptoJS.enc.Hex);
 
             //then call a new /update-password endpoint
-            console.log('calling /update-password endpoint');
-            apiPOST.callAPI('/update-password', {username: username, email: hashedEmail, password: hashedPassword}).then(function(res){
+            //console.log('calling /update-password endpoint');
+            apiPOST.callAPI('/update-password', {username: username, email: hashedEmail, password: hashedPassword}).then(function(){
                 //successfully updated password in db
                 //console.log('res=', res);
                 $scope.ui=false;
                 $scope.passwordSuccessMessage = true;
-            }, function(rej) {
+            }, function() {
                 //error updating password in db
                 //console.log('rej=', rej);
                 $scope.ui=false;
@@ -321,7 +337,7 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
             $scope.registrationSuccess = true;
             $scope.registrationForm = false;
             $scope.redirect(10, '/manager');
-        }, function(rej) {
+        }, function() {
             //failed registration of new user
             //console.log('error in registration', rej);
             $scope.registrationError = true;
@@ -341,6 +357,28 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
             number--;
             $scope.redirect(number, path);
         }, 1000);
+    };
+
+}]);
+
+
+//TODO: unit test from here
+client.controller('viewSite', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+
+    $rootScope.title = 'Password Vault | View';
+
+    $scope.go = function (destination) {
+        $location.path(destination);
+    };
+
+}]);
+
+client.controller('addSite', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+
+    $rootScope.title = 'Password Vault | Add';
+
+    $scope.go = function (destination) {
+        $location.path(destination);
     };
 
 

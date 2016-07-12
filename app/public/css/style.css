@@ -19,25 +19,22 @@ a:link, a:hover, a:visited {
 
 /* background styles */
 
-div#home {
-    background: url('../img/home-background.jpg');
+div#home, div#registration, div#forgotten, div#manager {
     background-size: cover;
     background-position: center center;
     min-height: 100vh;
+}
+
+div#home {
+    background: url('../img/home-background.jpg');
 }
 
 div#registration {
     background: url('../img/registration-background.jpg');
-    background-size: cover;
-    background-position: center center;
-    min-height: 100vh;
 }
 
 div#forgotten {
     background: url('../img/forgotten-background.jpg');
-    background-size: cover;
-    background-position: center center;
-    min-height: 100vh;
 }
 
 /* layout divs */
@@ -51,16 +48,16 @@ div#login, div#welcome {
 div.container {
     width: 60%;
     margin: 0 auto;
-    /*border: 1px dashed yellow;*/
+    border: 1px dashed yellow;
 }
 
-div.registrationForm, div#ui {
+div.registrationForm, div#ui, div#managerList {
     width: 60%;
     margin: 0px auto 0 auto;
-    /*border: 1px dashed white;*/
+    border: 1px dashed white;
 }
 
-div.registrationForm h1#title, div#ui h1#title {
+div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title {
     margin-top: 0px;
     padding-top: 120px;
     text-align: center;
@@ -90,7 +87,7 @@ div.displayMessage p.message, div#registrationMessages p.message {
     font-size: 1em;
 }
 
-div#ui h2 {
+div#ui h2, div#managerList h2 {
     padding: 10px 0;
     text-align: center;
 
@@ -135,7 +132,7 @@ button {
     padding: 5px 0;
 }
 
-div.registrationForm button, div#ui button, div#forgotten div.container button#back {
+div.registrationForm button, div#ui button, div#forgotten div.container button#back, div#managerList button {
     margin: 30px auto 10px auto;
 }
 
@@ -150,6 +147,19 @@ div#welcome button#registerButton {
 div#login button#submitButton[disabled=disabled], div.registrationForm button[disabled=disabled], div#ui button[disabled=disabled] {
     background-color: lightgrey;
     color: darkgrey;
+}
+
+
+/* manager list */
+
+div#managerList ul {
+    padding: 0;
+}
+
+div#managerList ul li {
+    list-style: none;
+    text-align: center;
+    padding: 10px 0 10px 0;
 }
 
 /* error messages */

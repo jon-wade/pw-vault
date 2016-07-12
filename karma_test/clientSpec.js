@@ -40,7 +40,7 @@ describe('client.js unit test', function() {
 
     });
 
-    describe('unit test email directive', function() {
+    describe('email directive unit test ', function() {
 
         var scope, html;
 
@@ -88,7 +88,7 @@ describe('client.js unit test', function() {
 
     });
 
-    describe('unit test emailReg directive', function() {
+    describe('emailReg directive unit test ', function() {
 
         var scope, html;
 
@@ -137,7 +137,7 @@ describe('client.js unit test', function() {
 
     });
 
-    describe('unit test userReg directive', function() {
+    describe('userReg directive unit test ', function() {
 
         var scope, html;
 
@@ -249,6 +249,12 @@ describe('client.js unit test', function() {
             expect(idStore.get_id()).toBe('');
             expect(location.path).toHaveBeenCalledWith('/');
         }));
+
+        it('$scope.go("/test") should redirect to /test', function() {
+            spyOn(location, 'path');
+            scope.go('/test');
+            expect(location.path).toHaveBeenCalledWith('/test');
+        });
 
     });
 
@@ -624,6 +630,38 @@ describe('client.js unit test', function() {
             $httpBackend.flush();
             expect($route.current.controller).toBe("register");
             expect($route.current.loadedTemplateUrl).toBe("./register/register.html");
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('should load the view-site template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
+            $httpBackend.whenGET('./view-site/view-site.html').respond('...');
+
+            $rootScope.$apply(function() {
+                $location.path('/view-site');
+            });
+
+            $httpBackend.flush();
+            expect($route.current.controller).toBe("viewSite");
+            expect($route.current.loadedTemplateUrl).toBe("./view-site/view-site.html");
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('should load the add-site template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
+            $httpBackend.whenGET('./add-site/add-site.html').respond('...');
+
+            $rootScope.$apply(function() {
+                $location.path('/add-site');
+            });
+
+            $httpBackend.flush();
+            expect($route.current.controller).toBe("addSite");
+            expect($route.current.loadedTemplateUrl).toBe("./add-site/add-site.html");
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
