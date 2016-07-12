@@ -361,18 +361,6 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
 
 }]);
 
-
-//TODO: unit test from here
-client.controller('viewSite', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
-
-    $rootScope.title = 'Password Vault | View';
-
-    $scope.go = function (destination) {
-        $location.path(destination);
-    };
-
-}]);
-
 client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'idStore', function($scope, $rootScope, $location, apiPOST, idStore) {
 
     $rootScope.title = 'Password Vault | Add';
@@ -398,26 +386,47 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
 
 
         apiPOST.callAPI('/add-site', {
-            userId: _id,
-            sitename: $scope.sitenameInput,
-            username: encryptedUsername,
-            password: encryptedPassword
-        })
+                userId: _id,
+                sitename: $scope.sitenameInput,
+                username: encryptedUsername,
+                password: encryptedPassword
+            })
             .then(function(res) {
                 //site record successfully added to db
                 console.log('SUCCESS=', res);
                 $scope.go('/manager');
-
             }, function(rej) {
                 //site record failed to be added to db
                 console.log('ERROR=', rej);
-
-
+                $scope.addSiteError = true;
+                $scope.addSiteForm = false;
+                $scope.redirect(5, '/manager');
             });
 
     };
 
+    $scope.redirect = function(number, path) {
 
-
+        $scope.timer = number;
+        if (number === 0) {
+            return $scope.go(path);
+        }
+        $interval(function() {
+            number--;
+            $scope.redirect(number, path);
+        }, 1000);
+    };
 
 }]);
+
+//TODO: unit test from here
+client.controller('viewSite', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+
+    $rootScope.title = 'Password Vault | View';
+
+    $scope.go = function (destination) {
+        $location.path(destination);
+    };
+
+}]);
+

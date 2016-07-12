@@ -67,22 +67,22 @@ div#ui h1#title {
     padding-top: 100px;
 }
 
-div.displayMessage, div#registrationMessages, div#emailSuccessMessage {
+div.displayMessage, div#registrationMessages, div#emailSuccessMessage, div#addSiteErrorMessage {
     text-align: center;
 }
 
-div.displayMessage h1, div#registrationMessages h1, div#emailSuccessMessage h1 {
+div.displayMessage h1, div#registrationMessages h1, div#emailSuccessMessage h1, div#addSiteErrorMessage h1 {
     margin-top: 0px;
     padding-top: 325px;
     font-size: 4em;
 }
 
-div.displayMessage p, div#registrationMessages p, div#emailSuccessMessage p {
+div.displayMessage p, div#registrationMessages p, div#emailSuccessMessage p, div#addSiteErrorMessage p {
     font-size: 2em;
     margin-bottom: 0px;
 }
 
-div.displayMessage p.message, div#registrationMessages p.message {
+div.displayMessage p.message, div#registrationMessages p.message, div#addSiteErrorMessage p.message {
     margin-top: 20px;
     font-size: 1em;
 }

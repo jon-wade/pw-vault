@@ -1,6 +1,6 @@
 <div id="addSite">
     <div class="container">
-        <div class="addSiteForm">
+        <div class="addSiteForm" ng-show="addSiteForm">
             <h1 id="title">Add Site</h1>
             <form id="addSiteForm" name="addSiteForm" novalidate ng-submit="addSite()">
 
@@ -23,6 +23,11 @@
                 <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/manager')">Cancel</button>
 
             </form>
+        </div>
+        <div id="addSiteErrorMessage" ng-show="addSiteError">
+            <h1>Oh no...!!!</h1>
+            <p>Sorry! We've had a problem adding your site to the database. You'll have to try again - gutted!!</p>
+            <p class="message">To make it easier, you'll be automagically returned to the manager page in <span ng-bind="timer"></span> seconds.</p>
         </div>
     </div>
 </div>

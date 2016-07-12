@@ -583,7 +583,7 @@ describe('client.js unit test', function() {
         });
 
 
-        it('$scope.addSite get _id from idStore, should encrypt the username and password input fields using AES and on success from the /add-site endpoint ...', inject(function($httpBackend) {
+        it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and on success from the /add-site endpoint should redirect back to the /manager page...', inject(function($httpBackend) {
 
 
             //console.log(CryptoJS.AES);
@@ -621,37 +621,45 @@ describe('client.js unit test', function() {
 
         }));
 
-        //it('$scope.register should hash the email and password input fields using SHA256 and on failure from the /create endpoint, correctly set the registrationError and registrationForm variables and call $scope.redirect with values "10", "/home" ...', inject(function($httpBackend, idStore) {
-        //
-        //    spyOn(CryptoJS, 'SHA256').and.callThrough();
-        //    spyOn(idStore, 'set_id');
-        //    spyOn(scope, 'redirect');
-        //
-        //    var response = {};
-        //    scope.usernameInput = 'testuser';
-        //    scope.emailInput = 'test@test.com';
-        //    scope.passwordInput = 'abcd1234';
-        //
-        //    $httpBackend.expect('POST', '/create', {username:'testuser', email: 'f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a', password: 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'}).respond(404, response, null, 'error');
-        //
-        //    scope.register();
-        //
-        //    scope.$digest();
-        //    $httpBackend.flush();
-        //
-        //    expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.emailInput);
-        //    expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
-        //    expect(scope.registrationError).toBe(true);
-        //    expect(scope.registrationForm).toBe(false);
-        //    expect(scope.redirect).toHaveBeenCalledWith(10, '/home');
-        //
-        //    $httpBackend.verifyNoOutstandingRequest();
-        //    $httpBackend.verifyNoOutstandingExpectation();
-        //
-        //
-        //}));
+        it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and on error from the /add-site endpoint should show error message and redirect back to the /mananger page...', inject(function($httpBackend) {
 
 
+            //console.log(CryptoJS.AES);
+            spyOn(CryptoJS.AES, 'encrypt').and.callThrough();
+            spyOn(idStr, 'get_id');
+            spyOn(scope, 'redirect');
+
+            var response = {};
+
+            idStr.set_id('12345');
+            //console.log(idStr.get_id());
+
+            scope.sitenameInput = 'testsite';
+            scope.usernameInput = 'testusername';
+            scope.passwordInput = 'testpassword';
+            scope.keyInput = 'testkey';
+
+
+            //.when() used as the encryption yields a different username and password request body so can't use expect
+            $httpBackend.when('POST', '/add-site').respond(404, response, null, 'error');
+
+            scope.addSite();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(CryptoJS.AES.encrypt).toHaveBeenCalledWith(scope.usernameInput, scope.keyInput);
+            expect(CryptoJS.AES.encrypt).toHaveBeenCalledWith(scope.passwordInput, scope.keyInput);
+            expect(idStr.get_id).toHaveBeenCalled();
+
+            expect(scope.addSiteError).toBe(true);
+            expect(scope.addSiteForm).toBe(false);
+            expect(scope.redirect).toHaveBeenCalledWith(5, '/manager');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
 
     });
 
