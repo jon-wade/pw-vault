@@ -62,8 +62,12 @@ div.registrationForm, div#ui {
 
 div.registrationForm h1#title, div#ui h1#title {
     margin-top: 0px;
-    padding-top: 150px;
+    padding-top: 120px;
     text-align: center;
+}
+
+div#ui h1#title {
+    padding-top: 100px;
 }
 
 div.displayMessage, div#registrationMessages, div#emailSuccessMessage {

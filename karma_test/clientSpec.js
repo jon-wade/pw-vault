@@ -368,6 +368,69 @@ describe('client.js unit test', function() {
 
         }));
 
+        it('On success $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with a successful response... ', inject(function($httpBackend) {
+            //mock _id and email
+            spyOn(CryptoJS, 'SHA256').and.callThrough();
+            spyOn(idStr, 'get_id');
+
+            idStr.set_id('1234');
+            scope.changePassword = true;
+            scope.usernameInput = 'jonwade';
+            scope.pwEmailInput = 'hashedemail';
+            scope.passwordInput = 'hashedpassword';
+
+            var response = {};
+            $httpBackend.expect('POST', '/update-password', {username: 'jonwade', email: '5770ec9cdc0b29fbff67abd8073a746344b511ecabf53399a720c5994346ccfe', password: '741f67765bef6f01f37bf5cb1724509a83409324efa6ad2586d27f4e3edea296'}).respond(200, response, null, 'success');
+
+            scope.helpMe();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(idStr.get_id).toHaveBeenCalled();
+            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
+            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.pwEmailInput);
+            expect(scope.ui).toBe(false);
+            expect(scope.passwordSuccessMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('On failure $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with an error response... ', inject(function($httpBackend) {
+            //mock _id and email
+            spyOn(CryptoJS, 'SHA256').and.callThrough();
+            spyOn(idStr, 'get_id');
+
+            idStr.set_id('1234');
+            scope.changePassword = true;
+            scope.usernameInput = 'jonwade';
+            scope.pwEmailInput = 'hashedemail';
+            scope.passwordInput = 'hashedpassword';
+
+            var response = {};
+            $httpBackend.expect('POST', '/update-password', {username: 'jonwade', email: '5770ec9cdc0b29fbff67abd8073a746344b511ecabf53399a720c5994346ccfe', password: '741f67765bef6f01f37bf5cb1724509a83409324efa6ad2586d27f4e3edea296'}).respond(404, response, null, 'error');
+
+            scope.helpMe();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(idStr.get_id).toHaveBeenCalled();
+            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
+            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.pwEmailInput);
+            expect(scope.ui).toBe(false);
+            expect(scope.passwordErrorMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+
+
+
     });
 
     describe('register controller unit test', function() {
