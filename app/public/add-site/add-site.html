@@ -1,2 +1,34 @@
-<p>This is the add-site template</p>
-<button ng-click="go('/manager')">Back</button>
+<div id="addSite">
+    <div class="container">
+        <div class="addSiteForm">
+            <h1 id="title">Add Site</h1>
+            <form id="addSiteForm" name="addSiteForm" novalidate ng-submit="addSite()">
+
+                <!-- sitename field -->
+                <input type="text" id="sitenameInput" ng-model="sitenameInput" name="sitenameInput" required placeholder="Enter site name">
+
+                <!-- username field -->
+                <input type="text" id="usernameInput" ng-model="usernameInput" name="usernameInput" required placeholder="Enter username to save">
+
+                <!--- password field --->
+                <input type="password" id="passwordInput" ng-model="passwordInput" name="passwordInput" required placeholder="Enter password to save">
+
+                <!-- encryption key field -->
+                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key">
+
+                <!-- encrypt button -->
+                <button type="submit" id="addsiteButton" name="addsiteButton">Add Site</button>
+
+                <!-- cancel button -->
+                <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/manager')">Cancel</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
