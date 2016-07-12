@@ -13,6 +13,13 @@ var User = mongoose.Schema({
     email: {type: String, minlength:64, index: {unique: true}, required: true}
 });
 
+var Manager = mongoose.Schema({
+    userId: {type: String, required: true},
+    sitename: {type: String, required: true},
+    username: {type: String, required: true},
+    password: {type: String, required: true}
+});
+
 
 var test = mongoose.createConnection(environment.test);
 //console.log('test=', typeof test);
@@ -28,4 +35,8 @@ exports.userTest = test.model('testUser', User);
 exports.userDev = dev.model('devUser', User);
 //console.log('userTest=', typeof exports.userDev());
 //console.log('userTest keys=', Object.keys(exports.userDev));
+
+exports.managerTest = test.model('testManager', Manager);
+
+exports.managerDev = test.model('devManager', Manager);
 

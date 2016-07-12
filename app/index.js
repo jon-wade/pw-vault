@@ -10,6 +10,7 @@ var usernameRecovery = require('./utils/username-recovery.js');
 var usernameVerification = require('./utils/username-verification.js');
 var registration = require('./utils/registration.js');
 var passwordUpdate = require('./utils/password-update.js');
+var addSite = require('./utils/add-site.js');
 
 var jsonParser = bodyParser.json();
 
@@ -76,6 +77,16 @@ app.post('/update-password', jsonParser, function(req, res) {
         //console.log('error=', error);
         res.status(404).send(error);
 
+    });
+});
+
+app.post('/add-site', jsonParser, function(req, res) {
+    addSite.go(req.body.userId, req.body.sitename, req.body.username, req.body.password, mongooseConfig.managerDev).then(function(success) {
+        //console.log('success=', success);
+        res.status(200).send(success);
+    }, function(error) {
+        //console.log('error=', error);
+        res.status(404).send(error);
     });
 });
 

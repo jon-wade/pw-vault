@@ -373,12 +373,41 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', function($sc
 
 }]);
 
-client.controller('addSite', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'idStore', function($scope, $rootScope, $location, apiPOST, idStore) {
 
     $rootScope.title = 'Password Vault | Add';
 
     $scope.go = function (destination) {
         $location.path(destination);
+    };
+
+    $scope.addSite = function() {
+
+        //get _id
+        var _id = idStore.get_id();
+
+        //encrypt sitename, username, password
+        var encryptedSitename = CryptoJS.AES.encrypt($scope.sitenameInput, $scope.keyInput).toString(CryptoJS.enc.Hex);
+
+        var encryptedUsername = CryptoJS.AES.encrypt($scope.usernameInput, $scope.keyInput).toString(CryptoJS.enc.Hex);
+
+        var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString(CryptoJS.enc.Hex);
+
+        apiPOST.callAPI('/add-site', {
+            userId: _id,
+            sitename: encryptedSitename,
+            username: encryptedUsername,
+            password: encryptedPassword
+        })
+            .then(function(res) {
+                //site record successfully added to db
+
+            }, function(rej) {
+                //site record failed to be added to db
+
+
+            });
+
     };
 
 

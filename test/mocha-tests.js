@@ -275,6 +275,91 @@ describe('registration.js unit test', function() {
     });
 });
 
+describe('add-site.js unit test', function() {
+
+    var mongooseConfig, registration, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.managerTest = {};
+        mongooseConfig.managerDev = {};
+
+        mockDb = {};
+        mockDb.controller = {
+            create: function(obj, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.managerTest){
+                        reject('mocked db access error');
+                    }
+                    else if (obj.userId !== '12345' || obj.sitename !=='hashedSitename' || obj.password !== 'hashedPassword' || obj.username !== 'hashedUsername') {
+                        reject({});
+                    }
+                    else {
+                        resolve({});
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        addSite = require('./../app/utils/add-site.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return successMessage "record successfully created"...', function(done) {
+        addSite.go('12345','hashedSitename', 'hashedUsername', 'hashedPassword', mongooseConfig.managerTest).then(function(res) {
+            //successfully added site record
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('record successfully created');
+            done();
+        }, function(rej) {
+            //failed registration
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('record creation failed');
+            //done();
+        });
+
+    });
+
+    it('should return errorMessage "record creation failed"...', function(done) {
+        addSite.go('54321', 'errorSitename', 'errorUsername', 'errorPassword', mongooseConfig.managerTest).then(function(res) {
+            //successfully added site record
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('record successfully created');
+            //done();
+        }, function(rej) {
+            //failed registration
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('record creation failed');
+            done();
+        });
+
+    });
+
+
+});
+
 describe('password-update.js unit test', function() {
 
     var mongooseConfig, passwordUpdate, mockDb, usernameVerificationMock, emailVerificationMock;
@@ -686,7 +771,7 @@ describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -805,6 +890,21 @@ describe('index.js unit test', function() {
 
         };
 
+        addSiteMock = {
+            go: function(userId, sitename, username, password, model) {
+                return new Promise(function(resolve, reject) {
+                    if(userId !== '12345' || sitename !== 'encryptedSitename' || username !== 'encryptedUsername' || password !== 'encryptedPassword') {
+                        reject({
+                            errorMessage: 'add site error'
+                        });
+                    }
+                    else {
+                        resolve({successMessage: 'add site success', data: {}});
+                    }
+                });
+            }
+        };
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
@@ -812,6 +912,7 @@ describe('index.js unit test', function() {
         mockery.registerMock('./utils/username-recovery.js', usernameRecoveryMock);
         mockery.registerMock('./utils/registration.js', registrationMock);
         mockery.registerMock('./utils/password-update.js', passwordUpdateMock);
+        mockery.registerMock('./utils/add-site.js', addSiteMock);
 
         index = require('./../app/index.js');
         app = index.app;
@@ -1013,6 +1114,36 @@ describe('index.js unit test', function() {
                 done();
             });
     });
+
+    it('On POST /add-site, on success should return return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/add-site')
+            .send({userId: '12345', sitename : 'encryptedSitename', username: 'encryptedUsername', password: 'encryptedPassword'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /add-site, on error should return return an object with a errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/add-site')
+            .send({sitename : 'errorSitename', username: 'errorUsername', password: 'errorPassword'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
 
     it('On GET /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)
@@ -1246,6 +1377,24 @@ describe('mongoose-config.js unit test', function() {
 
     it('should return an object from mongooseConfig.userDev with a method called schema...', function(done) {
         var testObject = mongooseConfig.userDev();
+
+        testObject.should.be.a('object');
+        testObject.should.have.property('schema');
+        done();
+
+    });
+
+    it('should return an object from mongooseConfig.managerTest with a method called schema...', function(done) {
+        var testObject = mongooseConfig.managerTest();
+
+        testObject.should.be.a('object');
+        testObject.should.have.property('schema');
+        done();
+
+    });
+
+    it('should return an object from mongooseConfig.managerDev with a method called schema...', function(done) {
+        var testObject = mongooseConfig.managerDev();
 
         testObject.should.be.a('object');
         testObject.should.have.property('schema');
