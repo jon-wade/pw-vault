@@ -16,10 +16,9 @@ var User = mongoose.Schema({
 var Manager = mongoose.Schema({
     userId: {type: String, required: true},
     sitename: {type: String, required: true},
-    username: {type: String, required: true},
-    password: {type: String, required: true}
+    username: {type: String, minlength: 44, required: true},
+    password: {type: String, minlength: 44, required: true}
 });
-
 
 var test = mongoose.createConnection(environment.test);
 //console.log('test=', typeof test);
@@ -38,5 +37,5 @@ exports.userDev = dev.model('devUser', User);
 
 exports.managerTest = test.model('testManager', Manager);
 
-exports.managerDev = test.model('devManager', Manager);
+exports.managerDev = dev.model('devManager', Manager);
 

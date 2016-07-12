@@ -333,6 +333,7 @@ describe('client.js unit test', function() {
         it('On success $scope.helpMe() and $scope.email=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a successful response... ', inject(function($httpBackend) {
             //mock _id and email
             idStr.set_id('1234');
+            console.log(idStr.get_id());
             scope.email = true;
             scope.emailInput = 'jonwadeuk@gmail.com';
 
@@ -552,6 +553,105 @@ describe('client.js unit test', function() {
             expect(scope.go).toHaveBeenCalledWith('/home');
 
         }));
+
+    });
+
+    describe('addSite controller unit test', function() {
+        var ctrl, scope, rootScope, location, idStr;
+        beforeEach(inject(function($controller, $rootScope, $location, idStore) {
+            //create a new clean scope object
+            scope = $rootScope.$new();
+            rootScope = $rootScope.$new();
+            location = $location;
+            idStr = idStore;
+            ctrl = $controller('addSite', {
+                $rootScope: rootScope,
+                $scope : scope,
+                $location: location,
+                idStore: idStr
+            });
+        }));
+
+        it('$rootScope.title should be Password Vault | Register', function() {
+            expect(rootScope.title).toBe('Password Vault | Add');
+        });
+
+        it('$scope.go("/test") should redirect to /test', function() {
+            spyOn(location, 'path');
+            scope.go('/test');
+            expect(location.path).toHaveBeenCalledWith('/test');
+        });
+
+
+        it('$scope.addSite get _id from idStore, should encrypt the username and password input fields using AES and on success from the /add-site endpoint ...', inject(function($httpBackend) {
+
+
+            //console.log(CryptoJS.AES);
+            spyOn(CryptoJS.AES, 'encrypt').and.callThrough();
+            spyOn(idStr, 'get_id');
+            spyOn(scope, 'go');
+
+            var response = {};
+
+            idStr.set_id('12345');
+            //console.log(idStr.get_id());
+
+            scope.sitenameInput = 'testsite';
+            scope.usernameInput = 'testusername';
+            scope.passwordInput = 'testpassword';
+            scope.keyInput = 'testkey';
+
+
+            //.when() used as the encryption yields a different username and password request body so can't use expect
+            $httpBackend.when('POST', '/add-site').respond(200, response, null, 'success');
+
+            scope.addSite();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(CryptoJS.AES.encrypt).toHaveBeenCalledWith(scope.usernameInput, scope.keyInput);
+            expect(CryptoJS.AES.encrypt).toHaveBeenCalledWith(scope.passwordInput, scope.keyInput);
+            expect(idStr.get_id).toHaveBeenCalled();
+            expect(scope.go).toHaveBeenCalledWith('/manager');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+
+        }));
+
+        //it('$scope.register should hash the email and password input fields using SHA256 and on failure from the /create endpoint, correctly set the registrationError and registrationForm variables and call $scope.redirect with values "10", "/home" ...', inject(function($httpBackend, idStore) {
+        //
+        //    spyOn(CryptoJS, 'SHA256').and.callThrough();
+        //    spyOn(idStore, 'set_id');
+        //    spyOn(scope, 'redirect');
+        //
+        //    var response = {};
+        //    scope.usernameInput = 'testuser';
+        //    scope.emailInput = 'test@test.com';
+        //    scope.passwordInput = 'abcd1234';
+        //
+        //    $httpBackend.expect('POST', '/create', {username:'testuser', email: 'f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a', password: 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'}).respond(404, response, null, 'error');
+        //
+        //    scope.register();
+        //
+        //    scope.$digest();
+        //    $httpBackend.flush();
+        //
+        //    expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.emailInput);
+        //    expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
+        //    expect(scope.registrationError).toBe(true);
+        //    expect(scope.registrationForm).toBe(false);
+        //    expect(scope.redirect).toHaveBeenCalledWith(10, '/home');
+        //
+        //    $httpBackend.verifyNoOutstandingRequest();
+        //    $httpBackend.verifyNoOutstandingExpectation();
+        //
+        //
+        //}));
+
+
 
     });
 

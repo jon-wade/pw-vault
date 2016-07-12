@@ -295,7 +295,7 @@ describe('add-site.js unit test', function() {
                     if(model != mongooseConfig.managerTest){
                         reject('mocked db access error');
                     }
-                    else if (obj.userId !== '12345' || obj.sitename !=='hashedSitename' || obj.password !== 'hashedPassword' || obj.username !== 'hashedUsername') {
+                    else if (obj.userId !== '12345' || obj.sitename !=='sitename' || obj.password !== 'encryptedPassword' || obj.username !== 'encryptedUsername') {
                         reject({});
                     }
                     else {
@@ -320,7 +320,7 @@ describe('add-site.js unit test', function() {
     });
 
     it('should return successMessage "record successfully created"...', function(done) {
-        addSite.go('12345','hashedSitename', 'hashedUsername', 'hashedPassword', mongooseConfig.managerTest).then(function(res) {
+        addSite.go('12345','sitename', 'encryptedUsername', 'encryptedPassword', mongooseConfig.managerTest).then(function(res) {
             //successfully added site record
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
@@ -893,7 +893,7 @@ describe('index.js unit test', function() {
         addSiteMock = {
             go: function(userId, sitename, username, password, model) {
                 return new Promise(function(resolve, reject) {
-                    if(userId !== '12345' || sitename !== 'encryptedSitename' || username !== 'encryptedUsername' || password !== 'encryptedPassword') {
+                    if(userId !== '12345' || sitename !== 'sitename' || username !== 'encryptedUsername' || password !== 'encryptedPassword') {
                         reject({
                             errorMessage: 'add site error'
                         });
@@ -1118,7 +1118,7 @@ describe('index.js unit test', function() {
     it('On POST /add-site, on success should return return an object with a successMessage property with a status 200...', function(done) {
         chai.request(app)
             .post('/add-site')
-            .send({userId: '12345', sitename : 'encryptedSitename', username: 'encryptedUsername', password: 'encryptedPassword'})
+            .send({userId: '12345', sitename : 'sitename', username: 'encryptedUsername', password: 'encryptedPassword'})
             .end(function(err, res) {
                 should.equal(err, null);
                 res.should.have.status(200);

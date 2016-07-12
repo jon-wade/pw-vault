@@ -386,24 +386,31 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
         //get _id
         var _id = idStore.get_id();
 
-        //encrypt sitename, username, password
-        var encryptedSitename = CryptoJS.AES.encrypt($scope.sitenameInput, $scope.keyInput).toString(CryptoJS.enc.Hex);
+        //encrypt username, password
+        var encryptedUsername = CryptoJS.AES.encrypt($scope.usernameInput, $scope.keyInput).toString();
 
-        var encryptedUsername = CryptoJS.AES.encrypt($scope.usernameInput, $scope.keyInput).toString(CryptoJS.enc.Hex);
+        var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString();
 
-        var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString(CryptoJS.enc.Hex);
+        console.log('sitenameInput=', $scope.sitenameInput);
+        console.log('_id=', _id);
+        console.log('encryptedUsername=', encryptedUsername);
+        console.log('encryptedPassword=', encryptedPassword);
+
 
         apiPOST.callAPI('/add-site', {
             userId: _id,
-            sitename: encryptedSitename,
+            sitename: $scope.sitenameInput,
             username: encryptedUsername,
             password: encryptedPassword
         })
             .then(function(res) {
                 //site record successfully added to db
+                console.log('SUCCESS=', res);
+                $scope.go('/manager');
 
             }, function(rej) {
                 //site record failed to be added to db
+                console.log('ERROR=', rej);
 
 
             });
