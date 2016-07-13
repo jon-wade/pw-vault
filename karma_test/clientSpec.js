@@ -184,77 +184,199 @@ describe('client.js unit test', function() {
 
     });
 
-    describe('home controller unit test', function() {
-        var ctrl, scope, rootScope, location;
-        beforeEach(inject(function($controller, $rootScope, $location) {
-            //create a new clean scope object
-            scope = $rootScope.$new();
-            rootScope = $rootScope.$new();
-            location = $location;
-            ctrl = $controller('home', {
-                $rootScope: rootScope,
-                $scope : scope,
-                $location: location
-            });
+    describe('home controller unit test 1', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
         }));
 
-        it('$rootScope.title should be Password Vault | Home', function() {
-            expect(rootScope.title).toBe('Password Vault | Home');
-        });
+        it('should set $rootScope.title to "Password Vault | Home", correctly set the $scope.regex variable and $scope.go("/test") should call $location.path("/test)', inject(function() {
 
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                set_id: function() {
+                    console.log('set_id called');
+                },
+                get_id: function() {
+                    return '12345';
+                }
+            };
 
-        it('$scope.regex should be ^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$ which constrains password field', function() {
-            expect(scope.regex).toBe('^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
-        });
+            $controller('home', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
 
-        it('$scope.go("/test") should redirect to /test', function() {
-            spyOn(location, 'path');
-            scope.go('/test');
-            expect(location.path).toHaveBeenCalledWith('/test');
-        });
+            spyOn(mockIdStore, 'set_id');
+            spyOn($location, 'path');
 
-        //TODO: update submit() unit test
-        it('$scope.submit() should return true', function() {
-            expect(scope.submit()).toBe(true);
-        });
+            expect($rootScope.title).toBe('Password Vault | Home');
+            expect($scope.regex).toBe('^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
+
+            $scope.go('/test');
+
+            expect($location.path).toHaveBeenCalledWith('/test');
+
+        }));
+
+    });
+
+    describe('home controller unit test 2', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('$scope.submit() should call idStore.set_id() and $location.path("/manager") on successful call to /login-test endpoint', inject(function($httpBackend) {
+
+            //mock services
+            //don't bother mocking-out CryptoJS
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                set_id: function() {
+                    console.log('set_id called');
+                },
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockResponse = {
+                _id: '12345'
+            };
+
+            $scope.usernameInput = 'testusername';
+            $scope.passwordInput = 'testpassword';
+
+            spyOn($location, 'path');
+            spyOn(mockIdStore, 'set_id');
+
+            $controller('home', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
+
+            $httpBackend.expect('POST', '/login-test', {username: 'testusername', password: '9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05'}).respond(200, mockResponse, null, 'success');
+
+            $scope.submit();
+
+            $httpBackend.flush();
+
+            expect(mockIdStore.set_id).toHaveBeenCalledWith('12345');
+            expect($location.path).toHaveBeenCalledWith('/manager');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation()
+
+        }));
+
+    });
+
+    describe('home controller unit test 3', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('$scope.submit() should set $scope.loginInvalid=true on error response from /login-test endpoint', inject(function($httpBackend) {
+
+            //mock services
+            //don't bother mocking-out CryptoJS
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                set_id: function() {
+                    console.log('set_id called');
+                },
+                get_id: function() {
+                    return '12345';
+                }
+            };
+
+            $scope.usernameInput = 'testusername';
+            $scope.passwordInput = 'testpassword';
+
+            $controller('home', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
+
+            $httpBackend.expect('POST', '/login-test', {username: 'testusername', password: '9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05'}).respond(404, {}, null, 'error');
+
+            $scope.submit();
+
+            $httpBackend.flush();
+
+            expect($scope.loginInvalid).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation()
+
+        }));
+
     });
 
     describe('manager controller unit test', function() {
-        var ctrl, scope, rootScope, location;
-        beforeEach(inject(function($controller, $rootScope, idStore, $location) {
-            //create a new clean scope object
-            scope = $rootScope.$new();
-            rootScope = $rootScope.$new();
-            idStore.set_id('1234');
-            location = $location;
-            ctrl = $controller('manager', {
-                $rootScope: rootScope,
-                $scope : scope,
-                idStore: idStore,
-                $location: location
-            });
+
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
         }));
 
-        it('$rootScope.title should be Password Vault | Manager', function() {
-            expect(rootScope.title).toBe('Password Vault | Manager');
-        });
+        it('should test the manager controller', inject(function($httpBackend) {
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                set_id: function() {
+                    console.log('set_id called');
+                },
+                get_id: function() {
+                    return '12345';
+                }
+            };
 
-        it('$scope._id should be 1234', function(){
-            expect(scope._id).toBe('1234');
-        });
+            var mockResponse = {
+                data: {}
+            };
 
-        it('$scope.logout should set idStore._id to empty string and redirect to homepage', inject(function(idStore) {
-            spyOn(location, 'path');
-            scope.logout();
-            expect(idStore.get_id()).toBe('');
-            expect(location.path).toHaveBeenCalledWith('/');
+            $httpBackend.expect('POST', '/site-list', {userId: '12345'}).respond(200, mockResponse, null, 'success');
+
+            $controller('manager', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
+
+            spyOn(mockIdStore, 'set_id');
+            spyOn($location, 'path');
+
+            $scope.logout();
+
+            $httpBackend.flush();
+
+            expect($scope._id).toBe('12345');
+            expect($rootScope.title).toBe('Password Vault | Manager');
+            expect(mockIdStore.set_id).toHaveBeenCalledWith('');
+            expect($location.path).toHaveBeenCalledWith('/');
+            expect($scope.siteList).toBeDefined();
+
+            console.log('$scope.siteList', $scope.siteList);
+
+            $scope.go('/test');
+
+            expect($location.path).toHaveBeenCalledWith('/test');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+
         }));
 
-        it('$scope.go("/test") should redirect to /test', function() {
-            spyOn(location, 'path');
-            scope.go('/test');
-            expect(location.path).toHaveBeenCalledWith('/test');
-        });
 
     });
 
@@ -333,7 +455,7 @@ describe('client.js unit test', function() {
         it('On success $scope.helpMe() and $scope.email=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a successful response... ', inject(function($httpBackend) {
             //mock _id and email
             idStr.set_id('1234');
-            console.log(idStr.get_id());
+            //console.log(idStr.get_id());
             scope.email = true;
             scope.emailInput = 'jonwadeuk@gmail.com';
 
@@ -582,11 +704,8 @@ describe('client.js unit test', function() {
             expect(location.path).toHaveBeenCalledWith('/test');
         });
 
-
         it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and on success from the /add-site endpoint should redirect back to the /manager page...', inject(function($httpBackend) {
 
-
-            //console.log(CryptoJS.AES);
             spyOn(CryptoJS.AES, 'encrypt').and.callThrough();
             spyOn(idStr, 'get_id');
             spyOn(scope, 'go');
@@ -778,5 +897,5 @@ describe('client.js unit test', function() {
 
     });
 
-
 });
+

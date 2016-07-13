@@ -360,6 +360,98 @@ describe('add-site.js unit test', function() {
 
 });
 
+describe('site-list.js unit test', function() {
+
+    var mongooseConfig, siteList, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.managerTest = {};
+        mongooseConfig.managerDev = {};
+
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, fields, model) {
+                console.log('query=', query);
+                console.log('fields=', fields);
+                console.log('model=', model);
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.managerTest){
+                        reject('mocked db access error');
+                    }
+                    else if (query.userId !== '12345') {
+                        reject([]);
+                    }
+                    else {
+                        resolve(['site1', 'site2']);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        siteList = require('./../app/utils/site-list.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return successMessage "success, array attached"...', function(done) {
+        siteList.go('12345', mongooseConfig.managerTest).then(function(res) {
+            //successfully added site record
+            console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('success, array attached');
+            done();
+        }, function(rej) {
+            //failed registration
+            console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('No records found');
+            //done();
+        });
+
+    });
+
+    it('should return errorMessage "No records found"...', function(done) {
+        siteList.go('54321', mongooseConfig.managerTest).then(function(res) {
+            //successfully added site record
+            console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('success, array attached');
+            //done();
+        }, function(rej) {
+            //failed registration
+            console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('No records found');
+            done();
+        });
+
+    });
+
+
+});
+
 describe('password-update.js unit test', function() {
 
     var mongooseConfig, passwordUpdate, mockDb, usernameVerificationMock, emailVerificationMock;
@@ -771,7 +863,7 @@ describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -905,6 +997,21 @@ describe('index.js unit test', function() {
             }
         };
 
+        siteListMock = {
+            go: function(userId) {
+                return new Promise(function(resolve, reject) {
+                    if(userId !== '12345') {
+                        reject({
+                            errorMessage: 'site list error'
+                        });
+                    }
+                    else {
+                        resolve({successMessage: 'site list success', data: {}});
+                    }
+                });
+            }
+        };
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
@@ -913,6 +1020,7 @@ describe('index.js unit test', function() {
         mockery.registerMock('./utils/registration.js', registrationMock);
         mockery.registerMock('./utils/password-update.js', passwordUpdateMock);
         mockery.registerMock('./utils/add-site.js', addSiteMock);
+        mockery.registerMock('./utils/site-list.js', siteListMock);
 
         index = require('./../app/index.js');
         app = index.app;
@@ -1134,6 +1242,35 @@ describe('index.js unit test', function() {
         chai.request(app)
             .post('/add-site')
             .send({sitename : 'errorSitename', username: 'errorUsername', password: 'errorPassword'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /site-list, on success should return return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/site-list')
+            .send({userId: '12345'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /site-list, on error should return return an object with a errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/site-list')
+            .send({userId: '54321'})
             .end(function(err, res) {
                 res.should.have.status(404);
                 res.should.be.json;

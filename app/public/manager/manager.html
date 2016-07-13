@@ -5,17 +5,12 @@
             <h1 id="title">Password Vault</h1>
             <h2>Site</h2>
             <ul id="manager-list">
-                <li ng-click="go('/view-site')">Placeholder 1</li>
-                <li>Placeholder 2</li>
-                <li>Placeholder 3</li>
-                <li>Placeholder 4</li>
-                <li>Placeholder 5</li>
+                <li ng-click="go('/view-site')" ng-repeat="item in siteList" ng-bind="item.sitename"></li>
             </ul>
             <button id="newSite" ng-click="go('/add-site')">Add Site</button>
             <button id="logoutButton" ng-click="logout()">Logout</button>
         </div>
     </div>
-    <p>Your database _id={{_id}}</p>
 </div>
 
 

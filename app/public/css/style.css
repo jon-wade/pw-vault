@@ -48,7 +48,7 @@ div#login, div#welcome {
 div.container {
     width: 60%;
     margin: 0 auto;
-    border: 1px dashed yellow;
+    /*border: 1px dashed yellow;*/
 }
 
 div.registrationForm, div#ui, div#managerList, div.addSiteForm {
@@ -160,6 +160,8 @@ div#managerList ul li {
     list-style: none;
     text-align: center;
     padding: 10px 0 10px 0;
+    cursor: pointer;
+    font-size: 1.3em;
 }
 
 /* error messages */

@@ -11,6 +11,7 @@ var usernameVerification = require('./utils/username-verification.js');
 var registration = require('./utils/registration.js');
 var passwordUpdate = require('./utils/password-update.js');
 var addSite = require('./utils/add-site.js');
+var siteList = require('./utils/site-list.js');
 
 var jsonParser = bodyParser.json();
 
@@ -88,6 +89,15 @@ app.post('/add-site', jsonParser, function(req, res) {
         //console.log('error=', error);
         res.status(404).send(error);
     });
+});
+
+app.post('/site-list', jsonParser, function(req, res) {
+    siteList.go(req.body.userId, mongooseConfig.managerDev)
+        .then(function(success) {
+            res.status(200).send(success);
+        }, function(error) {
+            res.status(404).send(error);
+        });
 });
 
 

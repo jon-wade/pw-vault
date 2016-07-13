@@ -164,7 +164,6 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
     $scope.submit = function() {
         //console.log('submit pressed');
 
-        //TODO: need to unit-test the hash function??
         var passwordHash = CryptoJS.SHA256($scope.passwordInput).toString();
 
         apiPOST.callAPI('/login-test', {username: $scope.usernameInput, password: passwordHash}).then(function(res) {
@@ -194,12 +193,10 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 
 }]);
 
-client.controller('manager', ['$scope', 'idStore', '$rootScope', '$location', function($scope, idStore, $rootScope, $location) {
+client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'apiPOST', function($scope, $rootScope, $location, idStore, apiPOST) {
     //manager controller code here
-    $scope._id = idStore.get_id();
 
     $rootScope.title = 'Password Vault | Manager';
-
 
     $scope.logout = function () {
         idStore.set_id('');
@@ -209,6 +206,22 @@ client.controller('manager', ['$scope', 'idStore', '$rootScope', '$location', fu
     $scope.go = function (destination) {
         $location.path(destination);
     };
+
+    //get site list and render on page
+
+    $scope._id = idStore.get_id();
+
+    apiPOST.callAPI('/site-list', {userId: $scope._id})
+        .then(function(res) {
+            //successfully retrieved site list from db
+            //need the site list to be in an array to allow ng-repeat to easily render on page
+            console.log('res=', res);
+            $scope.siteList = res.data.data;
+
+        }, function(rej) {
+            //error retrieving site list from db
+            console.log('rej=', rej);
+        });
 
 
 }]);
@@ -379,10 +392,10 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
 
         var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString();
 
-        console.log('sitenameInput=', $scope.sitenameInput);
-        console.log('_id=', _id);
-        console.log('encryptedUsername=', encryptedUsername);
-        console.log('encryptedPassword=', encryptedPassword);
+        //console.log('sitenameInput=', $scope.sitenameInput);
+        //console.log('_id=', _id);
+        //console.log('encryptedUsername=', encryptedUsername);
+        //console.log('encryptedPassword=', encryptedPassword);
 
 
         apiPOST.callAPI('/add-site', {
@@ -393,11 +406,11 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
             })
             .then(function(res) {
                 //site record successfully added to db
-                console.log('SUCCESS=', res);
+                //console.log('SUCCESS=', res);
                 $scope.go('/manager');
             }, function(rej) {
                 //site record failed to be added to db
-                console.log('ERROR=', rej);
+                //console.log('ERROR=', rej);
                 $scope.addSiteError = true;
                 $scope.addSiteForm = false;
                 $scope.redirect(5, '/manager');
