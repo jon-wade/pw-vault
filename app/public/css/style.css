@@ -19,7 +19,7 @@ a:link, a:hover, a:visited {
 
 /* background styles */
 
-div#home, div#registration, div#forgotten, div#manager, div#addSite {
+div#home, div#registration, div#forgotten, div#manager, div#addSite, div#viewSite {
     background-size: cover;
     background-position: center center;
     min-height: 100vh;
@@ -51,13 +51,13 @@ div.container {
     /*border: 1px dashed yellow;*/
 }
 
-div.registrationForm, div#ui, div#managerList, div.addSiteForm {
+div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList {
     width: 60%;
     margin: 0px auto 0 auto;
     border: 1px dashed white;
 }
 
-div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title {
+div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title, div#siteList h1#title {
     margin-top: 0px;
     padding-top: 120px;
     text-align: center;
@@ -87,7 +87,7 @@ div.displayMessage p.message, div#registrationMessages p.message, div#addSiteErr
     font-size: 1em;
 }
 
-div#ui h2, div#managerList h2 {
+div#ui h2, div#managerList h2, div#siteList h2 {
     padding: 10px 0;
     text-align: center;
 
@@ -112,7 +112,7 @@ div#login {
 
 /* form elements */
 
-div#login div#username input, div#login div#password input, div.registrationForm input, div#ui input, div.addSiteForm input {
+div#login div#username input, div#login div#password input, div.registrationForm input, div#ui input, div.addSiteForm input, div#siteList input {
     margin: 25px 0;
     width: 96%;
     padding: 10px 2% 10px 2%;
@@ -120,7 +120,7 @@ div#login div#username input, div#login div#password input, div.registrationForm
     border-radius: 5px;
 }
 
-div#forgotten div.container div#ui form#changePasswordForm input, div.addSiteForm input {
+div#forgotten div.container div#ui form#changePasswordForm input, div.addSiteForm input, div#siteList form#decryptForm {
     margin: 20px 0px 5px 0px;
 }
 
@@ -132,7 +132,7 @@ button {
     padding: 5px 0;
 }
 
-div.registrationForm button, div#ui button, div#forgotten div.container button#back, div#managerList button, div.addSiteForm button {
+div.registrationForm button, div#ui button, div#forgotten div.container button#back, div#managerList button, div.addSiteForm button, div#siteList button {
     margin: 30px auto 10px auto;
 }
 
@@ -162,6 +162,14 @@ div#managerList ul li {
     padding: 10px 0 10px 0;
     cursor: pointer;
     font-size: 1.3em;
+}
+
+/* viewSite username and password */
+
+div#siteList p {
+    text-align: center;
+    font-size: 1.1em;
+    margin-bottom: 30px;
 }
 
 /* error messages */

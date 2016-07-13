@@ -1,6 +1,19 @@
 var client = angular.module('client', ['ngRoute']);
 
-client.service('idStore', function () {
+client.service('idStore', function() {
+    var _id = '';
+
+    return {
+        get_id: function () {
+            return _id;
+        },
+        set_id: function(value) {
+            _id = value;
+        }
+    };
+});
+
+client.service('managerIdStore', function() {
     var _id = '';
 
     return {
@@ -193,7 +206,7 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 
 }]);
 
-client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'apiPOST', function($scope, $rootScope, $location, idStore, apiPOST) {
+client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'apiPOST', 'managerIdStore', function($scope, $rootScope, $location, idStore, apiPOST, managerIdStore) {
     //manager controller code here
 
     $rootScope.title = 'Password Vault | Manager';
@@ -203,7 +216,9 @@ client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'a
         $location.path('/');
     };
 
-    $scope.go = function (destination) {
+    $scope.go = function (destination, managerId) {
+        console.log('managerId=', managerId);
+        managerIdStore.set_id(managerId);
         $location.path(destination);
     };
 
@@ -432,14 +447,40 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
 
 }]);
 
-//TODO: unit test from here
-client.controller('viewSite', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdStore', 'idStore', 'apiPOST', function($scope, $rootScope, $location, managerIdStore, idStore, apiPOST) {
+
 
     $rootScope.title = 'Password Vault | View';
 
     $scope.go = function (destination) {
         $location.path(destination);
     };
+
+    //show placeholders for username and password
+    $scope.encrypted = true;
+
+    //get user and manager ids
+    $scope.userId = idStore.get_id();
+    $scope.managerId = managerIdStore.get_id();
+
+    //now we need to pull back the record that matches both ids
+    apiPOST.callAPI('/retrieve-site', {userId: $scope.userId, managerId: $scope.managerId})
+        .then(function(res) {
+            //successfully retrieved from db
+            console.log('res=', res);
+            //$scope.encrypted = false;
+            $scope.sitename = res.data.data[0].sitename;
+            $scope.encryptedUsername = res.data.data[0].username;
+            $scope.encryptedPassword = res.data.data[0].password;
+        }, function(rej) {
+            //error retrieving from db
+            console.log('rej=', rej);
+        });
+
+    //when decrypt key is pressed, decrypt username and password
+
+
+
 
 }]);
 

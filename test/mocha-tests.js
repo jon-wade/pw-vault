@@ -452,6 +452,97 @@ describe('site-list.js unit test', function() {
 
 });
 
+describe('retrieve-site.js unit test', function() {
+
+    var mongooseConfig, retrieveSite, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.managerTest = {};
+        mongooseConfig.managerDev = {};
+
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, fields, model) {
+                console.log('query=', query);
+                console.log('fields=', fields);
+                console.log('model=', model);
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.managerTest){
+                        reject('mocked db access error');
+                    }
+                    else if (query.userId !== '12345' || query._id !== '98765') {
+                        reject([]);
+                    }
+                    else {
+                        resolve(['site1']);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        retrieveSite = require('./../app/utils/retrieve-site.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return successMessage "success, array attached"...', function(done) {
+        retrieveSite.go('12345', '98765', mongooseConfig.managerTest).then(function(res) {
+            //successfully retrieved site
+            console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('success, array attached');
+            done();
+        }, function(rej) {
+            //failed to retrieve site
+            console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('No records found');
+            //done();
+        });
+
+    });
+
+    it('should return errorMessage "No records found"...', function(done) {
+        retrieveSite.go('54321', '98765', mongooseConfig.managerTest).then(function(res) {
+            //successfully retrieved
+            console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('success, array attached');
+            //done();
+        }, function(rej) {
+            //failed to retrieve site
+            console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('No records found');
+            done();
+        });
+
+    });
+
+});
+
 describe('password-update.js unit test', function() {
 
     var mongooseConfig, passwordUpdate, mockDb, usernameVerificationMock, emailVerificationMock;
@@ -863,7 +954,7 @@ describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -1012,6 +1103,21 @@ describe('index.js unit test', function() {
             }
         };
 
+        retrieveSiteMock = {
+            go: function(userId, managerId) {
+                return new Promise(function(resolve, reject) {
+                    if(userId !== '12345' || managerId !== '98765') {
+                        reject({
+                            errorMessage: 'retrieve site error'
+                        });
+                    }
+                    else {
+                        resolve({successMessage: 'retrieve site success', data: {}});
+                    }
+                });
+            }
+        };
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
@@ -1021,6 +1127,7 @@ describe('index.js unit test', function() {
         mockery.registerMock('./utils/password-update.js', passwordUpdateMock);
         mockery.registerMock('./utils/add-site.js', addSiteMock);
         mockery.registerMock('./utils/site-list.js', siteListMock);
+        mockery.registerMock('./utils/retrieve-site.js', retrieveSiteMock);
 
         index = require('./../app/index.js');
         app = index.app;
@@ -1281,6 +1388,34 @@ describe('index.js unit test', function() {
             });
     });
 
+    it('On POST /retrieve-site, on success should return return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/retrieve-site')
+            .send({userId: '12345', managerId: '98765'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /retrieve-site, on error should return return an object with a errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/retrieve-site')
+            .send({userId: '54321', managerId: '98765'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
 
     it('On GET /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)

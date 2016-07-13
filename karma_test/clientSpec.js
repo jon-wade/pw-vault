@@ -18,6 +18,20 @@ describe('client.js unit test', function() {
         }));
     });
 
+    describe('managerIdStore service unit test', function() {
+
+        it('should return an empty string when calling get_id...', inject(function(managerIdStore){
+            var res = managerIdStore.get_id();
+            expect(res).toBe('');
+        }));
+
+        it('should return the correct id when calling get_id after set_id...', inject(function(managerIdStore){
+            managerIdStore.set_id('abcd1234');
+            var res = managerIdStore.get_id();
+            expect(res).toBe('abcd1234');
+        }));
+    });
+
     describe('apiPOST service unit test', function(){
 
         it('should successfully return data object when data message matches an existing username and password...', inject(function(apiPOST, $rootScope, $httpBackend) {
@@ -184,6 +198,57 @@ describe('client.js unit test', function() {
 
     });
 
+    describe('viewSite controller unit test 1', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('should set...)', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockManagerIdStore = {
+                get_id: function() {
+                    return '98765';
+                }
+            };
+
+            $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
+
+            expect($scope.encrypted).toBe(true);
+
+            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, {}, null, 'success');
+
+            $httpBackend.flush();
+
+            //TODO: tests to go here
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+            spyOn($location, 'path');
+
+            expect($rootScope.title).toBe('Password Vault | View');
+
+            $scope.go('/test');
+
+            expect($location.path).toHaveBeenCalledWith('/test');
+
+        }));
+
+    });
+
     describe('home controller unit test 1', function() {
         var $controller;
 
@@ -343,16 +408,21 @@ describe('client.js unit test', function() {
                     return '12345';
                 }
             };
-
+            var mockManagerIdStore = {
+                set_id: function() {
+                    console.log('manager set_id called');
+                }
+            };
             var mockResponse = {
                 data: {}
             };
 
             $httpBackend.expect('POST', '/site-list', {userId: '12345'}).respond(200, mockResponse, null, 'success');
 
-            $controller('manager', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
+            $controller('manager', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, managerIdStore: mockManagerIdStore, $location: $location});
 
             spyOn(mockIdStore, 'set_id');
+            spyOn(mockManagerIdStore, 'set_id');
             spyOn($location, 'path');
 
             $scope.logout();
@@ -367,8 +437,9 @@ describe('client.js unit test', function() {
 
             console.log('$scope.siteList', $scope.siteList);
 
-            $scope.go('/test');
+            $scope.go('/test', '12345');
 
+            expect(mockManagerIdStore.set_id).toHaveBeenCalledWith('12345');
             expect($location.path).toHaveBeenCalledWith('/test');
 
             $httpBackend.verifyNoOutstandingRequest();

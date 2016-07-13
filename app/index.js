@@ -12,6 +12,7 @@ var registration = require('./utils/registration.js');
 var passwordUpdate = require('./utils/password-update.js');
 var addSite = require('./utils/add-site.js');
 var siteList = require('./utils/site-list.js');
+var retrieveSite = require('./utils/retrieve-site.js');
 
 var jsonParser = bodyParser.json();
 
@@ -93,6 +94,15 @@ app.post('/add-site', jsonParser, function(req, res) {
 
 app.post('/site-list', jsonParser, function(req, res) {
     siteList.go(req.body.userId, mongooseConfig.managerDev)
+        .then(function(success) {
+            res.status(200).send(success);
+        }, function(error) {
+            res.status(404).send(error);
+        });
+});
+
+app.post('/retrieve-site', jsonParser, function(req, res) {
+    retrieveSite.go(req.body.userId, req.body.managerId, mongooseConfig.managerDev)
         .then(function(success) {
             res.status(200).send(success);
         }, function(error) {
