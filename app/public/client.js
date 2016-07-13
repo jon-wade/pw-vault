@@ -162,7 +162,8 @@ client.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
-client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$location', function($scope, $rootScope, idStore, apiPOST, $location) {
+client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$location', '$route', function($scope, $rootScope, idStore, apiPOST, $location, $route) {
+
     //set the page title
     $rootScope.title = 'Password Vault | Home';
 
@@ -477,7 +478,53 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
             console.log('rej=', rej);
         });
 
+
+    //delete current site when delete button is pressed
+    $scope.delete = function() {
+
+        apiPOST.callAPI('/delete-site', {managerId: $scope.managerId})
+            .then(function(res) {
+                //site successfully deleted
+                console.log('res=', res);
+                //return to the manager page
+                $scope.go('/manager');
+            }, function(rej) {
+                //site deletion error
+                console.log('rej=', rej);
+            });
+
+    };
+
     //when decrypt key is pressed, decrypt username and password
+    $scope.decrypt = function() {
+
+        console.log($scope.keyInput);
+
+        if($scope.keyInput === undefined) {
+            //no encryption key entered, do nothing
+        }
+        else {
+
+            var plaintextUsername = CryptoJS.AES.decrypt($scope.encryptedUsername, $scope.keyInput).toString(CryptoJS.enc.Utf8);
+            var plaintextPassword = CryptoJS.AES.decrypt($scope.encryptedPassword, $scope.keyInput).toString(CryptoJS.enc.Utf8);
+
+            console.log(typeof plaintextUsername);
+            console.log(typeof plaintextPassword);
+            console.log(plaintextUsername==='');
+            console.log(plaintextPassword==='');
+
+            if (plaintextUsername==='' || plaintextPassword==='') {
+                //not the correct encryption key
+            }
+
+            else {
+                $scope.encrypted = false;
+                $scope.plaintextUsername = plaintextUsername;
+                $scope.plaintextPassword = plaintextPassword;
+            }
+        }
+
+    };
 
 
 

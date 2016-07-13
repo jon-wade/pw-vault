@@ -4,15 +4,17 @@
             <h1 id="title" ng-bind="sitename"></h1>
             <h2>Username</h2>
             <p ng-show="encrypted">****************</p>
+            <p ng-show="!encrypted" ng-bind="plaintextUsername"></p>
             <h2>Password</h2>
             <p ng-show="encrypted">****************</p>
+            <p ng-show="!encrypted" ng-bind="plaintextPassword"></p>
             <form id="decryptForm" name="decryptForm" novalidate ng-submit="decrypt()">
 
                 <!-- encryption key field -->
                 <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key">
 
                 <button type="submit" id="decryptButton">Decrypt</button>
-                <button type="button" id="deleteButton">Delete</button>
+                <button type="button" id="deleteButton" ng-click="delete()">Delete</button>
                 <button type="button" id="backButton" ng-click="go('/manager')">Back</button>
             </form>
         </div>

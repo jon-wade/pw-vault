@@ -6,12 +6,11 @@
             <!-- main form here --->
             <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
                 <div id="username">
-                    <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" ng-model-options="{ debounce: 500 }" required="">
+                    <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
 
                 </div>
                 <div id="password">
-                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-model-options="{ debounce: 500 }" ng-pattern="regex">
-
+                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-pattern="regex">
                 </div>
                 <!--error messages here-->
                 <div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">

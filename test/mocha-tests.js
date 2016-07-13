@@ -543,6 +543,99 @@ describe('retrieve-site.js unit test', function() {
 
 });
 
+describe('delete-site.js unit test', function() {
+
+    var mongooseConfig, deleteSite, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.managerTest = {};
+        mongooseConfig.managerDev = {};
+
+        mockDb = {};
+        mockDb.controller = {
+            delete: function(data, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.managerTest){
+                        reject('mocked db access error');
+                    }
+                    else if (data._id !== '12345') {
+                        reject({
+                            errorMessage: 'error deleting data'
+                        });
+                    }
+                    else {
+                        resolve({
+                            successMessage: 'success deleting data',
+                            result: {
+                                n: 1
+                            }
+                        });
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        deleteSite = require('./../app/utils/delete-site.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return successMessage "site successfully deleted"...', function(done) {
+        deleteSite.go('12345', mongooseConfig.managerTest).then(function(res) {
+            //successfully deleted site
+            console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.successMessage.should.include('site successfully deleted');
+            done();
+        }, function(rej) {
+            //failed to retrieve site
+            console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('site delete error');
+            //done();
+        });
+
+    });
+
+    it('should return errorMessage "site delete error"...', function(done) {
+        deleteSite.go('54321', mongooseConfig.managerTest).then(function(res) {
+            //successfully deleted site
+            console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.successMessage.should.include('site successfully deleted');
+            //done();
+        }, function(rej) {
+            //failed to retrieve site
+            console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('site delete error');
+            done();
+        });
+
+    });
+
+});
+
 describe('password-update.js unit test', function() {
 
     var mongooseConfig, passwordUpdate, mockDb, usernameVerificationMock, emailVerificationMock;
@@ -954,7 +1047,7 @@ describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock, deleteSiteMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -1118,6 +1211,21 @@ describe('index.js unit test', function() {
             }
         };
 
+        deleteSiteMock = {
+            go: function(managerId) {
+                return new Promise(function(resolve, reject) {
+                    if(managerId !== '12345') {
+                        reject({
+                            errorMessage: 'delete site error'
+                        });
+                    }
+                    else {
+                        resolve({successMessage: 'delete site success', data: {}});
+                    }
+                });
+            }
+        };
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
@@ -1128,6 +1236,7 @@ describe('index.js unit test', function() {
         mockery.registerMock('./utils/add-site.js', addSiteMock);
         mockery.registerMock('./utils/site-list.js', siteListMock);
         mockery.registerMock('./utils/retrieve-site.js', retrieveSiteMock);
+        mockery.registerMock('./utils/delete-site.js', deleteSiteMock);
 
         index = require('./../app/index.js');
         app = index.app;
@@ -1407,6 +1516,35 @@ describe('index.js unit test', function() {
         chai.request(app)
             .post('/retrieve-site')
             .send({userId: '54321', managerId: '98765'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /delete-site, on success should return return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/delete-site')
+            .send({managerId: '12345'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /delete-site, on error should return return an object with a errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/delete-site')
+            .send({managerId: '54321'})
             .end(function(err, res) {
                 res.should.have.status(404);
                 res.should.be.json;
