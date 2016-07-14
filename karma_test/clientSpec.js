@@ -223,12 +223,20 @@ describe('client.js unit test', function() {
                     return '98765';
                 }
             };
+            var mockResponse = {
+                successMessage: 'site retrieval successful',
+                data: [{
+                    sitename: 'testsitename',
+                    username: 'testusername',
+                    password: 'testpassword'
+                }]
+            };
 
             $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
 
             expect($scope.encrypted).toBe(true);
 
-            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, {}, null, 'success');
+            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, mockResponse, null, 'success');
 
             $httpBackend.flush();
 
@@ -303,7 +311,8 @@ describe('client.js unit test', function() {
             var $scope = {};
             var $rootScope = {};
             var $location = {
-                path: function() {}
+                path: function() {
+                }
             };
             var mockIdStore = {
                 set_id: function() {
@@ -326,6 +335,9 @@ describe('client.js unit test', function() {
             $controller('home', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
 
             $httpBackend.expect('POST', '/login-test', {username: 'testusername', password: '9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05'}).respond(200, mockResponse, null, 'success');
+
+            ////no idea why I need this here...not sure what is calling the homepage
+            //$httpBackend.expect('GET', './home/home.html').respond(200, {}, null, 'success');
 
             $scope.submit();
 
@@ -372,6 +384,9 @@ describe('client.js unit test', function() {
             $controller('home', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
 
             $httpBackend.expect('POST', '/login-test', {username: 'testusername', password: '9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05'}).respond(404, {}, null, 'error');
+
+            ////no idea why I need this here...not sure what is calling the homepage
+            //$httpBackend.expect('GET', './home/home.html').respond(200, {}, null, 'success');
 
             $scope.submit();
 
@@ -667,11 +682,10 @@ describe('client.js unit test', function() {
             expect(scope.registrationError).toBe(false);
         });
 
-        it('$scope.register should hash the email and password input fields using SHA256 and on success from the /create endpoint, set the returned id into the idStore, correctly setting the registrationSuccess and registrationForm variables and call the $scope.redirect method with values "10", "/manager" ...', inject(function($httpBackend, idStore) {
+        it('$scope.register should hash the email and password input fields using SHA256 and on success from the /create endpoint, set the returned id into the idStore, correctly setting the registrationSuccess and registrationForm variables...', inject(function($httpBackend, idStore) {
 
             spyOn(CryptoJS, 'SHA256').and.callThrough();
             spyOn(idStore, 'set_id');
-            spyOn(scope, 'redirect');
 
             var response = {data: '1234'};
             scope.usernameInput = 'testuser';
@@ -690,7 +704,6 @@ describe('client.js unit test', function() {
             expect(scope.registrationSuccess).toBe(true);
             expect(scope.registrationForm).toBe(false);
             expect(idStore.set_id).toHaveBeenCalledWith(response);
-            expect(scope.redirect).toHaveBeenCalledWith(10, '/manager');
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
@@ -698,11 +711,10 @@ describe('client.js unit test', function() {
 
         }));
 
-        it('$scope.register should hash the email and password input fields using SHA256 and on failure from the /create endpoint, correctly set the registrationError and registrationForm variables and call $scope.redirect with values "10", "/home" ...', inject(function($httpBackend, idStore) {
+        it('$scope.register should hash the email and password input fields using SHA256 and on failure from the /create endpoint, correctly set the registrationError and registrationForm variables...', inject(function($httpBackend, idStore) {
 
             spyOn(CryptoJS, 'SHA256').and.callThrough();
             spyOn(idStore, 'set_id');
-            spyOn(scope, 'redirect');
 
             var response = {};
             scope.usernameInput = 'testuser';
@@ -720,30 +732,9 @@ describe('client.js unit test', function() {
             expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
             expect(scope.registrationError).toBe(true);
             expect(scope.registrationForm).toBe(false);
-            expect(scope.redirect).toHaveBeenCalledWith(10, '/home');
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
-
-
-        }));
-
-        it('$scope.redirect(x, y) should call $interval(), set $scope.timer to x...', inject(function() {
-
-            spyOn(scope, 'go');
-            scope.redirect(10, '/home');
-
-            expect(scope.timer).toBe(10);
-
-        }));
-
-        it('$scope.redirect(0, y) should call $interval(), set $scope.timer to 0 and call $scope.go(y)...', inject(function() {
-
-            spyOn(scope, 'go');
-            scope.redirect(0, '/home');
-
-            expect(scope.timer).toBe(0);
-            expect(scope.go).toHaveBeenCalledWith('/home');
 
         }));
 
@@ -775,7 +766,7 @@ describe('client.js unit test', function() {
             expect(location.path).toHaveBeenCalledWith('/test');
         });
 
-        it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and on success from the /add-site endpoint should redirect back to the /manager page...', inject(function($httpBackend) {
+        it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and get a successful return from the /add-site endpoint...', inject(function($httpBackend) {
 
             spyOn(CryptoJS.AES, 'encrypt').and.callThrough();
             spyOn(idStr, 'get_id');
@@ -811,13 +802,12 @@ describe('client.js unit test', function() {
 
         }));
 
-        it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and on error from the /add-site endpoint should show error message and redirect back to the /mananger page...', inject(function($httpBackend) {
+        it('$scope.addSite should get _id from idStore, should encrypt the username and password input fields using AES and receive an error from the /add-site endpoint...', inject(function($httpBackend) {
 
 
             //console.log(CryptoJS.AES);
             spyOn(CryptoJS.AES, 'encrypt').and.callThrough();
             spyOn(idStr, 'get_id');
-            spyOn(scope, 'redirect');
 
             var response = {};
 
@@ -844,7 +834,6 @@ describe('client.js unit test', function() {
 
             expect(scope.addSiteError).toBe(true);
             expect(scope.addSiteForm).toBe(false);
-            expect(scope.redirect).toHaveBeenCalledWith(5, '/manager');
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();

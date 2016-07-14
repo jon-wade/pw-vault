@@ -37,6 +37,18 @@ div#forgotten {
     background: url('../img/forgotten-background.jpg');
 }
 
+div#viewSite {
+    background: url('../img/view-site-background.jpg');
+}
+
+div#manager {
+    background: url('../img/manager-background.jpg');
+}
+
+div#addSite {
+    background: url('../img/add-site-background.jpg');
+}
+
 /* layout divs */
 
 div#login, div#welcome {
@@ -54,7 +66,7 @@ div.container {
 div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList {
     width: 60%;
     margin: 0px auto 0 auto;
-    border: 1px dashed white;
+    /*border: 1px dashed white;*/
 }
 
 div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title, div#siteList h1#title {
@@ -65,6 +77,10 @@ div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.ad
 
 div#ui h1#title {
     padding-top: 100px;
+}
+
+div#siteList h1#title {
+    padding-top: 70px;
 }
 
 div.displayMessage, div#registrationMessages, div#emailSuccessMessage, div#addSiteErrorMessage {
@@ -96,6 +112,10 @@ div#ui h2, div#managerList h2, div#siteList h2 {
     background-color: grey;
 }
 
+div#siteList h2 {
+    margin: 0 auto 0 auto;
+
+}
 
 div#ui h2.selected {
     background-color: rebeccapurple;
@@ -120,6 +140,11 @@ div#login div#username input, div#login div#password input, div.registrationForm
     border-radius: 5px;
 }
 
+div#siteList input {
+    text-align: center;
+    margin: 10px 0 25px 0;
+}
+
 div#forgotten div.container div#ui form#changePasswordForm input, div.addSiteForm input, div#siteList form#decryptForm {
     margin: 20px 0px 5px 0px;
 }
@@ -130,9 +155,15 @@ button {
     border-radius: 5px;
     border: 0;
     padding: 5px 0;
+    background-color: orange;
 }
 
-div.registrationForm button, div#ui button, div#forgotten div.container button#back, div#managerList button, div.addSiteForm button, div#siteList button {
+button:focus {
+    outline: none;
+
+}
+
+div.registrationForm button, div#ui button, div#forgotten div.container button#back, div#managerList button, div.addSiteForm button, div#siteList button, div#registrationMessages button {
     margin: 30px auto 10px auto;
 }
 
@@ -144,7 +175,11 @@ div#welcome button#registerButton {
     margin: 104px auto 0 auto;
 }
 
-div#login button#submitButton[disabled=disabled], div.registrationForm button[disabled=disabled], div#ui button[disabled=disabled] {
+button#decryptButton.incorrect {
+    background-color: red;
+}
+
+button[disabled=disabled] {
     background-color: lightgrey;
     color: darkgrey;
 }
@@ -162,6 +197,12 @@ div#managerList ul li {
     padding: 10px 0 10px 0;
     cursor: pointer;
     font-size: 1.3em;
+    background-color: rgba(255,255,255,0.3);
+    margin-top: 10px;
+}
+
+div#managerList ul li:hover {
+    background-color: rebeccapurple;
 }
 
 /* viewSite username and password */

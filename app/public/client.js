@@ -162,7 +162,7 @@ client.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
-client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$location', '$route', function($scope, $rootScope, idStore, apiPOST, $location, $route) {
+client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$location', '$timeout', function($scope, $rootScope, idStore, apiPOST, $location, $timeout) {
 
     //set the page title
     $rootScope.title = 'Password Vault | Home';
@@ -197,11 +197,10 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
             console.log('rej=', rej);
             if(rej.status === 404){
                 $scope.loginInvalid = true;
+                $timeout(function() {$scope.loginInvalid = false}, 3500)
             }
         });
 
-        //this return is for unit testing the submit() method
-        return true;
     };
 
 
@@ -365,27 +364,13 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
             idStore.set_id(res.data);
             $scope.registrationSuccess = true;
             $scope.registrationForm = false;
-            $scope.redirect(10, '/manager');
         }, function() {
             //failed registration of new user
             //console.log('error in registration', rej);
             $scope.registrationError = true;
             $scope.registrationForm = false;
-            $scope.redirect(10, '/home');
         });
 
-    };
-
-    $scope.redirect = function(number, path) {
-
-         $scope.timer = number;
-         if (number === 0) {
-             return $scope.go(path);
-         }
-         $interval(function() {
-            number--;
-            $scope.redirect(number, path);
-        }, 1000);
     };
 
 }]);
@@ -429,26 +414,13 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
                 //console.log('ERROR=', rej);
                 $scope.addSiteError = true;
                 $scope.addSiteForm = false;
-                $scope.redirect(5, '/manager');
             });
 
     };
 
-    $scope.redirect = function(number, path) {
-
-        $scope.timer = number;
-        if (number === 0) {
-            return $scope.go(path);
-        }
-        $interval(function() {
-            number--;
-            $scope.redirect(number, path);
-        }, 1000);
-    };
-
 }]);
 
-client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdStore', 'idStore', 'apiPOST', function($scope, $rootScope, $location, managerIdStore, idStore, apiPOST) {
+client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdStore', 'idStore', 'apiPOST', '$timeout', function($scope, $rootScope, $location, managerIdStore, idStore, apiPOST, $timeout) {
 
 
     $rootScope.title = 'Password Vault | View';
@@ -504,26 +476,58 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
             //no encryption key entered, do nothing
         }
         else {
-
-            var plaintextUsername = CryptoJS.AES.decrypt($scope.encryptedUsername, $scope.keyInput).toString(CryptoJS.enc.Utf8);
-            var plaintextPassword = CryptoJS.AES.decrypt($scope.encryptedPassword, $scope.keyInput).toString(CryptoJS.enc.Utf8);
-
-            console.log(typeof plaintextUsername);
-            console.log(typeof plaintextPassword);
-            console.log(plaintextUsername==='');
-            console.log(plaintextPassword==='');
-
-            if (plaintextUsername==='' || plaintextPassword==='') {
-                //not the correct encryption key
+            try {
+                var plaintextUsername = CryptoJS.AES.decrypt($scope.encryptedUsername, $scope.keyInput).toString(CryptoJS.enc.Utf8);
+                var plaintextPassword = CryptoJS.AES.decrypt($scope.encryptedPassword, $scope.keyInput).toString(CryptoJS.enc.Utf8);
+                if (plaintextUsername==='' || plaintextPassword==='') {
+                    //not the correct encryption key
+                    //change color of button for 3 seconds
+                    $scope.incorrectKey = true;
+                    console.log('$scope.incorrectKey=', $scope.incorrectKey);
+                    $timeout(function() {$scope.incorrectKey = false; console.log('$scope.incorrectKey=', $scope.incorrectKey);}, 3000);
+                }
+                else {
+                    $scope.encrypted = false;
+                    $scope.plaintextUsername = plaintextUsername;
+                    $scope.plaintextPassword = plaintextPassword;
+                }
             }
-
-            else {
-                $scope.encrypted = false;
-                $scope.plaintextUsername = plaintextUsername;
-                $scope.plaintextPassword = plaintextPassword;
+            catch(err) {
+                //not the correct encryption key
+                //change color of button for 3 seconds
+                $scope.incorrectKey = true;
+                console.log('$scope.incorrectKey=', $scope.incorrectKey);
+                $timeout(function() {$scope.incorrectKey = false; console.log('$scope.incorrectKey=', $scope.incorrectKey);}, 3000);
             }
         }
 
+    };
+
+    $scope.encrypt = function() {
+
+        //all input fields can now be completed, so we can pull the values from them and send to the db to edit the current site
+
+        //we need to re-encrypt the username and password with the encryption key
+
+        //encrypt username, password
+        var encryptedUsername = CryptoJS.AES.encrypt($scope.usernameInput, $scope.keyInput).toString();
+
+        var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString();
+
+
+
+        apiPOST.callAPI('/edit-site', {
+            _id: $scope.managerId,
+            username: encryptedUsername,
+            password: encryptedPassword
+        })
+            .then(function(res) {
+                //site successfully edited
+                $scope.encrypted = true;
+            }, function(rej) {
+                //site edit failed
+                console.log('rej=', rej);
+            });
     };
 
 

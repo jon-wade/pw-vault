@@ -70,12 +70,14 @@
         <div id="registrationMessages" ng-show="registrationSuccess">
             <h1>Way to go...!!!</h1>
             <p>You have successfully registered for Password Vault.</p>
-            <p class="message">You will be automagically logged-in to the app in <span ng-bind="timer"></span> seconds.</p>
+            <p class="message">Click the button to enter the vault.</p>
+            <button type="button" ng-click="go('/manager')">Enter</button>
         </div>
         <div id="errorMessage" ng-show="registrationError">
             <h1>Oh no...!!!</h1>
             <p>Sorry! We’ve had a problem processing your registration. You’ll have to try again - gutted!!<p>
-            <p class="message">To make it easier, you will be automagically returned to the homepage in <span ng-bind="timer"></span> seconds.</p>
+            <p class="message">Click the button to return to the homepage.</p>
+            <button type="button" ng-click="go('/home')"></button>
         </div>
     </div>
 </div>

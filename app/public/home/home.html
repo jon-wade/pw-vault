@@ -7,10 +7,9 @@
             <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
                 <div id="username">
                     <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
-
                 </div>
                 <div id="password">
-                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" ng-disabled="!usernameInput" required="" ng-pattern="regex">
+                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" required="" ng-pattern="regex" ng-disabled="">
                 </div>
                 <!--error messages here-->
                 <div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">
@@ -35,7 +34,7 @@
                 </div>
 
                 <!-- button here -->
-                <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput">Log In</button>
+                <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput || !usernameInput">Log In</button>
             </form>
 
             <a id="forgotten" href="/forgotten">Forgotten your PV username or password?</a>
