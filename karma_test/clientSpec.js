@@ -205,7 +205,7 @@ describe('client.js unit test', function() {
             $controller = _$controller_;
         }));
 
-        it('should set...)', inject(function($httpBackend) {
+        it('should set $scope.title to "Password Vault | View", call $scope.go with argument "/test", set $scope.userId to "12345", set $scope.managerId to "98765", set $scope.encrypted to be true', inject(function($httpBackend) {
 
             //mock services
             var $scope = {};
@@ -235,12 +235,16 @@ describe('client.js unit test', function() {
             $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
 
             expect($scope.encrypted).toBe(true);
+            expect($scope.userId).toBe('12345');
+            expect($scope.managerId).toBe('98765');
 
             $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, mockResponse, null, 'success');
 
             $httpBackend.flush();
 
-            //TODO: tests to go here
+            expect($scope.sitename).toBe('testsitename');
+            expect($scope.encryptedUsername).toBe('testusername');
+            expect($scope.encryptedPassword).toBe('testpassword');
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
@@ -252,6 +256,242 @@ describe('client.js unit test', function() {
             $scope.go('/test');
 
             expect($location.path).toHaveBeenCalledWith('/test');
+
+        }));
+
+    });
+
+    describe('viewSite controller unit test 2', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('$scope.delete on successful response from server, should call $scope.go with argument "/manager"...)', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockManagerIdStore = {
+                get_id: function() {
+                    return '98765';
+                }
+            };
+            var mockResponse = {
+                successMessage: 'site retrieval successful',
+                data: [{
+                    sitename: 'testsitename',
+                    username: 'testusername',
+                    password: 'testpassword'
+                }]
+            };
+
+            $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
+
+
+            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, mockResponse, null, 'success');
+
+            $httpBackend.expect('POST', '/delete-site', {managerId: '12345'}).respond(200, mockResponse, null, 'success');
+
+            spyOn($scope, 'go');
+
+            $scope.managerId = '12345';
+
+            $scope.delete();
+
+            $httpBackend.flush();
+
+            expect($scope.go).toHaveBeenCalledWith('/manager');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+    });
+
+    describe('viewSite controller unit test 3', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('$scope.decrypt() with the correct encryption key should set $scope.encrypted to be false, $scope.usernameInput to "testusername" and $scope.passwordInput to "testpassword"...', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockManagerIdStore = {
+                get_id: function() {
+                    return '98765';
+                }
+            };
+            var mockResponse = {
+                successMessage: 'site retrieval successful',
+                data: [{
+                    sitename: 'testsitename',
+                    username: 'testusername',
+                    password: 'testpassword'
+                }]
+            };
+
+            $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
+
+
+            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, mockResponse, null, 'success');
+
+            $scope.keyInput = 'helloworld';
+            $scope.encryptedUsername = 'U2FsdGVkX183MSAJUkiKmgS6q1hBGTEvCAqvNlAs5BI=';
+            $scope.encryptedPassword = 'U2FsdGVkX1+YePbayhdli/ciVSstvwsip13pMZm9gyk=';
+
+            $scope.decrypt();
+
+            $httpBackend.flush();
+
+            expect($scope.encrypted).toBe(false);
+            expect($scope.usernameInput).toBe('testusername');
+            expect($scope.passwordInput).toBe('testpassword');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+    });
+
+    describe('viewSite controller unit test 4', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('$scope.decrypt() with the incorrect encryption key should leave $scope.encrypted as true and $scope.incorrectKey to true...', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockManagerIdStore = {
+                get_id: function() {
+                    return '98765';
+                }
+            };
+            var mockResponse = {
+                successMessage: 'site retrieval successful',
+                data: [{
+                    sitename: 'testsitename',
+                    username: 'testusername',
+                    password: 'testpassword'
+                }]
+            };
+
+            $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
+
+
+            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, mockResponse, null, 'success');
+
+            $scope.keyInput = 'abc';
+            $scope.encryptedUsername = 'U2FsdGVkX183MSAJUkiKmgS6q1hBGTEvCAqvNlAs5BI=';
+            $scope.encryptedPassword = 'U2FsdGVkX1+YePbayhdli/ciVSstvwsip13pMZm9gyk=';
+
+            $scope.decrypt();
+
+            $httpBackend.flush();
+
+            expect($scope.encrypted).toBe(true);
+            expect($scope.incorrectKey).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+    });
+
+    describe('viewSite controller unit test 5', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('$scope.encrypt on successful response from server...)', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockManagerIdStore = {
+                get_id: function() {
+                    return '98765';
+                }
+            };
+            var mockRetrieveResponse = {
+                successMessage: 'site retrieval successful',
+                data: [{
+                    sitename: 'testsitename',
+                    username: 'testusername',
+                    password: 'testpassword'
+                }]
+            };
+            var mockEditResponse = {
+
+            };
+
+            $scope.managerId = '12345';
+            $scope.usernameInput = 'testusername';
+            $scope.passwordInput = 'testpassword';
+            $scope.keyInput = 'helloworld';
+
+            $controller('viewSite', {$scope: $scope, $rootScope: $rootScope, $location: $location, idStore: mockIdStore, managerIdStore: mockManagerIdStore});
+
+            $httpBackend.expect('POST', '/retrieve-site', {userId: '12345', managerId: '98765'}).respond(200, mockRetrieveResponse, null, 'success');
+
+            //use .when() here as the encrypted username and password is a random string which can't be predicted in advance (and therefore cannot be tested with expect())
+            $httpBackend.when('POST', '/edit-site').respond(200, mockEditResponse, null, 'success');
+
+            $scope.encrypt();
+
+            $httpBackend.flush();
+
+            expect($scope.encrypted).toBe(true);
+            expect($scope.disableButton).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
 
         }));
 
@@ -450,7 +690,7 @@ describe('client.js unit test', function() {
             expect($location.path).toHaveBeenCalledWith('/');
             expect($scope.siteList).toBeDefined();
 
-            console.log('$scope.siteList', $scope.siteList);
+            //console.log('$scope.siteList', $scope.siteList);
 
             $scope.go('/test', '12345');
 

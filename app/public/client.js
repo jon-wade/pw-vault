@@ -183,7 +183,7 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
         apiPOST.callAPI('/login-test', {username: $scope.usernameInput, password: passwordHash}).then(function(res) {
 
             //login credentials are OK
-            console.log('res=', res);
+            //console.log('res=', res);
 
             //grab id from response object and store
             idStore.set_id(res.data._id);
@@ -194,7 +194,7 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
 
         }, function(rej) {
             //login credentials are not OK and an error message should be displayed
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             if(rej.status === 404){
                 $scope.loginInvalid = true;
                 $timeout(function() {$scope.loginInvalid = false}, 3500)
@@ -217,7 +217,7 @@ client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'a
     };
 
     $scope.go = function (destination, managerId) {
-        console.log('managerId=', managerId);
+        //console.log('managerId=', managerId);
         managerIdStore.set_id(managerId);
         $location.path(destination);
     };
@@ -230,12 +230,12 @@ client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'a
         .then(function(res) {
             //successfully retrieved site list from db
             //need the site list to be in an array to allow ng-repeat to easily render on page
-            console.log('res=', res);
+            //console.log('res=', res);
             $scope.siteList = res.data.data;
 
         }, function(rej) {
             //error retrieving site list from db
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
         });
 
 
@@ -438,14 +438,14 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
     apiPOST.callAPI('/retrieve-site', {userId: $scope.userId, managerId: $scope.managerId})
         .then(function(res) {
             //successfully retrieved from db
-            console.log('res=', res);
+            //console.log('res=', res);
             //$scope.encrypted = false;
             $scope.sitename = res.data.data[0].sitename;
             $scope.encryptedUsername = res.data.data[0].username;
             $scope.encryptedPassword = res.data.data[0].password;
         }, function(rej) {
             //error retrieving from db
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
         });
 
     //delete current site when delete button is pressed
@@ -454,12 +454,12 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
         apiPOST.callAPI('/delete-site', {managerId: $scope.managerId})
             .then(function(res) {
                 //site successfully deleted
-                console.log('res=', res);
+                //console.log('res=', res);
                 //return to the manager page
                 $scope.go('/manager');
             }, function(rej) {
                 //site deletion error
-                console.log('rej=', rej);
+                //console.log('rej=', rej);
             });
 
     };
@@ -467,7 +467,7 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
     //when decrypt key is pressed, decrypt username and password
     $scope.decrypt = function() {
 
-        console.log($scope.keyInput);
+        //console.log($scope.keyInput);
 
         if($scope.keyInput === undefined) {
             //no encryption key entered, do nothing
@@ -480,8 +480,7 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
                     //not the correct encryption key
                     //change color of button for 3 seconds
                     $scope.incorrectKey = true;
-                    console.log('$scope.incorrectKey=', $scope.incorrectKey);
-                    $timeout(function() {$scope.incorrectKey = false; console.log('$scope.incorrectKey=', $scope.incorrectKey);}, 3000);
+                    $timeout(function() {$scope.incorrectKey = false;}, 3000);
                 }
                 else {
                     $scope.encrypted = false;
@@ -493,8 +492,8 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
                 //not the correct encryption key
                 //change color of button for 3 seconds
                 $scope.incorrectKey = true;
-                console.log('$scope.incorrectKey=', $scope.incorrectKey);
-                $timeout(function() {$scope.incorrectKey = false; console.log('$scope.incorrectKey=', $scope.incorrectKey);}, 3000);
+                //console.log('$scope.incorrectKey=', $scope.incorrectKey);
+                $timeout(function() {$scope.incorrectKey = false;}, 3000);
             }
         }
 
@@ -518,13 +517,13 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
         })
             .then(function(res) {
                 //site successfully edited
-                console.log('res=', res);
+                //console.log('res=', res);
                 $scope.encrypted = true;
                 $scope.disableButton = true;
                 $timeout(function() {$scope.go('/manager');}, 2000);
             }, function(rej) {
                 //site edit failed
-                console.log('rej=', rej);
+                //console.log('rej=', rej);
             });
     };
 
