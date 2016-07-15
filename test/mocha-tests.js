@@ -376,9 +376,9 @@ describe('site-list.js unit test', function() {
         mockDb = {};
         mockDb.controller = {
             read: function(query, fields, model) {
-                console.log('query=', query);
-                console.log('fields=', fields);
-                console.log('model=', model);
+                //console.log('query=', query);
+                //console.log('fields=', fields);
+                //console.log('model=', model);
                 return new Promise(function(resolve, reject) {
                     if(model != mongooseConfig.managerTest){
                         reject('mocked db access error');
@@ -410,7 +410,7 @@ describe('site-list.js unit test', function() {
     it('should return successMessage "success, array attached"...', function(done) {
         siteList.go('12345', mongooseConfig.managerTest).then(function(res) {
             //successfully added site record
-            console.log('res=', res);
+            //console.log('res=', res);
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
             res.should.have.a.property('data');
@@ -418,7 +418,7 @@ describe('site-list.js unit test', function() {
             done();
         }, function(rej) {
             //failed registration
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
@@ -431,7 +431,7 @@ describe('site-list.js unit test', function() {
     it('should return errorMessage "No records found"...', function(done) {
         siteList.go('54321', mongooseConfig.managerTest).then(function(res) {
             //successfully added site record
-            console.log('res=', res);
+            //console.log('res=', res);
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
             res.should.have.a.property('data');
@@ -439,7 +439,7 @@ describe('site-list.js unit test', function() {
             //done();
         }, function(rej) {
             //failed registration
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
@@ -468,9 +468,9 @@ describe('retrieve-site.js unit test', function() {
         mockDb = {};
         mockDb.controller = {
             read: function(query, fields, model) {
-                console.log('query=', query);
-                console.log('fields=', fields);
-                console.log('model=', model);
+                //console.log('query=', query);
+                //console.log('fields=', fields);
+                //console.log('model=', model);
                 return new Promise(function(resolve, reject) {
                     if(model != mongooseConfig.managerTest){
                         reject('mocked db access error');
@@ -502,7 +502,7 @@ describe('retrieve-site.js unit test', function() {
     it('should return successMessage "success, array attached"...', function(done) {
         retrieveSite.go('12345', '98765', mongooseConfig.managerTest).then(function(res) {
             //successfully retrieved site
-            console.log('res=', res);
+            //console.log('res=', res);
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
             res.should.have.a.property('data');
@@ -510,7 +510,7 @@ describe('retrieve-site.js unit test', function() {
             done();
         }, function(rej) {
             //failed to retrieve site
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
@@ -523,7 +523,7 @@ describe('retrieve-site.js unit test', function() {
     it('should return errorMessage "No records found"...', function(done) {
         retrieveSite.go('54321', '98765', mongooseConfig.managerTest).then(function(res) {
             //successfully retrieved
-            console.log('res=', res);
+            //console.log('res=', res);
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
             res.should.have.a.property('data');
@@ -531,11 +531,102 @@ describe('retrieve-site.js unit test', function() {
             //done();
         }, function(rej) {
             //failed to retrieve site
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
             rej.errorMessage.should.include('No records found');
+            done();
+        });
+
+    });
+
+});
+
+describe('edit-site.js unit test', function() {
+
+    var mongooseConfig, editSite, mockDb;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        mongooseConfig = {};
+        mongooseConfig.managerTest = {};
+        mongooseConfig.managerDev = {};
+
+        mockDb = {};
+        mockDb.controller = {
+            update: function(query, content, model) {
+                //console.log('query=', query);
+                //console.log('fields=', content);
+                //console.log('model=', model);
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.managerTest){
+                        reject('mocked db access error');
+                    }
+                    else if (query._id !== '12345') {
+                        reject([]);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+
+        editSite = require('./../app/utils/edit-site.js');
+
+        done();
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+
+    });
+
+    it('should return successMessage "site successfully updated"...', function(done) {
+        editSite.go('12345', '', '', mongooseConfig.managerTest).then(function(res) {
+            //successfully retrieved site
+            //console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('site successfully updated');
+            done();
+        }, function(rej) {
+            //failed to retrieve site
+            //console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('site update failed');
+            //done();
+        });
+
+    });
+
+    it('should return errorMessage "site update failed"...', function(done) {
+        editSite.go("54321", '', '', mongooseConfig.managerTest).then(function(res) {
+            //successfully retrieved
+            //console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('site successfully updated');
+            //done();
+        }, function(rej) {
+            //failed to retrieve site
+            //console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('site update failed');
             done();
         });
 
@@ -597,14 +688,14 @@ describe('delete-site.js unit test', function() {
     it('should return successMessage "site successfully deleted"...', function(done) {
         deleteSite.go('12345', mongooseConfig.managerTest).then(function(res) {
             //successfully deleted site
-            console.log('res=', res);
+            //console.log('res=', res);
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
             res.successMessage.should.include('site successfully deleted');
             done();
         }, function(rej) {
             //failed to retrieve site
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
@@ -617,14 +708,14 @@ describe('delete-site.js unit test', function() {
     it('should return errorMessage "site delete error"...', function(done) {
         deleteSite.go('54321', mongooseConfig.managerTest).then(function(res) {
             //successfully deleted site
-            console.log('res=', res);
+            //console.log('res=', res);
             res.should.be.a('object');
             res.should.have.a.property('successMessage');
             res.successMessage.should.include('site successfully deleted');
             //done();
         }, function(rej) {
             //failed to retrieve site
-            console.log('rej=', rej);
+            //console.log('rej=', rej);
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
@@ -1047,7 +1138,7 @@ describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock, deleteSiteMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock, deleteSiteMock, editSiteMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -1226,6 +1317,24 @@ describe('index.js unit test', function() {
             }
         };
 
+        editSiteMock = {
+            go: function(managerId, username, password) {
+                return new Promise(function(resolve, reject) {
+                    if(managerId !== '12345' || username !== 'encryptedusername' || password !== 'encryptedpassword') {
+                        reject({
+                            errorMessage: 'edit site error'
+                        });
+                    }
+                    else {
+                        resolve({
+                            successMessage: 'edit site success',
+                            data: {}
+                        });
+                    }
+                });
+            }
+        };
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
@@ -1237,6 +1346,7 @@ describe('index.js unit test', function() {
         mockery.registerMock('./utils/site-list.js', siteListMock);
         mockery.registerMock('./utils/retrieve-site.js', retrieveSiteMock);
         mockery.registerMock('./utils/delete-site.js', deleteSiteMock);
+        mockery.registerMock('./utils/edit-site.js', editSiteMock);
 
         index = require('./../app/index.js');
         app = index.app;
@@ -1554,6 +1664,37 @@ describe('index.js unit test', function() {
                 done();
             });
     });
+
+    it('On POST /edit-site, on success should return return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/edit-site')
+            .send({_id: '12345', username: 'encryptedusername', password: 'encryptedpassword'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /edit-site, on error should return return an object with a errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/delete-site')
+            .send({managerId: '54321', username: 'encryptedusername', password: 'encryptedpassword'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+
 
     it('On GET /, should return the home page with a status 200, include a head tag and res.notFound should be false', function(done){
         chai.request(app)

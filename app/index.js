@@ -14,6 +14,7 @@ var addSite = require('./utils/add-site.js');
 var siteList = require('./utils/site-list.js');
 var retrieveSite = require('./utils/retrieve-site.js');
 var deleteSite = require('./utils/delete-site.js');
+var editSite = require('./utils/edit-site.js');
 
 var jsonParser = bodyParser.json();
 
@@ -113,6 +114,15 @@ app.post('/retrieve-site', jsonParser, function(req, res) {
 
 app.post('/delete-site', jsonParser, function(req, res) {
     deleteSite.go(req.body.managerId, mongooseConfig.managerDev)
+        .then(function(success) {
+            res.status(200).send(success);
+        }, function(error) {
+            res.status(404).send(error);
+        });
+});
+
+app.post('/edit-site', jsonParser, function(req, res) {
+    editSite.go(req.body._id, req.body.username, req.body.password, mongooseConfig.managerDev)
         .then(function(success) {
             res.status(200).send(success);
         }, function(error) {

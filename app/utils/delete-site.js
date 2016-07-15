@@ -18,7 +18,7 @@ exports.go = function(managerId, model) {
                 }
             }, function(rej) {
                 //delete never throws a rejection but to be safe include an error handling routing
-                console.log('delete-site rej=', rej);
+                //console.log('delete-site rej=', rej);
                 reject({
                     errorMessage: 'site delete error: mongo internal error',
                     data: rej

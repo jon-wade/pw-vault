@@ -28,8 +28,6 @@ exports.go = function(userId, sitename, username, password,  model) {
                 errorMessage: 'record creation failed',
                 data: rej
             });
-
         });
-
     });
 };

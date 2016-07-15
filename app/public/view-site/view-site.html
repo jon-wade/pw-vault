@@ -5,18 +5,18 @@
             <form id="decryptForm" name="decryptForm" novalidate>
                 <h2>Username</h2>
                 <input ng-show="encrypted" value="***************" ng-disabled="true">
-                <input id="usernameInput" name="usernameInput" ng-model="usernameInput" ng-show="!encrypted" value="{{plaintextUsername}}">
+                <input id="usernameInput" name="usernameInput" ng-model="usernameInput" ng-show="!encrypted" value="{{usernameInput}}">
                 <h2>Password</h2>
                 <input ng-show="encrypted" value="***************" ng-disabled="true">
-                <input id="passwordInput" name="passwordInput" ng-model="passwordInput" ng-show="!encrypted" value="{{plaintextPassword}}">
+                <input id="passwordInput" name="passwordInput" ng-model="passwordInput" ng-show="!encrypted" value="{{passwordInput}}">
 
                 <h2>Key</h2>
                 <!-- encryption key field -->
                 <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption/decryption key">
 
-                <button type="submit" id="decryptButton" ng-show="encrypted" ng-click="decrypt()" ng-disabled="!keyInput" ng-class="{incorrect: incorrectKey}">Decrypt</button>
-                <button type="submit" id="encryptButton" ng-show="!encrypted" ng-click="encrypt()">Encrypt</button>
-                <button type="button" id="deleteButton" ng-click="delete()">Delete</button>
+                <button type="submit" id="decryptButton" ng-show="encrypted" ng-click="decrypt()" ng-disabled="!keyInput || disableButton" ng-class="{incorrect: incorrectKey}">Decrypt</button>
+                <button type="submit" id="encryptButton" ng-show="!encrypted" ng-click="encrypt()" ng-disabled="">Encrypt</button>
+                <button type="button" id="deleteButton" ng-click="delete()" ng-disabled="encrypted">Delete</button>
                 <button type="button" id="backButton" ng-click="go('/manager')">Back</button>
             </form>
         </div>

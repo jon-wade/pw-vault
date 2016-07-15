@@ -398,7 +398,6 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
         //console.log('encryptedUsername=', encryptedUsername);
         //console.log('encryptedPassword=', encryptedPassword);
 
-
         apiPOST.callAPI('/add-site', {
                 userId: _id,
                 sitename: $scope.sitenameInput,
@@ -421,7 +420,6 @@ client.controller('addSite', ['$scope', '$rootScope', '$location', 'apiPOST', 'i
 }]);
 
 client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdStore', 'idStore', 'apiPOST', '$timeout', function($scope, $rootScope, $location, managerIdStore, idStore, apiPOST, $timeout) {
-
 
     $rootScope.title = 'Password Vault | View';
 
@@ -449,7 +447,6 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
             //error retrieving from db
             console.log('rej=', rej);
         });
-
 
     //delete current site when delete button is pressed
     $scope.delete = function() {
@@ -488,8 +485,8 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
                 }
                 else {
                     $scope.encrypted = false;
-                    $scope.plaintextUsername = plaintextUsername;
-                    $scope.plaintextPassword = plaintextPassword;
+                    $scope.usernameInput = plaintextUsername;
+                    $scope.passwordInput = plaintextPassword;
                 }
             }
             catch(err) {
@@ -514,8 +511,6 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
 
         var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString();
 
-
-
         apiPOST.callAPI('/edit-site', {
             _id: $scope.managerId,
             username: encryptedUsername,
@@ -523,15 +518,15 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
         })
             .then(function(res) {
                 //site successfully edited
+                console.log('res=', res);
                 $scope.encrypted = true;
+                $scope.disableButton = true;
+                $timeout(function() {$scope.go('/manager');}, 2000);
             }, function(rej) {
                 //site edit failed
                 console.log('rej=', rej);
             });
     };
-
-
-
 
 }]);
 
