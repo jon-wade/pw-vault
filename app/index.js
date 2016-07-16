@@ -87,7 +87,7 @@ app.post('/create', jsonParser, function(req, res) {
 });
 
 app.post('/update-password', jsonParser, function(req, res) {
-    passwordUpdate.go(req.body.username, req.body.email, req.body.password, mongooseConfig.userDev).then(function(success) {
+    passwordUpdate.go(req.body._id, req.body.username, req.body.email, req.body.password, mongooseConfig.userDev).then(function(success) {
         //console.log('success=', success);
         //noinspection JSUnresolvedVariable
         res.status(200).send(success.data._id);

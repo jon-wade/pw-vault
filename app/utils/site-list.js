@@ -23,7 +23,7 @@ exports.go = function(userId, model) {
         }, function(rej) {
             //userId cannot be found in database, error thrown
             reject({
-                errorMessage: 'No records found that matches userId',
+                errorMessage: 'MongoDB error',
                 data: rej
             });
 

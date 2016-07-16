@@ -383,11 +383,14 @@ describe('site-list.js unit test', function() {
                     if(model != mongooseConfig.managerTest){
                         reject('mocked db access error');
                     }
-                    else if (query.userId !== '12345') {
-                        reject([]);
+                    else if(query.userId === '33333') {
+                        resolve([]);
+                    }
+                    else if(query.userId === '12345') {
+                        resolve(['site1', 'site2']);
                     }
                     else {
-                        resolve(['site1', 'site2']);
+                        reject();
                     }
                 });
             }
@@ -428,7 +431,7 @@ describe('site-list.js unit test', function() {
 
     });
 
-    it('should return errorMessage "No records found"...', function(done) {
+    it('should return errorMessage "MongoDB error"...', function(done) {
         siteList.go('54321', mongooseConfig.managerTest).then(function(res) {
             //successfully added site record
             //console.log('res=', res);
@@ -443,11 +446,33 @@ describe('site-list.js unit test', function() {
             rej.should.be.a('object');
             rej.should.have.a.property('errorMessage');
             rej.should.have.a.property('data');
-            rej.errorMessage.should.include('No records found');
+            rej.errorMessage.should.include('MongoDB error');
             done();
         });
 
     });
+
+    it('should return errorMessage "MongoDB error"...', function(done) {
+        siteList.go('33333', mongooseConfig.managerTest).then(function(res) {
+            //successfully added site record
+            //console.log('res=', res);
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            res.should.have.a.property('data');
+            res.successMessage.should.include('success, array attached');
+            //done();
+        }, function(rej) {
+            //failed registration
+            //console.log('rej=', rej);
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            rej.should.have.a.property('data');
+            rej.errorMessage.should.include('No records found that matches userId');
+            done();
+        });
+
+    });
+
 
 
 });
@@ -829,8 +854,8 @@ describe('password-update.js unit test', function() {
 
     });
 
-    it('should return "ids match, all is well..." if the id of the email and the username are the same...', function(done) {
-        passwordUpdate.go('jonwade', 'jonwadeuk@gmail.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+    it('should return "ids match, all is well..." if the id of the email and the username are the same as the linkId...', function(done) {
+        passwordUpdate.go('57786733eeb287e63a404933', 'jonwade', 'jonwadeuk@gmail.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
             //should be in this branch as we're testing a success
             //console.log('res=', res);
             res.should.be.a('object');
@@ -844,7 +869,7 @@ describe('password-update.js unit test', function() {
     });
 
     it('should return "not a registered username" if the username cannot be found in the database...', function(done) {
-        passwordUpdate.go('jonwad', 'jonwadeuk@gmail.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+        passwordUpdate.go('57786733eeb287e63a404933', 'jonwad', 'jonwadeuk@gmail.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
             //should be in this branch as we're testing a success
             //console.log('res=', res);
         }, function(rej) {
@@ -858,7 +883,7 @@ describe('password-update.js unit test', function() {
     });
 
     it('should return "not a registered email" if the email cannot be found in the database...', function(done) {
-        passwordUpdate.go('jonwade', 'error@error.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+        passwordUpdate.go('57786733eeb287e63a404933', 'jonwade', 'error@error.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
             //should be in this branch as we're testing a success
             //console.log('res=', res);
         }, function(rej) {
@@ -871,8 +896,8 @@ describe('password-update.js unit test', function() {
 
     });
 
-    it('should return "the _ids for the username and email do not match and we cannot update the password..." if the id of the email and the username are not the same...', function(done) {
-        passwordUpdate.go('jonwade', 'test@test.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
+    it('should return "the _ids for the email do not match the linkId and we cannot update the password..." if the id of the email and the username are not the same...', function(done) {
+        passwordUpdate.go('57786733eeb287e63a404933', 'jonwade', 'test@test.com', 'newpassword', mongooseConfig.userTest).then(function(res) {
             //should be in this branch as we're testing a success
             //console.log('res=', res);
         }, function(rej) {
@@ -882,9 +907,7 @@ describe('password-update.js unit test', function() {
             rej.should.include('do not match');
             done();
         });
-
     });
-
 });
 
 describe('email-verification.js unit test', function() {
@@ -1368,9 +1391,9 @@ describe('index.js unit test', function() {
         };
 
         passwordUpdateMock = {
-            go: function(username, email, password, model) {
+            go: function(linkId, username, email, password, model) {
                 return new Promise(function(resolve, reject) {
-                    if(username !=='testuser' || password !=='testpassword' || email !== 'testemail') {
+                    if(linkId !== '1234' || username !=='testuser' || password !=='testpassword' || email !== 'testemail') {
                         reject({errorMessage: 'password update failed'});
                     }
                     else {
@@ -1697,7 +1720,7 @@ describe('index.js unit test', function() {
     it('On POST /update-password, on success should return an object with a data property with a status 200...', function(done) {
         chai.request(app)
             .post('/update-password')
-            .send({username: 'testuser', email: 'testemail', password: 'testpassword'})
+            .send({_id: '1234', username: 'testuser', email: 'testemail', password: 'testpassword'})
             .end(function(err, res) {
                 //console.log('res=', res);
                 should.equal(err, null);
@@ -1711,7 +1734,7 @@ describe('index.js unit test', function() {
     it('On POST /update-password, on error should return an object with an errorMessage property with a status 404...', function(done) {
         chai.request(app)
             .post('/update-password')
-            .send({username: 'errorcase', email: 'testemail', password: 'testpassword'})
+            .send({_id: '4321', username: 'errorcase', email: 'testemail', password: 'testpassword'})
             .end(function(err, res) {
                 err.should.have.status(404);
                 res.should.be.json;

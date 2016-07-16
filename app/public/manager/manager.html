@@ -5,8 +5,9 @@
             <h1 id="title">Password Vault</h1>
             <h2>Site List</h2>
             <ul id="manager-list">
-                <li ng-click="go('/view-site', item._id)" ng-repeat="item in siteList" ng-bind="item.sitename"></li>
+                <li ng-click="go('/view-site', item._id)" ng-repeat="item in siteList" ng-bind="item.sitename" ng-show="!noSites"></li>
             </ul>
+            <p ng-show="noSites">Click the 'Add Site' button below to create your first site record.</p>
             <button id="newSite" ng-click="go('/add-site')">Add Site</button>
             <button id="logoutButton" ng-click="logout()">Logout</button>
         </div>

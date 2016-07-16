@@ -19,7 +19,7 @@ a:link, a:hover, a:visited {
 
 /* background styles */
 
-div#home, div#registration, div#forgotten, div#manager, div#addSite, div#viewSite {
+div#home, div#registration, div#forgotten, div#manager, div#addSite, div#viewSite, div#changePassword {
     background-size: cover;
     background-position: center center;
     min-height: 100vh;
@@ -49,6 +49,10 @@ div#addSite {
     background: url('../img/add-site-background.jpg');
 }
 
+div#changePassword {
+    background: url('../img/change-password-background.jpg');
+}
+
 /* layout divs */
 
 div#login, div#welcome {
@@ -63,13 +67,13 @@ div.container {
     /*border: 1px dashed yellow;*/
 }
 
-div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList {
+div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList, div.changePasswordForm {
     width: 60%;
     margin: 0px auto 0 auto;
     /*border: 1px dashed white;*/
 }
 
-div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title, div#siteList h1#title {
+div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title, div#siteList h1#title, div.changePasswordForm h1#title {
     margin-top: 0px;
     padding-top: 120px;
     text-align: center;
@@ -132,7 +136,7 @@ div#login {
 
 /* form elements */
 
-div#login div#username input, div#login div#password input, div.registrationForm input, div#ui input, div.addSiteForm input, div#siteList input {
+div#login div#username input, div#login div#password input, div.registrationForm input, div#ui input, div.addSiteForm input, div#siteList input, div.changePasswordForm input {
     margin: 25px 0;
     width: 96%;
     padding: 10px 2% 10px 2%;
@@ -163,7 +167,7 @@ button:focus {
 
 }
 
-div.registrationForm button, div#ui button, div#forgotten div.container button#back, div#managerList button, div.addSiteForm button, div#siteList button, div#registrationMessages button {
+div.registrationForm button, div#ui button, div.container button#back, div#managerList button, div.addSiteForm button, div#siteList button, div#registrationMessages button, div.changePasswordForm button {
     margin: 30px auto 10px auto;
 }
 
@@ -203,6 +207,10 @@ div#managerList ul li {
 
 div#managerList ul li:hover {
     background-color: rebeccapurple;
+}
+
+div#managerList p {
+    text-align: center;
 }
 
 /* viewSite username and password */

@@ -2,8 +2,9 @@ var db = require('../db/database.js');
 var usernameVerification = require('../utils/username-verification.js');
 var emailVerification = require('../utils/email-verification.js');
 
-exports.go = function(username, email, password, model) {
+exports.go = function(linkId, username, email, password, model) {
 
+    //console.log('linkId=', linkId);
     //console.log('username=', username);
     //console.log('email=', email);
     //console.log('password=', password);
@@ -16,10 +17,21 @@ exports.go = function(username, email, password, model) {
             //username exists and should return an object with the _id
             var _id = res._id;
             //console.log('usernameVerification _id=', _id);
-            //usernameVerification is complete
-            userCheck = true;
-            checkComplete(_id);
 
+            //check returned id is the same as the linkId
+            if (_id < linkId) {
+                //returned id does not match id from recovery email link
+                reject(rej);
+            }
+            else if (_id > linkId) {
+                //returned id does not match id from recovery email link
+                reject(rej);
+            }
+            else {
+                //usernameVerification is complete
+                userCheck = true;
+                checkComplete(_id);
+            }
         }, function(rej) {
             //username does not exist in the db
             reject(rej);
@@ -29,9 +41,21 @@ exports.go = function(username, email, password, model) {
             //email exists and should return an object with the _id
             var _id = res._id;
             //console.log('emailVerification _id=', _id);
-            //emailVerification is complete
-            emCheck = true;
-            checkComplete(_id);
+
+            //check returned id is the same as the linkId
+            if (_id < linkId) {
+                //returned id does not match id from recovery email link
+                reject('the _ids for the email do not match the linkId and we cannot update the password...');
+            }
+            else if (_id > linkId) {
+                //returned id does not match id from recovery email link
+                reject('the _ids for the email do not match the linkId and we cannot update the password...');
+            }
+            else {
+                //emailVerification is complete
+                emCheck = true;
+                checkComplete(_id);
+            }
         }, function(rej) {
             //email address does not exist in the db
             reject(rej);

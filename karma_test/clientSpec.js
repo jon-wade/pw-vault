@@ -527,7 +527,7 @@ describe('client.js unit test', function() {
             spyOn($location, 'path');
 
             expect($rootScope.title).toBe('Password Vault | Home');
-            expect($scope.regex).toBe('^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
+            expect($scope.regex).toBe('^(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
 
             $scope.go('/test');
 
@@ -649,7 +649,7 @@ describe('client.js unit test', function() {
             $controller = _$controller_;
         }));
 
-        it('should test the manager controller', inject(function($httpBackend) {
+        it('should test the manager controller on success', inject(function($httpBackend) {
             var $scope = {};
             var $rootScope = {};
             var $location = {
@@ -696,6 +696,57 @@ describe('client.js unit test', function() {
 
             expect(mockManagerIdStore.set_id).toHaveBeenCalledWith('12345');
             expect($location.path).toHaveBeenCalledWith('/test');
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+
+        }));
+
+        xit('should test the manager controller on error', inject(function($httpBackend) {
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {}
+            };
+            var mockIdStore = {
+                set_id: function() {
+                    console.log('set_id called');
+                },
+                get_id: function() {
+                    return '12345';
+                }
+            };
+            var mockManagerIdStore = {
+                set_id: function() {
+                    console.log('manager set_id called');
+                }
+            };
+            var mockResponse = {
+                data: {
+                    errorMessage: 'No records found that matches userId'
+                }
+            };
+
+            $httpBackend.expect('POST', '/site-list', {userId: '12345'}).respond(404, mockResponse, null, 'error');
+
+            $controller('manager', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, managerIdStore: mockManagerIdStore, $location: $location});
+
+            spyOn(mockIdStore, 'set_id');
+            spyOn(mockManagerIdStore, 'set_id');
+            spyOn($location, 'path');
+
+            $scope.logout();
+
+            $httpBackend.flush();
+
+            expect($scope._id).toBe('12345');
+            expect($rootScope.title).toBe('Password Vault | Manager');
+            expect(mockIdStore.set_id).toHaveBeenCalledWith('');
+            expect($location.path).toHaveBeenCalledWith('/');
+            expect($scope.noSites).toBe(true);
+
+            //console.log('$scope.siteList', $scope.siteList);
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
@@ -870,66 +921,6 @@ describe('client.js unit test', function() {
 
         }));
 
-        xit('On success $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with a successful response... ', inject(function($httpBackend) {
-            //mock _id and email
-            spyOn(CryptoJS, 'SHA256').and.callThrough();
-            spyOn(idStr, 'get_id');
-
-            idStr.set_id('1234');
-            scope.changePassword = true;
-            scope.usernameInput = 'jonwade';
-            scope.pwEmailInput = 'hashedemail';
-            scope.passwordInput = 'hashedpassword';
-
-            var response = {};
-            $httpBackend.expect('POST', '/update-password', {username: 'jonwade', email: '5770ec9cdc0b29fbff67abd8073a746344b511ecabf53399a720c5994346ccfe', password: '741f67765bef6f01f37bf5cb1724509a83409324efa6ad2586d27f4e3edea296'}).respond(200, response, null, 'success');
-
-            scope.helpMe();
-
-            scope.$digest();
-            $httpBackend.flush();
-
-            expect(idStr.get_id).toHaveBeenCalled();
-            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
-            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.pwEmailInput);
-            expect(scope.ui).toBe(false);
-            expect(scope.passwordSuccessMessage).toBe(true);
-
-            $httpBackend.verifyNoOutstandingRequest();
-            $httpBackend.verifyNoOutstandingExpectation();
-
-        }));
-
-        xit('On failure $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with an error response... ', inject(function($httpBackend) {
-            //mock _id and email
-            spyOn(CryptoJS, 'SHA256').and.callThrough();
-            spyOn(idStr, 'get_id');
-
-            idStr.set_id('1234');
-            scope.changePassword = true;
-            scope.usernameInput = 'jonwade';
-            scope.pwEmailInput = 'hashedemail';
-            scope.passwordInput = 'hashedpassword';
-
-            var response = {};
-            $httpBackend.expect('POST', '/update-password', {username: 'jonwade', email: '5770ec9cdc0b29fbff67abd8073a746344b511ecabf53399a720c5994346ccfe', password: '741f67765bef6f01f37bf5cb1724509a83409324efa6ad2586d27f4e3edea296'}).respond(404, response, null, 'error');
-
-            scope.helpMe();
-
-            scope.$digest();
-            $httpBackend.flush();
-
-            expect(idStr.get_id).toHaveBeenCalled();
-            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.passwordInput);
-            expect(CryptoJS.SHA256).toHaveBeenCalledWith(scope.pwEmailInput);
-            expect(scope.ui).toBe(false);
-            expect(scope.passwordErrorMessage).toBe(true);
-
-            $httpBackend.verifyNoOutstandingRequest();
-            $httpBackend.verifyNoOutstandingExpectation();
-
-        }));
-
     });
 
     describe('register controller unit test', function() {
@@ -957,7 +948,7 @@ describe('client.js unit test', function() {
         });
 
         it('$scope.regex should be ^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$ which constrains password field', function() {
-            expect(scope.regex).toBe('^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
+            expect(scope.regex).toBe('^(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
         });
 
         it('registration view variables should be correctly initialized', function() {
@@ -1133,7 +1124,7 @@ describe('client.js unit test', function() {
             $controller = _$controller_;
         }));
 
-        it('...)', inject(function($httpBackend) {
+        it('should set $scope.regex, $rootScope.title, $scope.ui, $scope.id, $scope.passwordSuccessMessage and $scope.passwordErrorMessage correctly initially, and call $scope.go with "/test"...', inject(function() {
 
             //mock services
             var $scope = {};
@@ -1152,16 +1143,89 @@ describe('client.js unit test', function() {
 
             $scope.go('/test');
 
-
+            expect($scope.regex).toBe('^(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
             expect($rootScope.title).toBe('Password Vault | Password');
             expect($scope.go).toHaveBeenCalledWith('/test');
             expect($scope.id).toBe('12345');
-
+            expect($scope.ui).toBe(true);
+            expect($scope.passwordSuccessMessage).toBe(false);
+            expect($scope.passwordErrorMessage).toBe(false);
 
         }));
 
-    });
+        it('$scope.submit() on success should set $scope.ui to false and $scope.passwordSuccessMessage to true ...', inject(function($httpBackend) {
 
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {},
+                search: function() {
+                    return {id: '12345'};
+                }
+            };
+            var mockResponse = {};
+
+            $scope.usernameInput = 'jonwade';
+            $scope.pwEmailInput = 'jonwadeuk@gmail.com';
+            $scope.passwordInput = 'abcd1234';
+            $scope.id = '12345';
+
+            $controller('changePassword', {$scope: $scope, $rootScope: $rootScope, $location: $location});
+
+            $httpBackend.expect('POST', '/update-password', {_id: '12345', username: 'jonwade', email: '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e', password: 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'}).respond(200, mockResponse, null, 'success');
+
+            $scope.submit();
+
+            $httpBackend.flush();
+
+            //tests here
+            expect($scope.ui).toBe(false);
+            expect($scope.passwordSuccessMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('$scope.submit() on error should set $scope.ui to false and $scope.passwordErrorMessage to true ...', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {},
+                search: function() {
+                    return {id: '12345'};
+                }
+            };
+            var mockResponse = {};
+
+            $scope.usernameInput = 'jonwade';
+            $scope.pwEmailInput = 'jonwadeuk@gmail.com';
+            $scope.passwordInput = 'abcd1234';
+            $scope.id = '12345';
+
+            $controller('changePassword', {$scope: $scope, $rootScope: $rootScope, $location: $location});
+
+            $httpBackend.expect('POST', '/update-password', {_id: '12345', username: 'jonwade', email: '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e', password: 'e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae'}).respond(404, mockResponse, null, 'error');
+
+            $scope.submit();
+
+            $httpBackend.flush();
+
+            //tests here
+            expect($scope.ui).toBe(false);
+            expect($scope.passwordErrorMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+
+
+    });
 
     describe('routing unit test', function() {
         it('should load the home template and controller', inject(function($location, $rootScope, $httpBackend, $route) {

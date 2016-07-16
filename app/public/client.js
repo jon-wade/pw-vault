@@ -174,7 +174,7 @@ client.controller('home', ['$scope', '$rootScope', 'idStore', 'apiPOST', '$locat
     $rootScope.title = 'Password Vault | Home';
 
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
-    $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
+    $scope.regex = '^(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
 
     $scope.go = function (destination) {
         $location.path(destination);
@@ -236,15 +236,19 @@ client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'a
         .then(function(res) {
             //successfully retrieved site list from db
             //need the site list to be in an array to allow ng-repeat to easily render on page
-            //console.log('res=', res);
+            console.log('res=', res);
             $scope.siteList = res.data.data;
 
         }, function(rej) {
             //error retrieving site list from db
-            //console.log('rej=', rej);
+            if(rej.data.errorMessage === 'No records found that matches userId') {
+                $scope.noSites = true;
+            }
+            else {
+                //internal db error
+                console.log('rej=', rej);
+            }
         });
-
-
 }]);
 
 client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', function($scope, idStore, $rootScope, $location, apiPOST) {
@@ -252,7 +256,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
     $rootScope.title = 'Password Vault | Forgotten';
 
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
-    $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
+    $scope.regex = '^(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
 
     $scope.go = function (destination) {
         $location.path(destination);
@@ -337,7 +341,7 @@ client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', '
     };
 
     //set password parameters, at least 8 characters, at least one letter, only a-z, A-Z and 0-9
-    $scope.regex = '^.*(?=.{8,})(?=.*[a-zA-Z])[a-zA-Z0-9]+$';
+    $scope.regex = '^(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
 
     $scope.registrationForm = true;
     $scope.registrationSuccess = false;
@@ -524,7 +528,7 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
 
 }]);
 
-client.controller('changePassword', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+client.controller('changePassword', ['$scope', '$rootScope', '$location', 'apiPOST', function($scope, $rootScope, $location, apiPOST) {
 
     $rootScope.title = 'Password Vault | Password';
 
@@ -534,7 +538,35 @@ client.controller('changePassword', ['$scope', '$rootScope', '$location', functi
 
     $scope.id = $location.search().id;
 
-    console.log('$scope.id=', $scope.id);
+    $scope.regex = '^(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+
+    $scope.ui = true;
+    $scope.passwordSuccessMessage = false;
+    $scope.passwordErrorMessage = false;
+
+    //console.log('$scope.id=', $scope.id);
+
+    $scope.submit = function() {
+
+        //hash password and email address
+        var hashedEmail = CryptoJS.SHA256($scope.pwEmailInput).toString(CryptoJS.enc.Hex);
+        var hashedPassword = CryptoJS.SHA256($scope.passwordInput).toString(CryptoJS.enc.Hex);
+
+        //then call a new /update-password endpoint
+        //console.log('calling /update-password endpoint');
+        apiPOST.callAPI('/update-password', {_id: $scope.id, username: $scope.usernameInput, email: hashedEmail, password: hashedPassword}).then(function(res){
+            //successfully updated password in db
+            //console.log('res=', res);
+            $scope.ui=false;
+            $scope.passwordSuccessMessage = true;
+        }, function(rej) {
+            //error updating password in db
+            //console.log('rej=', rej);
+            $scope.ui=false;
+            $scope.passwordErrorMessage = true;
+        });
+
+    };
 
 }]);
 
