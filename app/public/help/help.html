@@ -1,0 +1,43 @@
+<div id="help">
+    <div class="container">
+        <div id="helpContent">
+            <h1 id="title">Using Password Vault</h1>
+            <h2>Introduction</h2>
+            <p>Password Vault allow you to securely save all the usernames and passwords you use online in one place.</p>
+            <p>You only need to remember one thing - your encryption key. This can be a number, a word, a phrase but you should memorise it and never tell or record it anywhere.</p>
+            <p>This key securely encrypts all your other usernames and passwords, meaning you only have to remember that one key, not the hundreds of passwords you use day to day.</p>
+            <p>It is very important to never forget that key. It is not stored anywhere in the app and if you do forget it, you will NOT be able to retrieve your saved usernames and passwords.</p>
+            <h2>How to use Password Vault</h2>
+            <p>All usernames and passwords are related to a 'site'. To start, you need to add a site in the <a href="/manager">manager</a> page by clicking the 'Add Site' button. This will take you to screen which allows you to name the site, add the username and password you use to access that site, and choose your encryption key.</p>
+            <p>You save the record by clicking the 'decrypt' button. Once a site is saved you'll see it listed under 'Site List' on the <a href="/manager">manager</a> page.</p>
+            <p>You can click on that site list entry to view the details you saved for that site. This takes you to a screen where you can enter your encryption key to decrypt the username and password you saved for that site. This screen also allows you to delete a site, change the saved username or password and also change your encryption key.</p>
+            <p>And that's it! Remember your encryption key and all your other usernames and passwords can be stored securely without having to commit them to memory or scribble them down on pieces of paper!</p>
+            <h2>FAQs</h2>
+            <ul>
+                <li class="question">You say I only have to remember one key, but can I use a different key to store different site details?</li>
+                <li class="answer">Yes you can, if you choose, use a different key for different site records. It's up to you.</li>
+                <li class="question">But, I also have to remember my username and password for Password Vault, as well as my key...</li>
+                <li class="answer">True, true, but if you do forget either your username or password for Password Vault, you can recover them here. So the only thing you absolutely have to remember is your encryption key.</li>
+                <li class="question">Is the encryption key ever stored on my computer or sent over the internet?</li>
+                <li class="answer">Absolutely not, the encryption key is held in memory only so long as its value is in the encryption key field. It's never stored in a database, a file or any other data structure and it's never transmitted to the server.</li>
+                <li class="question">So what is sent over the internet?</li>
+                <li class="answer">The only un-encrypted data sent over the internet is your email address, username and the name your give to your sites in the site list. However your email address and username are both securely encrypted before they are stored in the database. The only data stored in plaintext in the database is the name of your site record.</li>
+                <li class="question">How is the data encrypted?</li>
+                <li class="answer">
+                    <p>There are two encryption methods used in the app.</p>
+                    <p>Your email address and password for Password Vault are hashed using the SHA256 algorithm. The SHA hash functions were designed by the National Security Agency (NSA). SHA-1 is the most established of the existing SHA hash functions, and it's used in a variety of security applications and protocols. SHA-256 used in this app, isn't as widely used as SHA-1, but it appears to provide much better security.</p>
+                    <p>Your username for Password Vault and the usernames and passwords associated to your site records are encrypted using AES.</p>
+                    <p>The Advanced Encryption Standard (AES) is a U.S. Federal Information Processing Standard (FIPS). It was selected after a 5-year process where 15 competing designs were evaluated. This app supports AES-128, AES-192, and AES-256. It will pick the variant by the size of the encryption key you choose. If you use a passphrase, then it will generate a 256-bit key.</p>
+                    <p>All encryption for this app is handled using the excellent <a title="CryptoJS GitHub Repo" rel="external" href="https://github.com/brix/crypto-js">CryptoJS</a> library, with full credit for the software and explanation of the hashing and encrypting algorithms going to the author, Brix.</p>
+                </li>
+                <li class="question">OK, you told me not to forget my encryption key, but I have. What can I do?</li>
+                <li class="answer">Ummm...unfortunately you will not be able to retrieve details for any site encrypted with that key. Your only option is to contact the actual site in question and request a new username and / or password. You can delete the site entry in Password Vault and when you have new username and password details you can create a new site record in Password Vault with your new log-on credentials. We cannot recover your encryption key, ever!</li>
+                <li class="question">Love the screen backgrounds, where is that?</li>
+                <li class="answer">Apparently it's <a href="https://en.wikipedia.org/wiki/Antelope_Canyon" title="Antelope Canyon Wikipedia">Antelope Canyon</a>, Arizona, USA. Never been there, but it looks awesome right?</li>
+
+            </ul>
+            <!-- back button -->
+            <button id="back" type="button" ng-click="go('/manager')">Back to Manager</button>
+        </div>
+    </div>
+</div>

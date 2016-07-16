@@ -162,6 +162,12 @@ client.config(function($routeProvider, $locationProvider) {
                 controller: 'changePassword'
             })
 
+        .when('/help',
+            {
+                templateUrl: './help/help.html',
+                controller: 'help'
+            }
+        )
 
         .otherwise({redirectTo: '/'});
 
@@ -232,23 +238,33 @@ client.controller('manager', ['$scope', '$rootScope', '$location', 'idStore', 'a
 
     $scope._id = idStore.get_id();
 
-    apiPOST.callAPI('/site-list', {userId: $scope._id})
-        .then(function(res) {
-            //successfully retrieved site list from db
-            //need the site list to be in an array to allow ng-repeat to easily render on page
-            console.log('res=', res);
-            $scope.siteList = res.data.data;
+    //if a user has refreshed the page, there will be no id stored and we should direct them back to the homepage to login again
 
-        }, function(rej) {
-            //error retrieving site list from db
-            if(rej.data.errorMessage === 'No records found that matches userId') {
-                $scope.noSites = true;
-            }
-            else {
-                //internal db error
-                console.log('rej=', rej);
-            }
-        });
+    if($scope._id === '') {
+        $location.path('/');
+    }
+
+    else {
+        apiPOST.callAPI('/site-list', {userId: $scope._id})
+            .then(function(res) {
+                //successfully retrieved site list from db
+                //need the site list to be in an array to allow ng-repeat to easily render on page
+                //console.log('res=', res);
+                $scope.siteList = res.data.data;
+
+            }, function(rej) {
+                //error retrieving site list from db
+                //console.log('rej=', rej.data.errorMessage);
+                if(rej.data.errorMessage === 'No records found that matches userId') {
+                    $scope.noSites = true;
+                }
+                else {
+                    //internal db error
+                    console.log('rej=', rej);
+                }
+            });
+    }
+
 }]);
 
 client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', function($scope, idStore, $rootScope, $location, apiPOST) {
@@ -324,7 +340,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
                     $scope.passwordSuccessMessage = true;
                 }, function(rej) {
                     //error in password recovery
-                    console.log('rej=', rej);
+                    //console.log('rej=', rej);
                     $scope.ui=false;
                     $scope.passwordErrorMessage = true;
                 });
@@ -433,98 +449,110 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
     $scope.userId = idStore.get_id();
     $scope.managerId = managerIdStore.get_id();
 
-    //now we need to pull back the record that matches both ids
-    apiPOST.callAPI('/retrieve-site', {userId: $scope.userId, managerId: $scope.managerId})
-        .then(function(res) {
-            //successfully retrieved from db
-            //console.log('res=', res);
-            //$scope.encrypted = false;
-            $scope.sitename = res.data.data[0].sitename;
-            $scope.encryptedUsername = res.data.data[0].username;
-            $scope.encryptedPassword = res.data.data[0].password;
-        }, function(rej) {
-            //error retrieving from db
-            //console.log('rej=', rej);
-        });
+    //if there is no userId or managerId, page has probably been refreshed and we should send the user back to the login page
 
-    //delete current site when delete button is pressed
-    $scope.delete = function() {
-
-        apiPOST.callAPI('/delete-site', {managerId: $scope.managerId})
+    if($scope.userId === '' | $scope.managerId === '') {
+        $location.path('/');
+    }
+    else {
+        //now we need to pull back the record that matches both ids
+        apiPOST.callAPI('/retrieve-site', {userId: $scope.userId, managerId: $scope.managerId})
             .then(function(res) {
-                //site successfully deleted
+                //successfully retrieved from db
                 //console.log('res=', res);
-                //return to the manager page
-                $scope.go('/manager');
+                //$scope.encrypted = false;
+                $scope.sitename = res.data.data[0].sitename;
+                $scope.encryptedUsername = res.data.data[0].username;
+                $scope.encryptedPassword = res.data.data[0].password;
             }, function(rej) {
-                //site deletion error
+                //error retrieving from db
                 //console.log('rej=', rej);
             });
 
-    };
+        //delete current site when delete button is pressed
+        $scope.delete = function() {
 
-    //when decrypt key is pressed, decrypt username and password
-    $scope.decrypt = function() {
+            apiPOST.callAPI('/delete-site', {managerId: $scope.managerId})
+                .then(function(res) {
+                    //site successfully deleted
+                    //console.log('res=', res);
+                    //return to the manager page
+                    $scope.go('/manager');
+                }, function(rej) {
+                    //site deletion error
+                    //console.log('rej=', rej);
+                });
 
-        //console.log($scope.keyInput);
+        };
 
-        if($scope.keyInput === undefined) {
-            //no encryption key entered, do nothing
-        }
-        else {
-            try {
-                var plaintextUsername = CryptoJS.AES.decrypt($scope.encryptedUsername, $scope.keyInput).toString(CryptoJS.enc.Utf8);
-                var plaintextPassword = CryptoJS.AES.decrypt($scope.encryptedPassword, $scope.keyInput).toString(CryptoJS.enc.Utf8);
-                if (plaintextUsername==='' || plaintextPassword==='') {
+        //when decrypt key is pressed, decrypt username and password
+        $scope.decrypt = function() {
+
+            //console.log($scope.keyInput);
+
+            if($scope.keyInput === undefined) {
+                //no encryption key entered, do nothing
+            }
+            else {
+                try {
+                    var plaintextUsername = CryptoJS.AES.decrypt($scope.encryptedUsername, $scope.keyInput).toString(CryptoJS.enc.Utf8);
+                    var plaintextPassword = CryptoJS.AES.decrypt($scope.encryptedPassword, $scope.keyInput).toString(CryptoJS.enc.Utf8);
+                    if (plaintextUsername==='' || plaintextPassword==='') {
+                        //not the correct encryption key
+                        //change color of button for 3 seconds
+                        $scope.incorrectKey = true;
+                        $timeout(function() {$scope.incorrectKey = false;}, 3000);
+                    }
+                    else {
+                        $scope.encrypted = false;
+                        $scope.usernameInput = plaintextUsername;
+                        $scope.passwordInput = plaintextPassword;
+                    }
+                }
+                catch(err) {
                     //not the correct encryption key
                     //change color of button for 3 seconds
                     $scope.incorrectKey = true;
+                    //console.log('$scope.incorrectKey=', $scope.incorrectKey);
                     $timeout(function() {$scope.incorrectKey = false;}, 3000);
                 }
-                else {
-                    $scope.encrypted = false;
-                    $scope.usernameInput = plaintextUsername;
-                    $scope.passwordInput = plaintextPassword;
-                }
             }
-            catch(err) {
-                //not the correct encryption key
-                //change color of button for 3 seconds
-                $scope.incorrectKey = true;
-                //console.log('$scope.incorrectKey=', $scope.incorrectKey);
-                $timeout(function() {$scope.incorrectKey = false;}, 3000);
-            }
-        }
 
-    };
+        };
 
-    $scope.encrypt = function() {
+        $scope.encrypt = function() {
 
-        //all input fields can now be completed, so we can pull the values from them and send to the db to edit the current site
+            //all input fields can now be completed, so we can pull the values from them and send to the db to edit the current site
 
-        //we need to re-encrypt the username and password with the encryption key
+            //we need to re-encrypt the username and password with the encryption key
 
-        //encrypt username, password
-        var encryptedUsername = CryptoJS.AES.encrypt($scope.usernameInput, $scope.keyInput).toString();
+            //encrypt username, password
+            var encryptedUsername = CryptoJS.AES.encrypt($scope.usernameInput, $scope.keyInput).toString();
 
-        var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString();
+            var encryptedPassword = CryptoJS.AES.encrypt($scope.passwordInput, $scope.keyInput).toString();
 
-        apiPOST.callAPI('/edit-site', {
-            _id: $scope.managerId,
-            username: encryptedUsername,
-            password: encryptedPassword
-        })
-            .then(function(res) {
-                //site successfully edited
-                //console.log('res=', res);
-                $scope.encrypted = true;
-                $scope.disableButton = true;
-                $timeout(function() {$scope.go('/manager');}, 2000);
-            }, function(rej) {
-                //site edit failed
-                //console.log('rej=', rej);
-            });
-    };
+            apiPOST.callAPI('/edit-site', {
+                    _id: $scope.managerId,
+                    username: encryptedUsername,
+                    password: encryptedPassword
+                })
+                .then(function(res) {
+                    //site successfully edited
+                    //console.log('res=', res);
+                    $scope.encrypted = true;
+                    $scope.disableButton = true;
+                    $timeout(function() {$scope.go('/manager');}, 2000);
+                }, function(rej) {
+                    //site edit failed
+                    //console.log('rej=', rej);
+                });
+        };
+
+    }
+
+
+
+
 
 }]);
 
@@ -566,6 +594,17 @@ client.controller('changePassword', ['$scope', '$rootScope', '$location', 'apiPO
             $scope.passwordErrorMessage = true;
         });
 
+    };
+
+}]);
+
+client.controller('help', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+
+    //set the page title
+    $rootScope.title = 'Password Vault | Help';
+
+    $scope.go = function (destination) {
+        $location.path(destination);
     };
 
 }]);

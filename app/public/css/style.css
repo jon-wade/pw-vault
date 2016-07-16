@@ -21,6 +21,7 @@ a:link, a:hover, a:visited {
 
 div#home, div#registration, div#forgotten, div#manager, div#addSite, div#viewSite, div#changePassword {
     background-size: cover;
+    background-repeat: no-repeat;
     background-position: center center;
     min-height: 100vh;
 }
@@ -53,6 +54,11 @@ div#changePassword {
     background: url('../img/change-password-background.jpg');
 }
 
+div#help {
+    background: url('../img/help-background.jpg');
+    background-attachment: fixed;
+}
+
 /* layout divs */
 
 div#login, div#welcome {
@@ -66,6 +72,7 @@ div.container {
     margin: 0 auto;
     /*border: 1px dashed yellow;*/
 }
+
 
 div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList, div.changePasswordForm {
     width: 60%;
@@ -83,9 +90,12 @@ div#ui h1#title {
     padding-top: 100px;
 }
 
-div#siteList h1#title {
+div#siteList h1#title, div#help h1#title {
+    margin-top: 0px;
     padding-top: 70px;
 }
+
+
 
 div.displayMessage, div#registrationMessages, div#emailSuccessMessage, div#addSiteErrorMessage {
     text-align: center;
@@ -132,6 +142,11 @@ div#welcome {
 
 div#login {
     float: right;
+}
+
+div#manager a {
+    font-size: 0.9em;
+    margin-top: 100px;
 }
 
 /* form elements */
@@ -187,6 +202,61 @@ button[disabled=disabled] {
     background-color: lightgrey;
     color: darkgrey;
 }
+
+#addSiteMessage {
+    text-align: center;
+    background-color: rgba(25, 18, 18, 0.4);
+    border-radius: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+div#addSiteMessage h2 {
+    padding-top: 12px;
+    margin-bottom: 10px;
+}
+
+#addSiteMessage p {
+    font-size: 0.8em;
+    margin-top: 6px;
+    padding: 5px 40px 15px 40px;
+}
+
+div#helpContent {
+    padding: 0 50px 20px 50px;
+    background-color: rgba(0,0,0,0.5);
+}
+
+div#helpContent ul {
+    padding-left: 0px;
+}
+
+div#helpContent li.question {
+    font-style: italic;
+    margin: 10px 0;
+    list-style: none;
+    color: orange;
+}
+
+div#helpContent li.answer {
+    font-size: 0.9em;
+    margin: 10px 0;
+    list-style: none;
+}
+
+div#helpContent a {
+    font-size: 1em;
+    margin: 0;
+    color: white;
+    display: inline;
+}
+
+div#helpContent li.answer a {
+    font-size: 0.9em;
+}
+
+
+
 
 
 /* manager list */

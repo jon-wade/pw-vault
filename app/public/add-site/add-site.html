@@ -14,10 +14,15 @@
                 <input type="password" id="passwordInput" ng-model="passwordInput" name="passwordInput" required placeholder="Enter password to save">
 
                 <!-- encryption key field -->
-                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key">
+                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key" ng-show="passwordInput" ng-model-option="{debounce: 1000}">
+
+                <div id="addSiteMessage" ng-show="keyInput">
+                    <h2>WARNING. Please Read This!</h2>
+                    <p>The one thing you MUST remember is your encryption key. It is never stored by the app and you will NOT be able retrieve your username and password for this site if you forget it.</p>
+                </div>
 
                 <!-- encrypt button -->
-                <button type="submit" id="addsiteButton" name="addsiteButton">Add Site</button>
+                <button type="submit" id="addsiteButton" name="addsiteButton" ng-disabled="!keyInput">Add Site</button>
 
                 <!-- cancel button -->
                 <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/manager')">Cancel</button>
@@ -26,8 +31,9 @@
         </div>
         <div id="addSiteErrorMessage" ng-show="addSiteError">
             <h1>Oh no...!!!</h1>
-            <p>Sorry! We've had a problem adding your site to the database. You'll have to try again - gutted!!</p>
-            <p class="message">To make it easier, you'll be automagically returned to the manager page in <span ng-bind="timer"></span> seconds.</p>
+            <p>Sorry! We've had a problem adding your site to the database, probably because the page has been refreshed.</p>
+            <p class="message">Login and try again by clicking the button below.</p>
+            <button id="back" ng-click="go('/home')">Login</button>
         </div>
     </div>
 </div>

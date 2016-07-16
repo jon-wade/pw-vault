@@ -625,9 +625,6 @@ describe('client.js unit test', function() {
 
             $httpBackend.expect('POST', '/login-test', {username: 'testusername', password: '9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05'}).respond(404, {}, null, 'error');
 
-            ////no idea why I need this here...not sure what is calling the homepage
-            //$httpBackend.expect('GET', './home/home.html').respond(200, {}, null, 'success');
-
             $scope.submit();
 
             $httpBackend.flush();
@@ -703,7 +700,7 @@ describe('client.js unit test', function() {
 
         }));
 
-        xit('should test the manager controller on error', inject(function($httpBackend) {
+        it('should test the manager controller on error', inject(function($httpBackend) {
             var $scope = {};
             var $rootScope = {};
             var $location = {
@@ -717,44 +714,26 @@ describe('client.js unit test', function() {
                     return '12345';
                 }
             };
-            var mockManagerIdStore = {
-                set_id: function() {
-                    console.log('manager set_id called');
-                }
-            };
             var mockResponse = {
-                data: {
-                    errorMessage: 'No records found that matches userId'
-                }
+                    errorMessage: 'No records found that matches userId',
+                    data: {}
             };
 
             $httpBackend.expect('POST', '/site-list', {userId: '12345'}).respond(404, mockResponse, null, 'error');
 
-            $controller('manager', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, managerIdStore: mockManagerIdStore, $location: $location});
-
-            spyOn(mockIdStore, 'set_id');
-            spyOn(mockManagerIdStore, 'set_id');
-            spyOn($location, 'path');
-
-            $scope.logout();
+            $controller('manager', {$scope: $scope, $rootScope: $rootScope, idStore: mockIdStore, $location: $location});
 
             $httpBackend.flush();
 
             expect($scope._id).toBe('12345');
             expect($rootScope.title).toBe('Password Vault | Manager');
-            expect(mockIdStore.set_id).toHaveBeenCalledWith('');
-            expect($location.path).toHaveBeenCalledWith('/');
             expect($scope.noSites).toBe(true);
-
-            //console.log('$scope.siteList', $scope.siteList);
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
 
 
         }));
-
-
     });
 
     describe('forgotten controller unit test', function() {
@@ -1350,6 +1329,22 @@ describe('client.js unit test', function() {
             $httpBackend.flush();
             expect($route.current.controller).toBe("changePassword");
             expect($route.current.loadedTemplateUrl).toBe("./change-password/change-password.html");
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('should load the help template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
+            $httpBackend.whenGET('./help/help.html').respond('...');
+
+            $rootScope.$apply(function() {
+                $location.path('/help');
+            });
+
+            $httpBackend.flush();
+            expect($route.current.controller).toBe("help");
+            expect($route.current.loadedTemplateUrl).toBe("./help/help.html");
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
