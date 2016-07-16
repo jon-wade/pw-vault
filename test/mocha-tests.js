@@ -1134,11 +1134,113 @@ describe('username-recovery.js unit test', function() {
 
 });
 
+describe('password-recovery.js unit test', function() {
+
+    var passwordRecovery, mockDb, mockMailer, mongooseConfig;
+    beforeEach(function(done) {
+        mockery.enable({
+            useCleanCache: true,
+            warnOnUnregistered: false
+        });
+
+        //mongooseConfig Mock
+        mongooseConfig = {};
+        mongooseConfig.userTest = {};
+        mongooseConfig.userDev = {};
+
+        //mockDb
+        mockDb = {};
+        mockDb.controller = {
+            read: function(query, params, model) {
+                return new Promise(function(resolve, reject) {
+                    if(model != mongooseConfig.userTest) {
+                        reject('mocked db access error');
+                    }
+                    else if (query._id !== '57786733eeb287e63a404933') {
+                        reject();
+                    }
+                    else {
+                        resolve([{
+                            _id: '57786733eeb287e63a404933',
+                            email : '6929f4d0f691db9262bf7b7bed5aff6f425d52e212006e9ad2de9aec3b9bfd4e'
+                        }]);
+                    }
+                });
+            }
+        };
+
+        //mockMailer
+        mockMailer = {
+            send: function(email, subject, message) {
+                return new Promise(function(resolve, reject) {
+                    if (email === 'jonwadeuk@gmail.com') {
+                        resolve();
+                    }
+                    else if (email === 'jonwadeukgmail.com') {
+                        reject();
+                    }
+                });
+            }
+        };
+
+        mockery.registerMock('../db/database.js', mockDb);
+        mockery.registerMock('../utils/mailer.js', mockMailer);
+
+
+        passwordRecovery = require('./../app/utils/password-recovery.js');
+        done();
+
+    });
+
+    afterEach(function(done) {
+        mockery.deregisterAll();
+        mockery.disable();
+        done();
+    });
+
+    it('on successful mailing of password, it should return object containing a successMessage property...', function(done) {
+        passwordRecovery.go('57786733eeb287e63a404933', 'jonwadeuk@gmail.com', mongooseConfig.userTest).then(function(res) {
+            res.should.be.a('object');
+            res.should.have.a.property('successMessage');
+            done();
+        }, function(rej) {
+            should.have(rej, null);
+            done();
+        });
+    });
+
+    it('should return an object with an errorMessage property if email address is incorrectly formatted...', function(done) {
+        passwordRecovery.go('57786733eeb287e63a404933', 'jonwadeukgmail.com', mongooseConfig.userTest).then(function(res) {
+            should.have(res, null);
+            done();
+        }, function(rej) {
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            done();
+        });
+    });
+
+    it('should return an object with an errorMessage if no match in the database against the submitted id...', function(done) {
+        passwordRecovery.go('1234567', 'jonwadeuk@gmail.com', mongooseConfig.userTest).then(function(res) {
+            should.have(res, null);
+            done();
+        }, function(rej) {
+            rej.should.be.a('object');
+            rej.should.have.a.property('errorMessage');
+            done();
+        })
+    });
+
+
+
+
+});
+
 describe('index.js unit test', function() {
 
     console.log('still need to isolate express dependencies for index.js test...');
 
-    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock, deleteSiteMock, editSiteMock;
+    var mongooseConfigMock, app, index, loginMock, emailVerificationMock, usernameVerificationMock, usernameRecoveryMock, passwordRecoveryMock, registrationMock, passwordUpdateMock, addSiteMock, siteListMock, retrieveSiteMock, deleteSiteMock, editSiteMock;
     beforeEach(function(done) {
         mockery.enable({
             useCleanCache: true,
@@ -1221,6 +1323,29 @@ describe('index.js unit test', function() {
                     else {
                         reject({
                             errorMessage: 'No username found that matches _id.'
+                        });
+                    }
+                });
+            }
+
+        };
+
+        passwordRecoveryMock = {
+            go: function(id, email, model) {
+                return new Promise(function(resolve, reject) {
+                    if (email === 'jonwadeukgmail.com') {
+                        reject({
+                            errorMessage: 'Email incorrectly formatted'
+                        });
+                    }
+                    else if (id === '57786733eeb287e63a404933') {
+                        resolve({
+                            successMessage: 'Password link has been successfully dispatched by the mailer program.'
+                        });
+                    }
+                    else {
+                        reject({
+                            errorMessage: 'No user found that matches _id.'
                         });
                     }
                 });
@@ -1335,11 +1460,14 @@ describe('index.js unit test', function() {
             }
         };
 
+
+
         mockery.registerMock('./db/mongoose-config.js', mongooseConfigMock);
         mockery.registerMock('./utils/login.js', loginMock);
         mockery.registerMock('./utils/email-verification.js', emailVerificationMock);
         mockery.registerMock('./utils/username-verification.js', usernameVerificationMock);
         mockery.registerMock('./utils/username-recovery.js', usernameRecoveryMock);
+        mockery.registerMock('./utils/password-recovery.js', passwordRecoveryMock);
         mockery.registerMock('./utils/registration.js', registrationMock);
         mockery.registerMock('./utils/password-update.js', passwordUpdateMock);
         mockery.registerMock('./utils/add-site.js', addSiteMock);
@@ -1481,6 +1609,51 @@ describe('index.js unit test', function() {
 
         chai.request(app)
             .post('/username-recovery')
+            .send({_id: '5773272b231c75eb281e4460', email: 'jonwadeukgmail.com'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+
+    });
+
+    it('On POST /password-recovery, on success should return return an object with a successMessage property with a status 200...', function(done) {
+        chai.request(app)
+            .post('/password-recovery')
+            .send({_id : '57786733eeb287e63a404933', email: 'jonwadeuk@gmail.com'})
+            .end(function(err, res) {
+                should.equal(err, null);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('successMessage');
+                res.body.successMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /password-recovery, on _id error should return an object with an errorMessage property with a status 404...', function(done) {
+        chai.request(app)
+            .post('/password-recovery')
+            .send({_id : '12386733eeb287e63a404933', email: 'jonwadeuk@gmail.com'})
+            .end(function(err, res) {
+                res.should.have.status(404);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('errorMessage');
+                res.body.errorMessage.should.be.a('string');
+                done();
+            });
+    });
+
+    it('On POST /password-recovery, on email format failure should return an object with a errorMessage property with a status 404...', function(done) {
+
+        chai.request(app)
+            .post('/password-recovery')
             .send({_id: '5773272b231c75eb281e4460', email: 'jonwadeukgmail.com'})
             .end(function(err, res) {
                 res.should.have.status(404);

@@ -8,11 +8,11 @@
             <h2 id="password" ng-click="toggle('password')" ng-class="{selected: password}">Password</h2>
 
 
-            <!--recover username form -->
+            <!--recover username/password form -->
             <form ng-show="email" name="emailForm" id="emailForm" novalidate ng-submit="submit()">
 
                 <!-- email field -->
-                <input type="email" ng-model="emailInput" ng-model-options="{debounce: 500}" name="emailInput" id="emailInput" required email placeholder="Enter registered email address">
+                <input type="email" ng-model="emailInput"  name="emailInput" id="emailInput" ng-model-options="{debounce: 500}" required email placeholder="Enter registered email address">
 
                 <!-- email error messages -->
                 <div class="errorMessages" ng-show="emailForm.emailInput.$touched && emailForm.emailInput.$error.required">
@@ -25,58 +25,8 @@
                 </div>
             </form>
 
-            <!--changePassword form -->
-            <form id="changePasswordForm" ng-show="changePassword" name="changePasswordForm" novalidate>
-
-                <!-- username field -->
-                <input type="text" ng-model="usernameInput" ng-model-options="{debounce: 500}" name="usernameInput" id="usernameInput" required placeholder="Enter registered username">
-
-                <!-- username error messages -->
-                <div class="errorMessages" ng-show="changePasswordForm.usernameInput.$touched && changePasswordForm.usernameInput.$error.required">
-                    <img src="../img/sign-warning-icon.png" alt="warning icon">
-                    <p class="errorText">Please input a username.</p>
-                </div>
-
-                <!-- email field -->
-                <input type="email" ng-model="pwEmailInput" id="pwEmailInput" ng-model-options="{debounce: 500}" name="pwEmailInput" required placeholder="Enter registered email address" ng-disabled="!usernameInput" ng-show="usernameInput">
-
-                <!-- email error messages -->
-                <div class="errorMessages" ng-show="usernameInput && changePasswordForm.pwEmailInput.$touched && changePasswordForm.pwEmailInput.$error.required">
-                    <img src="../img/sign-warning-icon.png" alt="warning icon">
-                    <p class="errorText">Please input an email address.</p>
-                </div>
-
-                <!-- password field -->
-                <input type="password" ng-model="passwordInput" name="passwordInput" id="passwordInput" required placeholder="Enter new password" ng-pattern="regex" ng-model-options="{debounce: 500}" ng-disabled="!pwEmailInput" ng-show="pwEmailInput">
-
-                <!-- password error messages -->
-                <div class="errorMessages" ng-show="pwEmailInput && changePasswordForm.passwordInput.$error.pattern">
-                    <img src="../img/sign-warning-icon.png" alt="warning icon">
-                    <p class="errorText">Password should be at least 8 characters, contain at least one number and at least one letter.</p>
-                </div>
-                <div class="errorMessages" ng-show="pwEmailInput && changePasswordForm.passwordInput.$touched && changePasswordForm.passwordInput.$error.required">
-                    <img src="../img/sign-warning-icon.png" alt="warning icon">
-                    <p class="errorText">Please input a password.</p>
-                </div>
-
-
-                <!-- password confirm field -->
-                <input type="password" ng-model="passwordConfirm" name="passwordConfirm" id="passwordConfirm" required placeholder="Confirm password" ng-model-options="{debounce: 500}" ng-disabled="!passwordInput" ng-pattern="passwordInput" ng-show="passwordInput">
-
-                <!-- confirm password error messages -->
-                <div class="errorMessages" ng-show="passwordInput && changePasswordForm.passwordConfirm.$error.pattern">
-                    <img src="../img/sign-warning-icon.png" alt="warning icon">
-                    <p class="errorText">Passwords do not match, please re-enter.</p>
-                </div>
-                <div class="errorMessages" ng-show="passwordInput && changePasswordForm.passwordConfirm.$touched && changePasswordForm.passwordConfirm.$error.required">
-                    <img src="../img/sign-warning-icon.png" alt="warning icon">
-                    <p class="errorText">Please confirm your password.</p>
-                </div>
-
-            </form>
-
             <!--help me button -->
-            <button id="helpMe" type="button" ng-disabled="!emailInput && !passwordConfirm || helpMeClicked" ng-click="helpMe()">Help Me!</button>
+            <button id="helpMe" type="button" ng-disabled="!emailInput || helpMeClicked" ng-click="helpMe()">Help Me!</button>
             <br>
         </div>
 
@@ -91,11 +41,10 @@
             <p>There was a problem trying to send your username to you. Please try again later…</p>
         </div>
 
-
         <!-- password success and error messages -->
         <div class="displayMessage" id="passwordSuccessMessage" ng-show="passwordSuccessMessage">
             <h1>Yay!!</h1>
-            <p>Your password has been changed. Go back to the homepage to login.</p>
+            <p>We've emailed a password recovery link to your registered email address. Check out your inbox.</p>
         </div>
         <div class="displayMessage" id="passwordErrorMessage" ng-show="passwordErrorMessage">
             <h1>Oh No!</h1>

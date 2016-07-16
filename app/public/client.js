@@ -156,6 +156,12 @@ client.config(function($routeProvider, $locationProvider) {
                 controller: 'addSite'
             })
 
+        .when('/change-password',
+            {
+                templateUrl: './change-password/change-password.html',
+                controller: 'changePassword'
+            })
+
 
         .otherwise({redirectTo: '/'});
 
@@ -252,12 +258,10 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
         $location.path(destination);
     };
 
-
     //these handle the toggle function
     $scope.username = false;
     $scope.password = false;
     $scope.email = false;
-
 
     $scope.changePassword = false;
 
@@ -266,13 +270,11 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
             $scope.username = true;
             $scope.password = false;
             $scope.email = true;
-            $scope.changePassword = false;
         }
         else if (input==='password') {
             $scope.username = false;
             $scope.password = true;
-            $scope.email = false;
-            $scope.changePassword = true;
+            $scope.email = true;
         }
     };
 
@@ -292,7 +294,7 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
         $scope.helpMeClicked = true;
 
         //if its username recovery via email
-        if ($scope.email) {
+        if ($scope.username) {
 
             //then call the api endpoint /username-recovery
             apiPOST.callAPI('/username-recovery', {_id: _id, email: $scope.emailInput})
@@ -307,30 +309,23 @@ client.controller('forgotten', ['$scope', 'idStore', '$rootScope', '$location', 
                     $scope.emailErrorMessage = true;
                 });
         }
-        else if($scope.changePassword) {
+        else if($scope.password) {
 
-            var username = $scope.usernameInput;
-
-            //hash password and email address
-            var hashedEmail = CryptoJS.SHA256($scope.pwEmailInput).toString(CryptoJS.enc.Hex);
-            var hashedPassword = CryptoJS.SHA256($scope.passwordInput).toString(CryptoJS.enc.Hex);
-
-            //then call a new /update-password endpoint
-            //console.log('calling /update-password endpoint');
-            apiPOST.callAPI('/update-password', {username: username, email: hashedEmail, password: hashedPassword}).then(function(){
-                //successfully updated password in db
-                //console.log('res=', res);
-                $scope.ui=false;
-                $scope.passwordSuccessMessage = true;
-            }, function() {
-                //error updating password in db
-                //console.log('rej=', rej);
-                $scope.ui=false;
-                $scope.passwordErrorMessage = true;
-            });
+            //then call the api endpoint /password-recovery
+            apiPOST.callAPI('/password-recovery', {_id: _id, email: $scope.emailInput})
+                .then(function() {
+                    //successful password recovery
+                    //hide the ui and display the message
+                    $scope.ui=false;
+                    $scope.passwordSuccessMessage = true;
+                }, function(rej) {
+                    //error in password recovery
+                    console.log('rej=', rej);
+                    $scope.ui=false;
+                    $scope.passwordErrorMessage = true;
+                });
         }
     };
-
 }]);
 
 client.controller('register', ['$scope', 'idStore', '$rootScope', '$location', 'apiPOST', '$interval', function($scope, idStore, $rootScope, $location, apiPOST, $interval) {
@@ -526,6 +521,20 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
                 //console.log('rej=', rej);
             });
     };
+
+}]);
+
+client.controller('changePassword', ['$scope', '$rootScope', '$location', function($scope, $rootScope, $location) {
+
+    $rootScope.title = 'Password Vault | Password';
+
+    $scope.go = function (destination) {
+        $location.path(destination);
+    };
+
+    $scope.id = $location.search().id;
+
+    console.log('$scope.id=', $scope.id);
 
 }]);
 

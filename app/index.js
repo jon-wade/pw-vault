@@ -7,6 +7,7 @@ var mongooseConfig = require('./db/mongoose-config.js');
 var login = require('./utils/login.js');
 var emailVerification = require('./utils/email-verification.js');
 var usernameRecovery = require('./utils/username-recovery.js');
+var passwordRecovery = require('./utils/password-recovery.js');
 var usernameVerification = require('./utils/username-verification.js');
 var registration = require('./utils/registration.js');
 var passwordUpdate = require('./utils/password-update.js');
@@ -62,10 +63,22 @@ app.post('/username-recovery', jsonParser, function(req, res) {
         });
 });
 
+app.post('/password-recovery', jsonParser, function(req, res) {
+    passwordRecovery.go(req.body._id, req.body.email, mongooseConfig.userDev)
+        .then(function(success) {
+            //console.log('success=', success);
+            res.status(200).send(success);
+        }, function(error) {
+            //console.log('error=', error);
+            res.status(404).send(error);
+        });
+});
+
 app.post('/create', jsonParser, function(req, res) {
     registration.create(req.body.username, req.body.password, req.body.email, mongooseConfig.userDev)
         .then(function(success) {
             //console.log('success.data._id=', success.data._id);
+            //noinspection JSUnresolvedVariable
             res.status(200).send(success.data._id);
         }, function(error) {
             //console.log('error=', error);
@@ -76,6 +89,7 @@ app.post('/create', jsonParser, function(req, res) {
 app.post('/update-password', jsonParser, function(req, res) {
     passwordUpdate.go(req.body.username, req.body.email, req.body.password, mongooseConfig.userDev).then(function(success) {
         //console.log('success=', success);
+        //noinspection JSUnresolvedVariable
         res.status(200).send(success.data._id);
     }, function(error) {
         //console.log('error=', error);

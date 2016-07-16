@@ -732,47 +732,43 @@ describe('client.js unit test', function() {
             expect(location.path).toHaveBeenCalledWith('/test');
         });
 
-        it('$scope.toggle("username") and $scope.username=true should set $scope.username=true, $scope.password=false, $scope.email = true and $scope.changePassword=false', function() {
+        it('$scope.toggle("username") and $scope.username=true should set $scope.username=true, $scope.password=false, $scope.email = true...', function() {
             scope.username=true;
             scope.password=false;
             scope.toggle('username');
             expect(scope.username).toBe(true);
             expect(scope.password).toBe(false);
             expect(scope.email).toBe(true);
-            expect(scope.changePassword).toBe(false);
         });
 
-        it('$scope.toggle("username") and $scope.username=false should set $scope.username=true, $scope.password=false, $scope.email = true, $scope.changePassword=false', function() {
+        it('$scope.toggle("username") and $scope.username=false should set $scope.username=true, $scope.password=false, $scope.email = true...', function() {
             scope.username=false;
             scope.password=true;
             scope.toggle('username');
             expect(scope.username).toBe(true);
             expect(scope.password).toBe(false);
             expect(scope.email).toBe(true);
-            expect(scope.changePassword).toBe(false);
         });
 
-        it('$scope.toggle("password") and $scope.password=false should set $scope.password=true, $scope.username=false, $scope.email = false & scope.changePassword=true', function() {
+        it('$scope.toggle("password") and $scope.password=false should set $scope.password=true, $scope.username=false, $scope.email = true...', function() {
             scope.username=true;
             scope.password=false;
             scope.toggle('password');
             expect(scope.username).toBe(false);
             expect(scope.password).toBe(true);
-            expect(scope.email).toBe(false);
-            expect(scope.changePassword).toBe(true);
+            expect(scope.email).toBe(true);
         });
 
-        it('$scope.toggle("password") and $scope.password=true should set $scope.password=true, $scope.username=false, $scope.email = false and $scope.changePassword=true', function() {
+        it('$scope.toggle("password") and $scope.password=true should set $scope.password=true, $scope.username=false, $scope.email = true...', function() {
             scope.username=false;
             scope.password=true;
             scope.toggle('password');
             expect(scope.username).toBe(false);
             expect(scope.password).toBe(true);
-            expect(scope.email).toBe(false);
-            expect(scope.changePassword).toBe(true);
+            expect(scope.email).toBe(true);
         });
 
-        it('should initially correctly set the valued of $scope.ui, $scope.emailSuccessMessage and $scope.emailErrorMessage', function() {
+        it('should initially correctly set the value of $scope.ui, $scope.emailSuccessMessage and $scope.emailErrorMessage', function() {
             expect(scope.ui).toBe(true);
             expect(scope.emailSuccessMessage).toBe(false);
             expect(scope.emailErrorMessage).toBe(false);
@@ -782,6 +778,7 @@ describe('client.js unit test', function() {
             //mock _id and email
             idStr.set_id('1234');
             //console.log(idStr.get_id());
+            scope.username = true;
             scope.email = true;
             scope.emailInput = 'jonwadeuk@gmail.com';
 
@@ -801,11 +798,38 @@ describe('client.js unit test', function() {
 
         }));
 
+        it('On success $scope.helpMe() and $scope.password=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /password-recovery api endpoint with a successful response... ', inject(function($httpBackend) {
+            //mock _id and email
+            idStr.set_id('1234');
+            //console.log(idStr.get_id());
+            scope.password = true;
+            scope.email = true;
+            scope.emailInput = 'jonwadeuk@gmail.com';
+
+            var response = {};
+            $httpBackend.expect('POST', '/password-recovery', {_id: '1234', email: 'jonwadeuk@gmail.com'}).respond(200, response, null, 'success');
+
+            scope.helpMe();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(scope.ui).toBe(false);
+            expect(scope.passwordSuccessMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+
+
         it('On failure $scope.helpMe() and $scope.email=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /username-recovery api endpoint with a failure response... ', inject(function($httpBackend) {
             //mock _id and email
             idStr.set_id('4321');
             scope.emailInput = 'jonwadeuk@gmail.com';
             scope.email = true;
+            scope.username = true;
 
             var response = {};
             $httpBackend.expect('POST', '/username-recovery', {_id: '4321', email: 'jonwadeuk@gmail.com'}).respond(404, response, null, 'error');
@@ -823,7 +847,30 @@ describe('client.js unit test', function() {
 
         }));
 
-        it('On success $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with a successful response... ', inject(function($httpBackend) {
+        it('On failure $scope.helpMe() and $scope.password=true should get the _id from idStore, set $scope.helpMeClicked to true, and call the /password-recovery api endpoint with a failure response... ', inject(function($httpBackend) {
+            //mock _id and email
+            idStr.set_id('4321');
+            scope.password = true;
+            scope.email = true;
+            scope.emailInput = 'jonwadeuk@gmail.com';
+
+            var response = {};
+            $httpBackend.expect('POST', '/password-recovery', {_id: '4321', email: 'jonwadeuk@gmail.com'}).respond(404, response, null, 'error');
+
+            scope.helpMe();
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(scope.ui).toBe(false);
+            expect(scope.passwordErrorMessage).toBe(true);
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        xit('On success $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with a successful response... ', inject(function($httpBackend) {
             //mock _id and email
             spyOn(CryptoJS, 'SHA256').and.callThrough();
             spyOn(idStr, 'get_id');
@@ -853,7 +900,7 @@ describe('client.js unit test', function() {
 
         }));
 
-        it('On failure $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with an error response... ', inject(function($httpBackend) {
+        xit('On failure $scope.helpMe() and $scope.changePassword=true should get the _id from idStore, set $scope.helpMeClicked to true, should hash the email and password input fields using SHA256 and call the /update-password api endpoint with an error response... ', inject(function($httpBackend) {
             //mock _id and email
             spyOn(CryptoJS, 'SHA256').and.callThrough();
             spyOn(idStr, 'get_id');
@@ -882,9 +929,6 @@ describe('client.js unit test', function() {
             $httpBackend.verifyNoOutstandingExpectation();
 
         }));
-
-
-
 
     });
 
@@ -1082,6 +1126,43 @@ describe('client.js unit test', function() {
 
     });
 
+    describe('changePassword controller unit test 1', function() {
+        var $controller;
+
+        beforeEach(inject(function(_$controller_) {
+            $controller = _$controller_;
+        }));
+
+        it('...)', inject(function($httpBackend) {
+
+            //mock services
+            var $scope = {};
+            var $rootScope = {};
+            var $location = {
+                path: function() {},
+                search: function() {
+                    return {id: '12345'};
+                }
+            };
+
+            $controller('changePassword', {$scope: $scope, $rootScope: $rootScope, $location: $location});
+
+
+            spyOn($scope, 'go');
+
+            $scope.go('/test');
+
+
+            expect($rootScope.title).toBe('Password Vault | Password');
+            expect($scope.go).toHaveBeenCalledWith('/test');
+            expect($scope.id).toBe('12345');
+
+
+        }));
+
+    });
+
+
     describe('routing unit test', function() {
         it('should load the home template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
             $httpBackend.whenGET('./home/home.html').respond('...');
@@ -1189,6 +1270,22 @@ describe('client.js unit test', function() {
             $httpBackend.flush();
             expect($route.current.controller).toBe("addSite");
             expect($route.current.loadedTemplateUrl).toBe("./add-site/add-site.html");
+
+            $httpBackend.verifyNoOutstandingRequest();
+            $httpBackend.verifyNoOutstandingExpectation();
+
+        }));
+
+        it('should load the change-password template and controller', inject(function($location, $rootScope, $httpBackend, $route) {
+            $httpBackend.whenGET('./change-password/change-password.html').respond('...');
+
+            $rootScope.$apply(function() {
+                $location.path('/change-password');
+            });
+
+            $httpBackend.flush();
+            expect($route.current.controller).toBe("changePassword");
+            expect($route.current.loadedTemplateUrl).toBe("./change-password/change-password.html");
 
             $httpBackend.verifyNoOutstandingRequest();
             $httpBackend.verifyNoOutstandingExpectation();
