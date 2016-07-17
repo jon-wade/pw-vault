@@ -17,7 +17,7 @@
                 <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key" ng-show="passwordInput" ng-model-option="{debounce: 1000}">
 
                 <div id="addSiteMessage" ng-show="keyInput">
-                    <h2>WARNING. Please Read This!</h2>
+                    <h2>Please Read This!</h2>
                     <p>The one thing you MUST remember is your encryption key. It is never stored by the app and you will NOT be able retrieve your username and password for this site if you forget it.</p>
                 </div>
 
@@ -26,6 +26,7 @@
 
                 <!-- cancel button -->
                 <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/manager')">Cancel</button>
+                <div id="spacer">&nbsp;</div>
 
             </form>
         </div>

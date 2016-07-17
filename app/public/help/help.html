@@ -17,11 +17,11 @@
                 <li class="question">You say I only have to remember one key, but can I use a different key to store different site details?</li>
                 <li class="answer">Yes you can, if you choose, use a different key for different site records. It's up to you.</li>
                 <li class="question">But, I also have to remember my username and password for Password Vault, as well as my key...</li>
-                <li class="answer">True, true, but if you do forget either your username or password for Password Vault, you can recover them here. So the only thing you absolutely have to remember is your encryption key.</li>
+                <li class="answer">True, true, but if you do forget either your username or password for Password Vault, you can recover them <a title="recover username or password" href="/forgotten">here</a>. So the only thing you absolutely have to remember is your encryption key.</li>
                 <li class="question">Is the encryption key ever stored on my computer or sent over the internet?</li>
                 <li class="answer">Absolutely not, the encryption key is held in memory only so long as its value is in the encryption key field. It's never stored in a database, a file or any other data structure and it's never transmitted to the server.</li>
                 <li class="question">So what is sent over the internet?</li>
-                <li class="answer">The only un-encrypted data sent over the internet is your email address, username and the name your give to your sites in the site list. However your email address and username are both securely encrypted before they are stored in the database. The only data stored in plaintext in the database is the name of your site record.</li>
+                <li class="answer">The only un-encrypted data sent over the internet is your email address, username and the name you give to your sites in the site list. However your email address and username are both securely encrypted before they are stored in the database. The only data stored in plaintext in the database is the name of your site record.</li>
                 <li class="question">How is the data encrypted?</li>
                 <li class="answer">
                     <p>There are two encryption methods used in the app.</p>
@@ -32,12 +32,10 @@
                 </li>
                 <li class="question">OK, you told me not to forget my encryption key, but I have. What can I do?</li>
                 <li class="answer">Ummm...unfortunately you will not be able to retrieve details for any site encrypted with that key. Your only option is to contact the actual site in question and request a new username and / or password. You can delete the site entry in Password Vault and when you have new username and password details you can create a new site record in Password Vault with your new log-on credentials. We cannot recover your encryption key, ever!</li>
-                <li class="question">Love the screen backgrounds, where is that?</li>
-                <li class="answer">Apparently it's <a href="https://en.wikipedia.org/wiki/Antelope_Canyon" title="Antelope Canyon Wikipedia">Antelope Canyon</a>, Arizona, USA. Never been there, but it looks awesome right?</li>
-
             </ul>
             <!-- back button -->
-            <button id="back" type="button" ng-click="go('/manager')">Back to Manager</button>
+            <button id="back" type="button" ng-click="go('/manager')">Back</button>
+            <div id="spacer">&nbsp;</div>
         </div>
     </div>
 </div>

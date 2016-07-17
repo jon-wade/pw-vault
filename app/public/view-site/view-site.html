@@ -12,12 +12,13 @@
 
                 <h2>Key</h2>
                 <!-- encryption key field -->
-                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption/decryption key">
+                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter key">
 
                 <button type="submit" id="decryptButton" ng-show="encrypted" ng-click="decrypt()" ng-disabled="!keyInput || disableButton" ng-class="{incorrect: incorrectKey}">Decrypt</button>
                 <button type="submit" id="encryptButton" ng-show="!encrypted" ng-click="encrypt()" ng-disabled="">Re-encrypt</button>
                 <button type="button" id="deleteButton" ng-click="delete()">Delete</button>
                 <button type="button" id="backButton" ng-click="go('/manager')">Back</button>
+                <div id="spacer">&nbsp;</div>
             </form>
         </div>
     </div>

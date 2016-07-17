@@ -64,6 +64,7 @@
                 <!-- register and cancel button -->
                 <button type="submit" id="registerButton" name="registerButton" ng-disabled="!passwordConfirm">Register</button>
                 <button type="button" id="cancelButton" name="cancelButton" ng-click="go('/')">Cancel</button>
+                <div id="spacer">&nbsp;</div>
             </form>
         </div>
         <!-- registration and error confirmation here -->
@@ -72,12 +73,14 @@
             <p>You have successfully registered for Password Vault.</p>
             <p class="message">Click the button to enter the vault.</p>
             <button type="button" ng-click="go('/manager')">Enter</button>
+            <div id="spacer">&nbsp;</div>
         </div>
         <div id="errorMessage" ng-show="registrationError">
             <h1>Oh no...!!!</h1>
             <p>Sorry! We’ve had a problem processing your registration. You’ll have to try again - gutted!!<p>
             <p class="message">Click the button to return to the homepage.</p>
             <button type="button" ng-click="go('/home')"></button>
+            <div id="spacer">&nbsp;</div>
         </div>
     </div>
 </div>

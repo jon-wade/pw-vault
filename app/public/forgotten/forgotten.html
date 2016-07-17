@@ -1,7 +1,7 @@
 <div id="forgotten">
     <div class="container">
         <div id="ui" ng-show="ui">
-            <h1 id="title">I've forgotten my...</h1>
+            <h1 id="title">Recover my...</h1>
 
             <!-- toggle buttons -->
             <h2 id="username" ng-click="toggle('username')" ng-class="{selected: username}">Username</h2>
@@ -12,7 +12,7 @@
             <form ng-show="email" name="emailForm" id="emailForm" novalidate ng-submit="submit()">
 
                 <!-- email field -->
-                <input type="email" ng-model="emailInput"  name="emailInput" id="emailInput" ng-model-options="{debounce: 500}" required email placeholder="Enter registered email address">
+                <input type="email" ng-model="emailInput"  name="emailInput" id="emailInput" ng-model-options="{debounce: 500}" required email placeholder="Enter your email address">
 
                 <!-- email error messages -->
                 <div class="errorMessages" ng-show="emailForm.emailInput.$touched && emailForm.emailInput.$error.required">

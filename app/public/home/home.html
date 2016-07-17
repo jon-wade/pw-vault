@@ -1,7 +1,8 @@
-<div id="home">
+<div id="home" class="main">
+    <h1 id="title">Password Vault</h1>
     <div id="login">
         <div class="container">
-            <h1>Login</h1>
+            <h2>Login</h2>
 
             <!-- main form here --->
             <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
@@ -42,8 +43,8 @@
     </div>
     <div id="welcome">
         <div class="container">
-            <h1 id="title">Password Vault</h1>
-            <h2>Only ever memorise one password!</h2>
+            <h2>About Password Vault</h2>
+            <p>Only ever memorise one password!</p>
             <p>Securely store all your passwords using an internationally recognised, hyper-secure encryption algorithm, AES.</p>
             <p>The encryption key is neither stored by the app nor sent over the internet. Only you know it, EVER, and it’s the ONLY thing you have to remember to securely store ALL your online passwords.</p>
             <button id="registerButton" ng-click="go('/register')">Register</button>

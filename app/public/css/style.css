@@ -1,12 +1,22 @@
 /* general rules */
 
 body, html {
-    background-color: black;
+    /*background-color: black;*/
     color: white;
     box-sizing: border-box;
-    border:0;
-    margin:0;
-    padding:0;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: black; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(black, darkslategrey); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(black, darkslategray); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(black, darkslategray); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(black, darkslategray); /* Standard syntax */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: 'Exo 2', Arial, sans-serif;
+    font-weight: 300;
 }
 
 a:link, a:hover, a:visited {
@@ -17,62 +27,25 @@ a:link, a:hover, a:visited {
     text-align: center;
 }
 
-/* background styles */
-
-div#home, div#registration, div#forgotten, div#manager, div#addSite, div#viewSite, div#changePassword {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    min-height: 100vh;
+h1 {
+    font-family: 'Audiowide', Arial, sans-serif;
 }
 
-div#home {
-    background: url('../img/home-background.jpg');
+h2 {
+    font-family: 'Armata', Helvetica, sans-serif;
 }
 
-div#registration {
-    background: url('../img/registration-background.jpg');
-}
-
-div#forgotten {
-    background: url('../img/forgotten-background.jpg');
-}
-
-div#viewSite {
-    background: url('../img/view-site-background.jpg');
-}
-
-div#manager {
-    background: url('../img/manager-background.jpg');
-}
-
-div#addSite {
-    background: url('../img/add-site-background.jpg');
-}
-
-div#changePassword {
-    background: url('../img/change-password-background.jpg');
-}
-
-div#help {
-    background: url('../img/help-background.jpg');
-    background-attachment: fixed;
-}
-
-/* layout divs */
-
-div#login, div#welcome {
-    width:49%;
-    margin-top: 200px;
-    /*border: 1px dashed white;*/
-}
+/* general layout divs */
 
 div.container {
     width: 60%;
     margin: 0 auto;
-    /*border: 1px dashed yellow;*/
 }
 
+div#login, div#welcome {
+    width:49%;
+    margin-top: 50px;
+}
 
 div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList, div.changePasswordForm {
     width: 60%;
@@ -80,7 +53,7 @@ div.registrationForm, div#ui, div#managerList, div.addSiteForm, div#siteList, di
     /*border: 1px dashed white;*/
 }
 
-div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title, div#siteList h1#title, div.changePasswordForm h1#title {
+div#home h1#title, div.registrationForm h1#title, div#ui h1#title, div#managerList h1#title, div.addSiteForm h1#title, div#siteList h1#title, div.changePasswordForm h1#title {
     margin-top: 0px;
     padding-top: 120px;
     text-align: center;
@@ -103,7 +76,7 @@ div.displayMessage, div#registrationMessages, div#emailSuccessMessage, div#addSi
 
 div.displayMessage h1, div#registrationMessages h1, div#emailSuccessMessage h1, div#addSiteErrorMessage h1 {
     margin-top: 0px;
-    padding-top: 325px;
+    padding-top: 250px;
     font-size: 4em;
 }
 
@@ -123,7 +96,12 @@ div#ui h2, div#managerList h2, div#siteList h2 {
 
     margin: 0 auto 30px auto;
     border-radius: 5px;
-    background-color: grey;
+    background-color: rebeccapurple;
+}
+
+div#ui h2 {
+    background-color: transparent;
+    border: white 3px solid;
 }
 
 div#siteList h2 {
@@ -132,8 +110,8 @@ div#siteList h2 {
 }
 
 div#ui h2.selected {
-    background-color: rebeccapurple;
-    border: 3px solid black;
+    background-color: orange;
+    border: 3px solid white;
 }
 
 div#welcome {
@@ -146,7 +124,7 @@ div#login {
 
 div#manager a {
     font-size: 0.9em;
-    margin-top: 100px;
+    margin-top: 25px;
 }
 
 /* form elements */
@@ -187,11 +165,11 @@ div.registrationForm button, div#ui button, div.container button#back, div#manag
 }
 
 div#login button#submitButton {
-    margin: 100px auto 0 auto;
+    margin: 27.5% auto 0 auto;
 }
 
 div#welcome button#registerButton {
-    margin: 104px auto 0 auto;
+    margin: 30% auto 0 auto;
 }
 
 button#decryptButton.incorrect {
@@ -222,10 +200,10 @@ div#addSiteMessage h2 {
     padding: 5px 40px 15px 40px;
 }
 
-div#helpContent {
-    padding: 0 50px 20px 50px;
-    background-color: rgba(0,0,0,0.5);
-}
+/*div#helpContent {*/
+    /*padding: 0 50px 20px 50px;*/
+    /*background-color: rgba(0,0,0,0.5);*/
+/*}*/
 
 div#helpContent ul {
     padding-left: 0px;
@@ -252,7 +230,7 @@ div#helpContent a {
 }
 
 div#helpContent li.answer a {
-    font-size: 0.9em;
+    font-size: 1em;
 }
 
 
@@ -276,7 +254,7 @@ div#managerList ul li {
 }
 
 div#managerList ul li:hover {
-    background-color: rebeccapurple;
+    background-color: orange;
 }
 
 div#managerList p {
@@ -313,6 +291,103 @@ div.errorMessages p {
     padding: 8px 10px 5px 5px;
     margin: 0 0 5px 0;
     vertical-align: middle;
+}
+
+div#spacer {
+    height: 50px;
+    padding-bottom: 20px;
+    opacity: 0;
+}
+
+
+@media screen and (max-width: 1024px) {
+    div#login button#submitButton {
+        margin: 38.5% auto 0 auto;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    div#login button#submitButton {
+        margin: 96.5% auto 0 auto;
+    }
+
+    #addSiteMessage p {
+        padding: 5px 5% 15px 5%;
+    }
+
+    #addSiteMessage {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+}
+
+@media screen and (max-width: 425px) {
+
+    div#login {
+        float: none;
+        width: 100%;
+        margin-top: 50px;
+    }
+
+    div#home h1#title, div#manager h1#title, div#addSite h1#title, div#addSiteErrorMessage h1, div#emailSuccessMessage h1, div#emailErrorMessage h1, div#passwordErrorMessage h1, div#passwordSuccessMessage h1, div#registrationMessages h1, div#errorMessage h1, div.changePasswordForm h1#title {
+        padding-top: 85px;
+    }
+
+    div#ui h1#title, div.changePasswordForm h1#title {
+        padding-top: 35px;
+    }
+
+    div#login h2 {
+        text-align: center;
+    }
+
+    div#login button#submitButton {
+        margin: 17.5% auto 0 auto;
+    }
+
+    div#welcome {
+        float: none;
+        width: 100%;
+        margin-top: 150px;
+        margin-bottom: 65px;
+    }
+
+    div#welcome h2 {
+        text-align: center;
+    }
+
+    div#welcome a {
+        padding-bottom: 100px;
+    }
+
+    div#welcome div.container p {
+        text-align: justify;
+        font-size: 0.9em;
+    }
+
+    div#managerList, div.addSiteForm, div#siteList, div#helpContent, div#ui, div.registrationForm, div.changePasswordForm {
+        width: 100%;
+    }
+
+    div#manager div.container, div#addSite div.container {
+        width: 70%;
+    }
+
+    #addSiteMessage {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #addSiteMessage p {
+        padding: 5px 5% 15px 5%;
+    }
+
+    div#addSiteErrorMessage p, div#emailSuccessMessage p, div#emailErrorMessage p, div#passwordSuccessMessage p, div#passwordErrorMessage p, div#registrationMessages p, div#errorMessage p {
+        font-size: 1.3em;
+    }
+
 }
 
 
