@@ -24,7 +24,7 @@ exports.go = function(id, email, model) {
                 //check if hashedemail and email field are the same
                 if(hashedemail === res[0].email) {
                     //there is a match, send a password recovery link to the registered email address
-                    mailer.send(email, 'Password Vault Password Recovery', 'Hi there - you recently requested to reset your password. Please click this link to start the password reset process: http://localhost:8080/change-password?id=' + id + '. Best, Password Vault')
+                    mailer.send(email, 'Password Vault Password Recovery', 'Hi there - you recently requested to reset your password. Please click this link to start the password reset process: http://pv.uk/change-password?id=' + id + '. Best, Password Vault')
                         .then(function(res) {
                             //successful mailing
                             resolve({

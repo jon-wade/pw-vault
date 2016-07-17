@@ -222,7 +222,7 @@ div#helpContent li.answer {
     list-style: none;
 }
 
-div#helpContent a {
+div#helpContent a, div#welcome div.container p a {
     font-size: 1em;
     margin: 0;
     color: white;

@@ -38,15 +38,15 @@
                 <button type="submit" id="submitButton" name="submitButton" ng-disabled="!passwordInput || !usernameInput">Log In</button>
             </form>
 
-            <a id="forgotten" href="/forgotten">Forgotten your PV username or password?</a>
+            <a id="forgotten" href="/forgotten">Forgotten your Password Vault username or password?</a>
         </div>
     </div>
     <div id="welcome">
         <div class="container">
             <h2>About Password Vault</h2>
             <p>Only ever memorise one password!</p>
-            <p>Securely store all your passwords using an internationally recognised, hyper-secure encryption algorithm, AES.</p>
-            <p>The encryption key is neither stored by the app nor sent over the internet. Only you know it, EVER, and it’s the ONLY thing you have to remember to securely store ALL your online passwords.</p>
+            <p>Securely store all your passwords using an internationally recognised, hyper-secure encryption algorithm, <a href="/help" title="learn about AES">AES</a>.</p>
+            <p>The <a href="/help" title="learn about encryption keys">encryption key</a> is neither stored by the app nor sent over the internet. Only you know it, EVER, and it’s the ONLY thing you have to remember to securely store ALL your online passwords.</p>
             <button id="registerButton" ng-click="go('/register')">Register</button>
             <a id="registerLink" href="/register">New to Password Vault? Click this link or the register button above.</a>
         </div>

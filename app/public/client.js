@@ -517,7 +517,6 @@ client.controller('viewSite', ['$scope', '$rootScope', '$location', 'managerIdSt
                     $timeout(function() {$scope.incorrectKey = false;}, 3000);
                 }
             }
-
         };
 
         $scope.encrypt = function() {
