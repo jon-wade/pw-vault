@@ -1,9 +1,15 @@
 //mongoose/mongodb set-up
 var mongoose = require('mongoose');
+var secret = require('../utils/secret.js');
+
+var username = secret.dbcredentials().get_Username();
+var password = secret.dbcredentials().get_Password();
+
+var dev = 'mongodb://' + username + ':' + password + '@localhost:27017/pw-vault-dev';
 
 var environment = {
     production: "",
-    development: "mongodb://localhost:27017/pw-vault-dev",
+    development: dev
     //test: "mongodb://localhost:27018/pw-vault-test"
 };
 
