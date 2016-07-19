@@ -1,7 +1,7 @@
 #Password Vault
 Thinkful (https://www.thinkful.com/) end of course portfolio project - a responsive MEAN stack app to securely store online username and passwords.
 
-![Screenshots](http://jonwade.digital/hosted-projects/github-images/password-vault-screenshot.jpg)
+![Screenshots](http://jonwade.digital/hosted-projects/github-images/password-vault-screenshot.png)
 
 #Introduction
 Password Vault allow you to securely save all the usernames and passwords you use online in one place.
