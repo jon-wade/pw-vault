@@ -7,10 +7,10 @@
             <!-- main form here --->
             <form novalidate id="loginForm" name="loginForm" ng-submit="submit()" autocomplete="off">
                 <div id="username">
-                    <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="" autocomplete="off">
+                    <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="" autocomplete="off" maxlength="50">
                 </div>
                 <div id="password">
-                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" required="" ng-pattern="regex" ng-disabled="" autocomplete="off">
+                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" required="" ng-pattern="regex" ng-disabled="" autocomplete="off" maxlength="50">
                 </div>
                 <!--error messages here-->
                 <div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">

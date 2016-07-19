@@ -12,7 +12,7 @@
             <form ng-show="email" name="emailForm" id="emailForm" novalidate ng-submit="submit()">
 
                 <!-- email field -->
-                <input type="email" ng-model="emailInput"  name="emailInput" id="emailInput" ng-model-options="{debounce: 500}" required email placeholder="Enter your email address">
+                <input type="email" ng-model="emailInput"  name="emailInput" id="emailInput" ng-model-options="{debounce: 500}" required email placeholder="Enter your email address" maxlength="50">
 
                 <!-- email error messages -->
                 <div class="errorMessages" ng-show="emailForm.emailInput.$touched && emailForm.emailInput.$error.required">

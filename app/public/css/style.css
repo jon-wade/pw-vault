@@ -68,6 +68,17 @@ div#siteList h1#title, div#help h1#title {
     padding-top: 70px;
 }
 
+div#siteList h1#title {
+    max-width: 100%;
+    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    white-space: pre-wrap;       /* css-3 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+    word-break: normal;
+    white-space: normal;
+}
 
 
 div.displayMessage, div#registrationMessages, div#emailSuccessMessage, div#addSiteErrorMessage {
@@ -249,11 +260,15 @@ div#managerList ul {
 div#managerList ul li {
     list-style: none;
     text-align: center;
-    padding: 10px 0 10px 0;
+    padding: 10px 20px;
     cursor: pointer;
     font-size: 1.3em;
     background-color: rgba(255,255,255,0.3);
     margin-top: 10px;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 div#managerList ul li:hover {

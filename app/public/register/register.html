@@ -6,7 +6,7 @@
             <form id="registrationForm" name="registrationForm" novalidate ng-submit="register()">
 
                 <!-- username field -->
-                <input type="text" id="usernameInput" ng-model="usernameInput" ng-model-options="{debounce: 500}" name="usernameInput" required user-reg="" placeholder="username">
+                <input type="text" id="usernameInput" ng-model="usernameInput" ng-model-options="{debounce: 500}" name="usernameInput" required user-reg="" placeholder="username" maxlength="50">
 
                 <!-- username error messages -->
                 <div class="errorMessages" ng-show="registrationForm.usernameInput.$error.username">
@@ -19,7 +19,7 @@
                 </div>
 
                 <!-- email field -->
-                <input type="email" id="emailInput" ng-model="emailInput" ng-model-options="{debounce:500}" name="emailInput" required ng-disabled="!usernameInput" email-reg="" placeholder="email">
+                <input type="email" id="emailInput" ng-model="emailInput" ng-model-options="{debounce:500}" name="emailInput" required ng-disabled="!usernameInput" email-reg="" placeholder="email" maxlength="50">
 
                 <!-- email error messages -->
                 <div class="errorMessages" ng-show="registrationForm.emailInput.$error.email">
@@ -32,7 +32,7 @@
                 </div>
 
                 <!-- password field -->
-                <input type="password" id="passwordInput" ng-model="passwordInput" ng-model-options="{debounce: 500}" name="passwordInput" required ng-pattern="regex" ng-disabled="!emailInput" placeholder="password">
+                <input type="password" id="passwordInput" ng-model="passwordInput" ng-model-options="{debounce: 500}" name="passwordInput" required ng-pattern="regex" ng-disabled="!emailInput" placeholder="password" maxlength="50">
 
                 <!-- password error messages -->
                 <div class="errorMessages" ng-show="registrationForm.passwordInput.$error.pattern">
@@ -48,7 +48,7 @@
                 <div id="confirmPassword" ng-show="passwordInput && (!registrationForm.passwordInput.$error.required && !registrationForm.passwordInput.$error.pattern)">
 
                     <!-- confirm password field -->
-                    <input type="password" id="passwordConfirm" ng-model="passwordConfirm" ng-model-options="{debounce:500}" name="passwordConfirm" required ng-pattern="{{passwordInput}}" ng-disabled="!passwordInput" placeholder="confirm password">
+                    <input type="password" id="passwordConfirm" ng-model="passwordConfirm" ng-model-options="{debounce:500}" name="passwordConfirm" required ng-pattern="{{passwordInput}}" ng-disabled="!passwordInput" placeholder="confirm password" maxlength="50">
 
                     <!-- confirm password error messages -->
                     <div class="errorMessages" ng-show="registrationForm.passwordConfirm.$error.pattern">

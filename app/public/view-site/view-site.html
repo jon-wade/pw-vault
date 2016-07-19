@@ -4,15 +4,15 @@
             <h1 id="title" ng-bind="sitename"></h1>
             <form id="decryptForm" name="decryptForm" novalidate autocomplete="off">
                 <h2>Username</h2>
-                <input ng-show="encrypted" value="***************" ng-disabled="true" autocomplete="off">
-                <input id="usernameInput" name="usernameInput" ng-model="usernameInput" ng-show="!encrypted" value="{{usernameInput}}" autocomplete="off">
+                <input ng-show="encrypted" value="***************" ng-disabled="true" autocomplete="off" maxlength="50">
+                <input id="usernameInput" name="usernameInput" ng-model="usernameInput" ng-show="!encrypted" value="{{usernameInput}}" autocomplete="off" maxlength="50">
                 <h2>Password</h2>
-                <input ng-show="encrypted" value="***************" ng-disabled="true" autocomplete="off">
-                <input id="passwordInput" name="passwordInput" ng-model="passwordInput" ng-show="!encrypted" value="{{passwordInput}}" autocomplete="off">
+                <input ng-show="encrypted" value="***************" ng-disabled="true" autocomplete="off" maxlength="50">
+                <input id="passwordInput" name="passwordInput" ng-model="passwordInput" ng-show="!encrypted" value="{{passwordInput}}" autocomplete="off" maxlength="50">
 
                 <h2>Key</h2>
                 <!-- encryption key field -->
-                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter key" autocomplete="off">
+                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter key" autocomplete="off" maxlength="50">
 
                 <button type="submit" id="decryptButton" ng-show="encrypted" ng-click="decrypt()" ng-disabled="!keyInput || disableButton" ng-class="{incorrect: incorrectKey}">Decrypt</button>
                 <button type="submit" id="encryptButton" ng-show="!encrypted" ng-click="encrypt()" ng-disabled="">Re-encrypt</button>
