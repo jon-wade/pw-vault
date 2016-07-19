@@ -13,7 +13,8 @@ Why is this app useful? A typical internet user will need to remember a huge num
 
 #UX
 
-To follow.
+![Initial Wireframes](http://jonwade.digital/hosted-projects/github-images/password-vault-wireframe-1.png)
+![Registration User Flow] (http://jonwade.digital/hosted-projects/github-images/password-vault-registration-userflow.jpg)
 
 #Live Site
 You can access Password Vault at http://pw-vault.com
