@@ -5,12 +5,12 @@
             <h2>Login</h2>
 
             <!-- main form here --->
-            <form novalidate id="loginForm" name="loginForm" ng-submit="submit()">
+            <form novalidate id="loginForm" name="loginForm" ng-submit="submit()" autocomplete="off">
                 <div id="username">
-                    <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="">
+                    <input type="text" id="usernameInput" name="usernameInput" ng-model="usernameInput" placeholder="username" required="" autocomplete="off">
                 </div>
                 <div id="password">
-                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" required="" ng-pattern="regex" ng-disabled="">
+                    <input type="password" id="passwordInput" name="passwordInput" ng-model="passwordInput" placeholder="password" required="" ng-pattern="regex" ng-disabled="" autocomplete="off">
                 </div>
                 <!--error messages here-->
                 <div class="errorMessages" ng-show="loginForm.usernameInput.$touched && loginForm.usernameInput.$error.required" id="usernameMissing">

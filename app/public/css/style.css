@@ -123,8 +123,11 @@ div#login {
 }
 
 div#manager a {
-    font-size: 0.9em;
-    margin-top: 25px;
+    font-size: 1em;
+    margin: 25px auto;
+    background-color: firebrick;
+    padding: 12px 12px;
+    border-radius: 5px;
 }
 
 /* form elements */

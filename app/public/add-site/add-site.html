@@ -2,19 +2,18 @@
     <div class="container">
         <div class="addSiteForm" ng-show="addSiteForm">
             <h1 id="title">Add Site</h1>
-            <form id="addSiteForm" name="addSiteForm" novalidate ng-submit="addSite()">
-
+            <form id="addSiteForm" name="addSiteForm" novalidate ng-submit="addSite()" autocomplete="off">
                 <!-- sitename field -->
-                <input type="text" id="sitenameInput" ng-model="sitenameInput" name="sitenameInput" required placeholder="Enter site name">
+                <input type="text" id="sitenameInput" ng-model="sitenameInput" name="sitenameInput" required placeholder="Enter site name" autocomplete="off">
 
                 <!-- username field -->
-                <input type="text" id="usernameInput" ng-model="usernameInput" name="usernameInput" required placeholder="Enter username to save">
+                <input type="text" id="usernameInput" ng-model="usernameInput" name="usernameInput" required placeholder="Enter username to save" autocomplete="off">
 
                 <!--- password field --->
-                <input type="password" id="passwordInput" ng-model="passwordInput" name="passwordInput" required placeholder="Enter password to save">
+                <input type="password" id="passwordInput" ng-model="passwordInput" name="passwordInput" required placeholder="Enter password to save" autocomplete="off">
 
                 <!-- encryption key field -->
-                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key" ng-show="passwordInput" ng-model-option="{debounce: 1000}">
+                <input type="password" id="keyInput" ng-model="keyInput" name="keyInput" required placeholder="Enter encryption key" ng-show="passwordInput" ng-model-option="{debounce: 1000}" autocomplete="off">
 
                 <div id="addSiteMessage" ng-show="keyInput">
                     <h2>Please Read This!</h2>
