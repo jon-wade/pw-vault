@@ -1,22 +1,22 @@
-*Password Vault*
+#Password Vault
 Thinkful end of course portfolio project - a responsive MEAN stack app to securely store online username and passwords.
 
-*Introduction*
+#Introduction
 Password Vault allow you to securely save all the usernames and passwords you use online in one place.
 You only need to remember one thing - an encryption key. This can be a number, a word, or a phrase. This key securely encrypts all your other usernames and passwords, meaning you only have to remember that one key, not the hundreds of passwords you use day to day.
 It is very important to never forget that key, it's not stored anywhere in the app and if you do forget it, you will not be able to retrieve your saved usernames and passwords.
 
-*Use Case*
+#Use Case
 Why is this app useful? A typical internet user will need to remember a huge number of, supposedly, unique usernames and passwords to access the sites they visit day-to-day. Any site that requires registration will typically have a username and password associated to it. Whilst browsers have implemented password and username storage protocols, these methods provide risk in the situation where a user's computer is accessed without permission (through theft, hacking etc). Password Vault is designed to provide an easy-to-use, secure method of storing usernames and passwords without relying on the browser or other insecure storage methods (files, offline records etc).
 
-*UX*
+#UX
 
 To follow.
 
-*Live Site*
+#Live Site
 You can access Password Vault at http://pw-vault.com
 
-*Technical*
+#Technical
 * The app is built using the MEAN stack. The front-end is built using AngularJS, the back-end using NodeJS with ExpressJS as the web server and MongoDB as the database.
 * All routing is handled in the front-end by Angular.
 * Extensive form validation and error handling is demonstrated throughout the app. On the front-end, field type, value, length etc is validated using HTML5 and Angular ng-model and ng-pattern. Directives are used to ensure usernames and email addresses are not duplicated in the database. On the back-end a Mongoose schema provides further error checking for field values and uniqueness.
