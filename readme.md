@@ -1,6 +1,8 @@
 #Password Vault
 Thinkful (https://www.thinkful.com/) end of course portfolio project - a responsive MEAN stack app to securely store online username and passwords.
 
+![Screenshots](http://jonwade.digital/hosted-projects/github-images/password-vault-screenshot.jpg)
+
 #Introduction
 Password Vault allow you to securely save all the usernames and passwords you use online in one place.
 You only need to remember one thing - an encryption key. This can be a number, a word, or a phrase. This key securely encrypts all your other usernames and passwords, meaning you only have to remember that one key, not the hundreds of passwords you use day to day.
@@ -21,6 +23,8 @@ You can access Password Vault at http://pw-vault.com
 * The app is fully responsive, adapting for mobile, table and desktop viewports.
 * All routing is handled in the front-end by Angular.
 * Extensive form validation and error handling is demonstrated throughout the app. On the front-end, field type, value, length etc is validated using HTML5 and Angular ng-model and ng-pattern. Angular directives are used to ensure usernames and email addresses are checked in real-time and not duplicated in the database. On the back-end a Mongoose schema provides further error checking for field values and uniqueness.
+* A fully-featured user registration system in integral to the application, with user registration and username / password recovery functionality provided.
+* Server-side email functionality is provide by Nodemailer (https://github.com/nodemailer/nodemailer).
 * An extensive API has been built to provide database access to the Angular app using ExpressJS, with 12 separate endpoints constructed.
 * The app is fully unit tested on the front and back-end. For the Angular testing a combination of Karma and Jasmine has been used. For the back-end, Mocha and Chai, with extensive use of the Mockery (https://github.com/padraic/mockery) library which provides excellent abilities to truly mock-out require dependencies.
 * E2E testing has been accomplished through the use of Protractor and the Selenium webdriver.
