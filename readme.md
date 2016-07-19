@@ -3,15 +3,15 @@ Thinkful (https://www.thinkful.com/) end of course portfolio project - a respons
 
 ![Screenshots](http://jonwade.digital/hosted-projects/github-images/password-vault-screenshot.png)
 
-#Introduction
+##Introduction
 Password Vault allow you to securely save all the usernames and passwords you use online in one place.
 You only need to remember one thing - an encryption key. This can be a number, a word, or a phrase. This key securely encrypts all your other usernames and passwords, meaning you only have to remember that one key, not the hundreds of passwords you use day to day.
 It is very important to never forget that key, it's not stored anywhere in the app and if you do forget it, you will not be able to retrieve your saved usernames and passwords.
 
-#Use Case
+##Use Case
 Why is this app useful? A typical internet user will need to remember a huge number of, supposedly, unique usernames and passwords to access the sites they visit day-to-day. Any site that requires registration will typically have a username and password associated to it. Whilst browsers have implemented password and username storage protocols, these methods provide risk in the situation where a user's computer is accessed without permission (through theft, hacking etc). Password Vault is designed to provide an easy-to-use, secure method of storing usernames and passwords without relying on the browser or other insecure storage methods (files, offline records etc).
 
-#UX
+##UX
 
 Initial wireframes for the home page can be seen below. Wireframes of all key processes were designed along with data flow / decision trees for key data processing tasks.
 
@@ -19,10 +19,10 @@ Initial wireframes for the home page can be seen below. Wireframes of all key pr
 
 The app was designed to work on mobile as well as tablet and desktop from the outset. Error prompts using Angular's form validation features provides a helpful experience for users as they move through the application. A prominent 'help' message in the main manager screen leads through to instructions for using the site and a FAQ page, with the answer to commonly asked questions. Reminders are provided at key points of the process (for instance, when entering the encryption key into the input field) to ensure the user does not miss critical aspects of the site.
 
-#Live Site
+##Live Site
 You can access Password Vault at http://pw-vault.com
 
-#Technical
+##Technical
 * The app is built using the MEAN stack. The front-end is built using HTML5, CSS3 and AngularJS, the back-end using NodeJS with ExpressJS as the web server and MongoDB as the database.
 * The app is fully responsive, adapting for mobile, table and desktop viewports.
 * All routing is handled in the front-end by Angular.
